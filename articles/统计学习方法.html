@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="整理统计学习中的基本概念、模型、损失函数、优化和泛化问题。">
+  <title>统计学习方法笔记 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>统计学习方法笔记</span></h1>
+  <div class="postDesc">posted @ 2026-03-10 swilderyude 分类: <a href="../categories.html#ai-基础">AI 基础</a></div>
+  <p class="postSummary">整理统计学习中的基本概念、模型、损失函数、优化和泛化问题。</p>
+  <div class="postTags"><span>机器学习</span> <span>统计学习</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#监督学习">监督学习</a></li>
+<li class="toc-level-2"><a href="#统计学习">统计学习</a></li>
+<li class="toc-level-2"><a href="#分类">分类</a></li>
+<li class="toc-level-2"><a href="#三要素">三要素</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>本书以讨论离散变量的方法为主。 统计学习方法可以概括如下：从给定的、有限的、用于学习的训练数据（training data）集合出发，假设数据是独立同分布产生的；并且假设要学习的模型属于某个函数的集合，称为假设空间（hypothesis space）​；应用某个评价准则（evaluation criterion）​，从假设空间中选取一个最优模型，使它对已知的训练数据及未知的测试数据（test data）在给定的评价准则下有最优的预测；最优模型的选取由算法实现。 这样，统计学习方法包括模型的假设空间、模型选择的准则以及模型学习的算法。称其为统计学习方法的三要素，简称为模型（model）​、策略（strategy）和算法（algorithm）​。 实现统计学习方法的步骤如下：（1）得到一个有限的训练数据集合；（2）确定包含所有可能的模型的假设空间，即学习模型的集合；（3）确定模型选择的准则，即学习的策略；（4）实现求解最优模型的算法，即学习的算法；（5）通过学习方法选择最优模型；（6）利用学习的最优模型对新数据进行预测或分析。</p>
+<h1 id="监督学习">监督学习</h1>
+<h2 id="统计学习">统计学习</h2>
+<p><strong>监督学习</strong> （1）输入空间、特征空间和输出空间 集合或欧式空间 （2）联合概率分布 通常是独立同分布 （3）假设空间 模型属于由输入空间到输出空间的映射的集合，这个集合就是假设空间（hypothesis space）​。 <strong>无监督学习</strong> 假设X是输入空间，Z是隐式结构空间。要学习的模型可以表示为函数z=g（x）​，条件概率分布P（z|x）​，或者条件概率分布P（x|z）的形式，其中x∈X是输入，Z是输出。包含所有可能的模型的集合称为假设空间。无监督学习旨在从假设空间中选出在给定评价标准下的最优模型。 <strong>强化学习</strong> 强化学习的本质是学习最优的序贯决策。 <strong>半监督学习</strong> <strong>主动学习</strong> 主动学习（active learning）是指机器不断主动给出实例让教师进行标注，然后利用标注数据学习预测模型的机器学习问题。通常的监督学习使用给定的标注数据，往往是随机得到的，可以看作是“被动学习”​，主动学习的目标是找出对学习最有帮助的实例让教师标注，以较小的标注代价，达到较好的学习效果。</p>
+<h2 id="分类">分类</h2>
+<p><strong>概率</strong> 在无监督学习中，概率模型取条件概率分布形式P（z|x）或P（x|z）​，非概率模型取函数形式z=g（x）​，其中x是输入，z是输出。 条件概率分布最大化后得到函数，函数归一化后得到条件概率分布。 概率模型的代表是概率图模型（probabilistic graphical model）​，概率图模型是联合概率分布由有向图或者无向图表示的概率模型，而联合概率分布可以根据图的结构分解为因子乘积的形式。贝叶斯网络、马尔可夫随机场、条件随机场是概率图模型。 <strong>线性</strong> 大部分非概率模型可分为线性和非线性 <strong>参数</strong> 统计学习模型又可以分为参数化模型（parametric model）和非参数化模型（non-parametric model）​。参数化模型假设模型参数的维度固定，模型可以由有限维参数完全刻画；非参数化模型假设模型参数的维度不固定或者说无穷大，随着训练数据量的增加而不断增大。 <strong>算法</strong> 统计学习根据算法，可以分为在线学习（online learning）与批量学习（batch learning）​。在线学习是指每次接受一个样本，进行预测，之后学习模型，并不断重复该操作的机器学习。与之对应，批量学习一次接受所有数据，学习模型，之后进行预测。 利用随机梯度下降的感知机学习算法就是在线学习算法。 <strong>技巧</strong> 贝叶斯 核方法</p>
+<h2 id="三要素">三要素</h2>
+<p>方法=模型+策略+算法</p>
+<p>在监督学习过程中，模型就是所要学习的条件概率分布或决策函数。模型的假设空间（hypothesis space）包含所有可能的条件概率分布或决策函数。 函数族</p>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></div>
+<div><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></div>
+<div><a href="../articles/python学习.html">Python 学习笔记</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

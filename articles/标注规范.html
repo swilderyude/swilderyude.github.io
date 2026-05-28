@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="记录色斑、痘痣等类别的标注边界、质量控制和一致性要求。">
+  <title>人脸色斑检测标注规范 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>人脸色斑检测标注规范</span></h1>
+  <div class="postDesc">posted @ 2026-03-17 swilderyude 分类: <a href="../categories.html#项目实践">项目实践</a></div>
+  <p class="postSummary">记录色斑、痘痣等类别的标注边界、质量控制和一致性要求。</p>
+  <div class="postTags"><span>标注</span> <span>规范</span> <span>数据质量</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#类别定义与基础标注规则">1.类别定义与基础标注规则</a></li>
+<li class="toc-level-3"><a href="#spot">1.1spot</a></li>
+<li class="toc-level-3"><a href="#acne">1.2acne</a></li>
+<li class="toc-level-3"><a href="#mole">1.3mole</a></li>
+<li class="toc-level-3"><a href="#标注规则">标注规则</a></li>
+<li class="toc-level-2"><a href="#易混淆情况">2.易混淆情况</a></li>
+<li class="toc-level-3"><a href="#区分斑和痣">2.1区分斑和痣</a></li>
+<li class="toc-level-3"><a href="#不在这三类中">2.2不在这三类中</a></li>
+<li class="toc-level-2"><a href="#不需要标注但保留的图片">3.不需要标注但保留的图片</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>本项目需要标注以下三类目标：</p>
+<ol type="1">
+<li><p>spot —— 斑点</p></li>
+<li><p>acne —— 痘痘</p></li>
+<li><p>mole —— 黑痣</p></li>
+</ol>
+<p>全部是按个数标注。</p>
+<h2 id="类别定义与基础标注规则">1.类别定义与基础标注规则</h2>
+<h3 id="spot">1.1spot</h3>
+<p>斑 <strong>颜色</strong>： 浅褐色、黄褐色、咖啡色。 <strong>特征</strong>： 边界模糊、不规则。通常是成片出现（如雀斑）或大面积出现（如黄褐斑）。 <strong>立体感</strong>： 绝对平整，完全没有凸起。 <strong>判定技巧</strong>： 边缘像水彩画晕染开的、颜色比痣浅、形状不规则的，归为“斑”。</p>
+<h4 id="注意事项">注意事项：</h4>
+<ol type="1">
+<li>对于斑点是这种一片式的，标注这些脸上干净的，明显的，容易标注的斑点。</li>
+</ol>
+<div class="image-placeholder">图片未发布：Pasted image 20260316001714.png</div>
+<h3 id="acne">1.2acne</h3>
+<p>痘 <strong>颜色</strong>： 鲜红色、暗红色、淡粉色，或者带有黄白色的脓头。 <strong>特征</strong>： 伴有炎症反应（周围皮肤发红发亮）。 <strong>立体感</strong>： 明显的凸起。在侧光下会有阴影。 <strong>判定技巧</strong>： 只要是红色系且中心有隆起的，全部归为“痘”。</p>
+<h3 id="mole">1.3mole</h3>
+<p>痣 <strong>颜色</strong>： 深褐色、黑色、纯黑色。 <strong>特征</strong>： 边界非常清晰、锐利，形状通常趋于圆形或椭圆形。 <strong>立体感</strong>： 哪怕是平的痣，其色素分布通常非常均匀且深。 <strong>判定技巧</strong>： 颜色极深的、边缘不虚化的，优先标为“痣”。</p>
+<h3 id="标注规则">标注规则</h3>
+<p>人脸上肉眼可见的斑痘痣，都要<strong>按个数全部标注</strong>，不能<strong>漏标</strong>，对于不属于这三类的则不标注。</p>
+<h2 id="易混淆情况">2.易混淆情况</h2>
+<h3 id="区分斑和痣">2.1区分斑和痣</h3>
+<ol type="1">
+<li>按照边缘规则与否进行区分，绿色为斑，红色为痣。</li>
+</ol>
+<div class="image-placeholder">图片未发布：Pasted image 20260316004240.png</div>
+<ol start="2" type="1">
+<li>按照颜色均为深黑色或墨灰色，按照边界特征，下方那个点边缘非常锐利、清晰，上方那个点虽然边缘稍显模糊，但中心色核非常深且圆。按照视觉厚度二者均凸起，红色框均为痣。</li>
+</ol>
+<div class="image-placeholder">图片未发布：Pasted image 20260316004521.png</div>
+<h3 id="不在这三类中">2.2不在这三类中</h3>
+<p>此类为痘坑，无需标注</p>
+<div class="image-placeholder">图片未发布：Pasted image 20260316003849.png</div>
+<h2 id="不需要标注但保留的图片">3.不需要标注但保留的图片</h2>
+<p>图中无标注三类但不能删除。 这些图仍会用于模型训练中的背景学习。</p>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></div>
+<div><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></div>
+<div><a href="../articles/修改.html">检测与分割双模型协同方案</a></div>
+<div><a href="../articles/优化计划.html">人脸色斑检测优化计划</a></div>
+<div><a href="../articles/超市识别项目.html">超市识别项目：视频预处理、标注与 YOLO 训练</a></div>
+<div><a href="../articles/实验记录.html">人脸色斑检测实验记录</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/数据集.html">人脸色斑检测数据集整理笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

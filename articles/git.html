@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="整理 Git 常用命令、分支、提交和协作流程。">
+  <title>Git 使用笔记 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>Git 使用笔记</span></h1>
+  <div class="postDesc">posted @ 2026-03-15 swilderyude 分类: <a href="../categories.html#工具与环境">工具与环境</a></div>
+  <p class="postSummary">整理 Git 常用命令、分支、提交和协作流程。</p>
+  <div class="postTags"><span>Git</span> <span>版本控制</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#github上传文件">github上传文件</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>Git 是一款分布式的代码版本控制工具。 https://missing.csail.mit.edu/2020/version-control/ https://www.bilibili.com/video/BV1vy4y1s7k6/?vd_source=09869b1ec3841e2995a2d4fa3739cba5</p>
+<p>https://cbea.ms/git-commit/</p>
+<p>github https://docs.github.com/zh/get-started</p>
+<h1 id="github上传文件">github上传文件</h1>
+<p>（<a href="https://blog.csdn.net/qq_34082113/article/details/102998115">https://blog.csdn.net/qq_34082113/article/details/102998115</a>）</p>
+<p>cd ～/.ssh mkdir 创建新的目录（文件夹） git init 初始化当前目录为git 项目 git status 查看当前项目 git 状态 git add .  把当前路径及子路径下所有内容加入本地git 暂存区 或git add “文件名” git commit -m “初始化项目” / git commit -m “添加说明” 提交到暂存区 git remote add origin  xxx 添加一个远程仓库关联  网址ssh模式不需要密码 /git remote set-url origin xxx更改远程地址 git push -u origin master/main /git push git push -f origin master（强制会覆盖）</p>
+<p>git push</p>
+<p>添加大文件 先把超过50M的大文件分出来，把其他的按上述步骤传上去。 git lfs install 初始化 LFS（为当前仓库启用） git lfs track “文件名” Git LFS 跟踪 git add .gitattributes git add “文件名” git commit -m “添加大文件” git push origin master</p>
+<p>git branch -vv 查看分支信息 git remote -v 查看远程信息 git push –set-upstream origin master 把远程分支作为当前分支推送的关联分支 git config –global –unset http.version 清除git缓存） git上传大文件或添加文件 https://blog.csdn.net/wzk4869/article/details/131661472 git修改文件路径<a href="https://m.w3cschool.cn/githubcn/githubcn-dxoy3ato.html">https://m.w3cschool.cn/githubcn/githubcn-dxoy3ato.html</a> git添加文件</p>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></div>
+<div><a href="../articles/linux命令.html">Linux 命令笔记</a></div>
+<div><a href="../articles/远程服务器.html">远程服务器使用笔记</a></div>
+<div><a href="../articles/x-anylabeling.html">X-AnyLabeling 标注工具使用记录</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/latex.html">LaTeX 写作笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

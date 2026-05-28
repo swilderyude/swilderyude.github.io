@@ -1,0 +1,2612 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="围绕人脸色斑检测任务，整理数据匿名化、数据集结构、YOLO 训练、结果融合与 SDK 对接的完整工程记录。">
+  <title>人脸色斑检测项目：从数据处理到 SDK 封装 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>人脸色斑检测项目：从数据处理到 SDK 封装</span></h1>
+  <div class="postDesc">posted @ 2026-05-28 swilderyude 分类: <a href="../categories.html#项目实践">项目实践</a></div>
+  <p class="postSummary">围绕人脸色斑检测任务，整理数据匿名化、数据集结构、YOLO 训练、结果融合与 SDK 对接的完整工程记录。</p>
+  <div class="postTags"><span>YOLO</span> <span>小目标检测</span> <span>医学图像</span> <span>工程化</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#数据预处理">数据预处理</a></li>
+<li class="toc-level-1"><a href="#section">========================================**</a></li>
+<li class="toc-level-1"><a href="#界面-gui-设计部分">界面 (GUI) 设计部分</a></li>
+<li class="toc-level-1"><a href="#section-1">======================================</a></li>
+<li class="toc-level-1"><a href="#数据集">数据集</a></li>
+<li class="toc-level-2"><a href="#标签分类">标签分类</a></li>
+<li class="toc-level-3"><a href="#处理">处理</a></li>
+<li class="toc-level-1"><a href="#定义要处理的根目录">定义要处理的根目录</a></li>
+<li class="toc-level-2"><a href="#universe数据集未使用">Universe数据集（未使用）</a></li>
+<li class="toc-level-3"><a href="#单类">单类</a></li>
+<li class="toc-level-3"><a href="#总结">总结</a></li>
+<li class="toc-level-2"><a href="#医院数据集">医院数据集</a></li>
+<li class="toc-level-3"><a href="#数据标注">数据标注</a></li>
+<li class="toc-level-2"><a href="#训练前数据处理">训练前数据处理</a></li>
+<li class="toc-level-1"><a href="#section-2">**=======================</a></li>
+<li class="toc-level-1"><a href="#配置区">配置区</a></li>
+<li class="toc-level-1"><a href="#section-3">=========================</a></li>
+<li class="toc-level-3"><a href="#类似数据集">类似数据集</a></li>
+<li class="toc-level-1"><a href="#模型选择与训练">模型选择与训练</a></li>
+<li class="toc-level-3"><a href="#训练模型">训练模型</a></li>
+<li class="toc-level-3"><a href="#训练结果">训练结果</a></li>
+<li class="toc-level-3"><a href="#测试">测试</a></li>
+<li class="toc-level-1"><a href="#配置">=======** 配置 **=======</a></li>
+<li class="toc-level-1"><a href="#加载模型">=======** 加载模型 **=======</a></li>
+<li class="toc-level-1"><a href="#遍历-test">=======** 遍历 test **=======</a></li>
+<li class="toc-level-2"><a href="#划分数据集">划分数据集</a></li>
+<li class="toc-level-1"><a href="#数据集记录">数据集记录</a></li>
+<li class="toc-level-1"><a href="#section-4">**=======================</a></li>
+<li class="toc-level-1"><a href="#你需要修改的参数">你需要修改的参数</a></li>
+<li class="toc-level-1"><a href="#section-5">=========================</a></li>
+<li class="toc-level-1"><a href="#section-6">=========================</a></li>
+<li class="toc-level-1"><a href="#修改这些路径">修改这些路径</a></li>
+<li class="toc-level-1"><a href="#section-7">=========================</a></li>
+<li class="toc-level-1"><a href="#评估时判定预测正确的-iou-阈值">评估时判定预测正确的 IoU 阈值</a></li>
+<li class="toc-level-1"><a href="#指标">指标</a></li>
+<li class="toc-level-1"><a href="#改进">改进</a></li>
+<li class="toc-level-2"><a href="#app">app</a></li>
+<li class="toc-level-2"><a href="#sdk">SDK</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>https://blog.csdn.net/llf000000/article/details/134615520 借鉴博客yolo训练</p>
+<h1 id="数据预处理">数据预处理</h1>
+<ol type="1">
+<li>医院的图片数据需要做匿名化处理，把眼睛部分和嘴巴部分遮住。
+<ol type="a">
+<li>先用分割算法找出掩膜，然后用最小外接矩形覆盖上去。</li>
+<li>工业界常用的做法是“人脸关键点检测 (Facial Landmark Detection)”。</li>
+</ol></li>
+</ol>
+<p>选择b.<a href="https://blog.csdn.net/weixin_40062244/article/details/128283144">Mediapipe人脸关键点检测</a></p>
+<p>环境部署 Python环境：建议3.6版本以上 Python主要模块:opencv-contrib-python；numpy; pandas; matplotlib Python 主要模块：opencv-contrib-python;numpy;熊猫;Matplotlib MediaPipe模块:mediapipe MediaPipe 模块：mediapipe 安装方法：使用以下pip命令安装</p>
+<pre class="bash"><code>pip install mediapipe</code></pre>
+<p>测试环境：导入如下库，如果不报错说明导入成功</p>
+<pre class="python"><code>import cv2
+import mediapipe as mp
+import pandas as pd 
+import numpy as np 
+import matplotlib.pyplot as plt</code></pre>
+<p>若报错，运行冲突。</p>
+<pre class="bash"><code>pip install &quot;numpy&lt;2.0.0&quot;
+pip install &quot;opencv-python**4.9.0.80&quot; &quot;opencv-contrib-python**4.9.0.80&quot; &quot;opencv-python-headless**4.9.0.80&quot; &quot;ml-dtypes~=0.3.1&quot;</code></pre>
+<p>运行主代码</p>
+<p>```python title:“anonymize.py” import cv2<br />
+import mediapipe as mp<br />
+import os<br />
+import tkinter as tk<br />
+from tkinter import filedialog, messagebox<br />
+import threading</p>
+<p>def process_images(input_folder, output_folder, log_widget, start_button):<br />
+""“核心处理逻辑”""<br />
+try:<br />
+mp_face_mesh = mp.solutions.face_mesh<br />
+face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=10)</p>
+<pre><code>    LEFT_EYE = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246]  
+    RIGHT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]  
+    MOUTH = [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 185, 40, 39, 37, 0, 267, 269, 270, 409]  
+    BOTH_EYES = LEFT_EYE + RIGHT_EYE  
+    features_to_mask = [{&quot;name&quot;: &quot;eyes&quot;, &quot;indices&quot;: BOTH_EYES}, {&quot;name&quot;: &quot;mouth&quot;, &quot;indices&quot;: MOUTH}]  
+
+    # 获取所有图片  
+    valid_exts = (&#39;.jpg&#39;, &#39;.jpeg&#39;, &#39;.png&#39;, &#39;.bmp&#39;)  
+    files = [f for f in os.listdir(input_folder) if f.lower().endswith(valid_exts)]  
+
+    if not files:  
+        log_widget.insert(tk.END, &quot;⚠️ 输入文件夹中没有找到图片！\n&quot;)  
+        log_widget.see(tk.END)  
+        start_button.config(state=tk.NORMAL)  
+        return  
+
+    for idx, filename in enumerate(files):  
+        input_pic_path = os.path.join(input_folder, filename)  
+        output_pic_path = os.path.join(output_folder, filename)  
+
+        image = cv2.imread(input_pic_path)  
+        if image is None:  
+            continue  
+
+        h, w, _ = image.shape  
+        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  
+        results = face_mesh.process(rgb_image)  
+
+        if results.multi_face_landmarks:  
+            for face_landmarks in results.multi_face_landmarks:  
+                for feature in features_to_mask:  
+                    f_name = feature[&quot;name&quot;]  
+                    f_indices = feature[&quot;indices&quot;]  
+
+                    x_coords = [int(face_landmarks.landmark[i].x * w) for i in f_indices]  
+                    y_coords = [int(face_landmarks.landmark[i].y * h) for i in f_indices]  
+
+                    x_min, x_max = min(x_coords), max(x_coords)  
+                    y_min, y_max = min(y_coords), max(y_coords)  
+
+                    box_w, box_h = x_max - x_min, y_max - y_min  
+
+                    if f_name ** &quot;eyes&quot;:  
+                        pad_x, pad_y = int(box_w * 0.05), int(box_h * 0.6)  
+                    else:  
+                        pad_x, pad_y = int(box_w * 0.15), int(box_h * 0.20)  
+
+                    x_min, y_min = max(0, x_min - pad_x), max(0, y_min - pad_y)  
+                    x_max, y_max = min(w, x_max + pad_x), min(h, y_max + pad_y)  
+
+                    cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 0), -1)  
+
+            cv2.imwrite(output_pic_path, image)  
+            log_widget.insert(tk.END, f&quot;✅ [{idx + 1}/{len(files)}] 成功: {filename}\n&quot;)  
+        else:  
+            log_widget.insert(tk.END, f&quot;⚠️ [{idx + 1}/{len(files)}] 未检测到人脸: {filename}\n&quot;)  
+
+        # 实时更新滚动条  
+        log_widget.see(tk.END)  
+
+    face_mesh.close()  
+    log_widget.insert(tk.END, &quot;\n🎉 所有图片处理完毕！\n&quot;)  
+    messagebox.showinfo(&quot;完成&quot;, &quot;所有图片已成功打码！&quot;)  
+
+except Exception as e:  
+    log_widget.insert(tk.END, f&quot;\n❌ 发生错误: {str(e)}\n&quot;)  
+
+finally:  
+    # 恢复按钮可点击状态  
+    start_button.config(state=tk.NORMAL)  </code></pre>
+<h1 id="section">========================================**</h1>
+<h1 id="界面-gui-设计部分">界面 (GUI) 设计部分</h1>
+<h1 id="section-1"><strong>======================================</strong></h1>
+<p>class FaceAnonymizerApp:<br />
+def <strong>init</strong>(self, root):<br />
+self.root = root<br />
+self.root.title(“人脸隐私一键打码工具”)<br />
+self.root.geometry(“500x400”)</p>
+<pre><code>    self.input_folder = &quot;&quot;  
+    self.output_folder = &quot;&quot;  
+
+    # 标题  
+    tk.Label(root, text=&quot;🕶️ 人脸隐私自动打码工具&quot;, font=(&quot;Arial&quot;, 18, &quot;bold&quot;)).pack(pady=15)  
+
+    # 输入文件夹选择  
+    frame1 = tk.Frame(root)  
+    frame1.pack(pady=5, fill=tk.X, padx=20)  
+    tk.Button(frame1, text=&quot;1. 选择待打码图片文件夹&quot;, command=self.select_input, width=20).pack(side=tk.LEFT)  
+    self.lbl_input = tk.Label(frame1, text=&quot;未选择&quot;, fg=&quot;gray&quot;)  
+    self.lbl_input.pack(side=tk.LEFT, padx=10)  
+
+    # 输出文件夹选择  
+    frame2 = tk.Frame(root)  
+    frame2.pack(pady=5, fill=tk.X, padx=20)  
+    tk.Button(frame2, text=&quot;2. 选择保存结果文件夹&quot;, command=self.select_output, width=20).pack(side=tk.LEFT)  
+    self.lbl_output = tk.Label(frame2, text=&quot;未选择&quot;, fg=&quot;gray&quot;)  
+    self.lbl_output.pack(side=tk.LEFT, padx=10)  
+
+    # 开始按钮  
+    self.btn_start = tk.Button(root, text=&quot;🚀 开始批量打码&quot;, font=(&quot;Arial&quot;, 14), bg=&quot;#4CAF50&quot;,  
+                               command=self.start_task)  
+    self.btn_start.pack(pady=20)  
+
+    # 日志输出框  
+    self.log_text = tk.Text(root, height=10, width=60, bg=&quot;#f4f4f4&quot;)  
+    self.log_text.pack(padx=20, pady=5)  
+    self.log_text.insert(tk.END, &quot;请先选择文件夹，然后点击开始...\n&quot;)  
+
+def select_input(self):  
+    folder = filedialog.askdirectory(title=&quot;选择包含原始图片的文件夹&quot;)  
+    if folder:  
+        self.input_folder = folder  
+        self.lbl_input.config(text=f&quot;...{folder[-20:]}&quot;, fg=&quot;black&quot;)  
+
+def select_output(self):  
+    folder = filedialog.askdirectory(title=&quot;选择保存打码图片的文件夹&quot;)  
+    if folder:  
+        self.output_folder = folder  
+        self.lbl_output.config(text=f&quot;...{folder[-20:]}&quot;, fg=&quot;black&quot;)  
+
+def start_task(self):  
+    if not self.input_folder or not self.output_folder:  
+        messagebox.showwarning(&quot;提示&quot;, &quot;请先选择输入和输出文件夹！&quot;)  
+        return  
+
+    # 禁用按钮，防止重复点击  
+    self.btn_start.config(state=tk.DISABLED)  
+    self.log_text.insert(tk.END, &quot;\n⏳ 正在初始化 AI 模型，请稍候...\n&quot;)  
+    self.log_text.see(tk.END)  
+
+    # 开启一个新线程去跑代码  
+    threading.Thread(target=process_images,  
+                     args=(self.input_folder, self.output_folder, self.log_text, self.btn_start)).start()  </code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”:<br />
+root = tk.Tk()<br />
+app = FaceAnonymizerApp(root)<br />
+root.mainloop()</p>
+<pre><code>打包程序
+
+```bash
+pip install pyinstaller
+pyinstaller --windowed --noconfirm --collect-all mediapipe --exclude PyQt5 --exclude PyQt6 --exclude PySide6 --name &quot;FaceMasker&quot; app.py
+# 电脑环境里同时安装了 PyQt5、PyQt6、PySide6</code></pre>
+<h1 id="数据集">数据集</h1>
+<p><strong>启发</strong>（但是甲方多种光照无法实现） VISIA 图像分析原理 (医美行业标准) VISIA 是由美国 Canfield Scientific 公司开发的皮肤分析系统，是目前全球医美机构公认的检测标准。</p>
+<ul>
+<li><p><strong>核心原理参考</strong>：<strong>Canfield Scientific - Imaging Systems</strong></p>
+<ul>
+<li><p><strong>借鉴点</strong>：</p>
+<ol type="1">
+<li><p><strong>交叉偏振光 (Cross-Polarized Lighting)</strong>：这是检测色斑的核心技术。通过滤掉表皮的反射光，直接拍摄到真皮层和表皮深层的黑色素沉着。</p></li>
+<li><p><strong>UV 光成像</strong>：使用紫外光激发出皮肤黑色素的对比度，使肉眼看不见的潜伏斑清晰显现。</p></li>
+<li><p><strong>多光谱成像</strong>：区分血红蛋白（红色区）和黑色素（褐色区）。</p></li>
+</ol></li>
+<li><p><strong>参考网址</strong>：<a href="https://www.google.com/url?sa=E&amp;q=https%3A%2F%2Fwww.canfieldsci.com%2Fimaging-systems%2Fvisia-complexion-analysis%2F">Canfield Scientific - VISIA Complexion Analysis</a></p></li>
+</ul></li>
+</ul>
+<p>数据集文件夹结构 mydata：</p>
+<pre class="text"><code>zhao:.
+├──test
+│  ├──images
+│  └──labels
+└──train
+│  ├──images
+│  └──labels
+└──val
+   ├──images
+   └──labels</code></pre>
+<p>train（训练集）、valid（验证集）和 test（测试集）</p>
+<p>接受的文件： 类型：txt文件， 检测框类型：四边形</p>
+<p>原始数据集格式： json文件</p>
+<p>检测框类型： 标注的检测框为矩形框</p>
+<h2 id="标签分类">标签分类</h2>
+<p>网上数据集中所有标签：斑点spots  痘点pimple  痣点moles 痤疮acne 色斑pigmentation 分类只有三类 斑（斑点spots、色斑pigmentation） 痘（痘点pimple、痤疮acne） 痣（痣点moles）</p>
+<h3 id="处理">处理</h3>
+<ol type="1">
+<li><p>单个数据集筛选。将不需要的标注标签的txt和图片删除，图片上有多类，仅删除不需要的一类，保留需要的类。</p></li>
+<li><p>所有数据集标签一致。spot acne mole。data.yaml</p></li>
+<li><p>将数据集合并为一个，合并时类别顺序一致。先把类别的01调整好，或者不按照01进行分类，而是名称。合并仅针对txt，最后仅一个data.yaml</p></li>
+</ol>
+<p>单一数据集。 改类名，直接在data.yaml里修改。 改顺序或合并类，必须用 Python 脚本批量修改所有的 .txt 文件。nc: X（类别总数）也改掉。</p>
+<p>多个数据集合并。 文件夹层级合并 先删除json文件</p>
+<p>```python title:“delete.py” import os import glob</p>
+<h1 id="定义要处理的根目录">定义要处理的根目录</h1>
+<p>target_dirs = [‘train’, ‘valid’, ‘test’]</p>
+<p>def delete_json_files(): count = 0 for root_dir in target_dirs: # 构建搜索路径，匹配 images 文件夹下的所有 .json 文件 search_pattern = os.path.join(root_dir, ‘images’, ’*.json’)</p>
+<pre><code>    # 获取所有匹配的文件列表
+    json_files = glob.glob(search_pattern)
+    
+    for file_path in json_files:
+        try:
+            os.remove(file_path)
+            print(f&quot;已删除: {file_path}&quot;)
+            count += 1
+        except Exception as e:
+            print(f&quot;删除失败 {file_path}: {e}&quot;)
+            
+print(f&quot;\n操作完成！共删除了 {count} 个 JSON 文件。&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: # 确认当前目录下是否存在这些文件夹 exists = [d for d in target_dirs if os.path.exists(d)] if not exists: print(“错误：在当前路径下未找到 train/valid/test 文件夹，请检查运行位置。”) else: delete_json_files()</p>
+<pre><code>merge
+
+```python title:&quot;merge.py&quot;
+import os
+import shutil
+
+def merge_all_datasets():
+    # 最终合并到的目标文件夹
+    target_root = &#39;data&#39;
+    # 需要识别的标准子集
+    target_splits = [&#39;train&#39;, &#39;valid&#39;, &#39;test&#39;]
+    
+    # 统计数据
+    stats = {&#39;images&#39;: 0, &#39;json&#39;: 0, &#39;labels&#39;: 0, &#39;skipped&#39;: 0}
+
+    print(&quot;开始深度扫描并合并所有数据集...&quot;)
+
+    # 使用 os.walk 递归遍历当前目录下所有的文件夹
+    # 这可以确保无论数据集嵌套在几层目录下都能被找到
+    for root, dirs, files in os.walk(&#39;.&#39;):
+        
+        # 如果当前文件夹名字是 [&#39;train&#39;, &#39;valid&#39;, &#39;test&#39;] 之一
+        # 且我们不在目标文件夹 &#39;data&#39; 内部
+        dir_name = os.path.basename(root)
+        if dir_name in target_splits and target_root not in root:
+            
+            split = dir_name # train, valid 或 test
+            print(f&quot;发现数据集片段: {root}&quot;)
+
+            # 1. 处理 images 文件夹 (图片 + JSON)
+            src_img_dir = os.path.join(root, &#39;images&#39;)
+            if os.path.exists(src_img_dir):
+                dst_img_dir = os.path.join(target_root, split, &#39;images&#39;)
+                os.makedirs(dst_img_dir, exist_ok=True)
+                
+                for f in os.listdir(src_img_dir):
+                    if f.startswith(&#39;.&#39;): continue
+                    src_file = os.path.join(src_img_dir, f)
+                    dst_file = os.path.join(dst_img_dir, f)
+                    
+                    if not os.path.exists(dst_file):
+                        shutil.copy2(src_file, dst_file)
+                        if f.lower().endswith(&#39;.json&#39;): stats[&#39;json&#39;] += 1
+                        else: stats[&#39;images&#39;] += 1
+                    else:
+                        stats[&#39;skipped&#39;] += 1
+
+            # 2. 处理 labels 文件夹 (TXT)
+            src_lab_dir = os.path.join(root, &#39;labels&#39;)
+            if os.path.exists(src_lab_dir):
+                dst_lab_dir = os.path.join(target_root, split, &#39;labels&#39;)
+                os.makedirs(dst_lab_dir, exist_ok=True)
+                
+                for f in os.listdir(src_lab_dir):
+                    if f.startswith(&#39;.&#39;): continue
+                    src_file = os.path.join(src_lab_dir, f)
+                    dst_file = os.path.join(dst_lab_dir, f)
+                    
+                    if not os.path.exists(dst_file):
+                        shutil.copy2(src_file, dst_file)
+                        stats[&#39;labels&#39;] += 1
+                    else:
+                        stats[&#39;skipped&#39;] += 1
+
+    print(&quot;\n&quot; + &quot;=&quot;*40)
+    print(&quot;合并工作全部完成！&quot;)
+    print(f&quot;合并后的数据存放在: {os.path.abspath(target_root)}&quot;)
+    print(f&quot;成功合并图片: {stats[&#39;images&#39;]} 张&quot;)
+    print(f&quot;成功合并 JSON: {stats[&#39;json&#39;]} 个&quot;)
+    print(f&quot;成功合并 TXT 标签: {stats[&#39;labels&#39;]} 个&quot;)
+    print(f&quot;因同名跳过文件: {stats[&#39;skipped&#39;]} 个 (已去重)&quot;)
+    print(&quot;=&quot;*40)
+
+if __name__ ** &quot;__main__&quot;:
+    merge_all_datasets()</code></pre>
+<h2 id="universe数据集未使用">Universe数据集（未使用）</h2>
+<p><strong>一个小技巧</strong> 对于已经标注好的yolo文件txt，如何在X-AnyLabeling中显示标注框？ 1.准备好classes.txt文件 2.X-AnyLabeling界面<code>导入</code>-<code>导入yolo水平标注框</code>，导入classes.txt文件，再选择labels文件夹。 3.标注框显示。images文件夹里出现了json文件。 可能会出现的问题： txt文件不是utf-8，但文件确实是utf-8的格式。 是因为mac的隐藏文件也会被识别。要删除。</p>
+<pre class="bash"><code># 删除所有隐藏的 AppleDouble 文件 (以 ._ 开头的文件) 
+dot_clean . 
+# 删除所有的 .DS_Store 文件 
+find . -name &quot;.DS_Store&quot; -depth -exec rm {} \;</code></pre>
+<p>```python title:“delete.py” import os import shutil</p>
+<p>def deep_clean_hidden_files(start_path=‘.’): deleted_files_count = 0 deleted_dirs_count = 0</p>
+<pre><code>print(f&quot;开始从 {os.path.abspath(start_path)} 递归清理隐藏文件...\n&quot;)
+
+# os.walk 会遍历目录下所有的文件夹和文件
+# topdown=False 表示先处理子目录中的文件，再处理父目录，这样更安全
+for root, dirs, files in os.walk(start_path, topdown=False):
+    
+    # 1. 处理文件
+    for filename in files:
+        if filename.startswith(&#39;.&#39;):
+            file_path = os.path.join(root, filename)
+            try:
+                os.remove(file_path)
+                print(f&quot;已删除文件: {file_path}&quot;)
+                deleted_files_count += 1
+            except Exception as e:
+                print(f&quot;删除文件失败 {file_path}: {e}&quot;)
+
+    # 2. 处理文件夹 (可选：如果你也想删除像 .ipynb_checkpoints 这样的隐藏文件夹)
+    for dirname in dirs:
+        if dirname.startswith(&#39;.&#39;):
+            dir_path = os.path.join(root, dirname)
+            try:
+                # 使用 shutil.rmtree 删除整个文件夹
+                shutil.rmtree(dir_path)
+                print(f&quot;已删除目录: {dir_path}&quot;)
+                deleted_dirs_count += 1
+            except Exception as e:
+                print(f&quot;删除目录失败 {dir_path}: {e}&quot;)
+
+print(&quot;-&quot; * 40)
+print(f&quot;清理完成！&quot;)
+print(f&quot;共删除隐藏文件: {deleted_files_count} 个&quot;)
+print(f&quot;共删除隐藏目录: {deleted_dirs_count} 个&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: # 确认提示（防止误删） confirm = input(“该操作将递归删除当前目录下所有以 ‘.’ 开头的文件和文件夹。确认继续吗？(y/n):”) if confirm.lower() ** ‘y’: deep_clean_hidden_files() else: print(“操作已取消。”)</p>
+<pre><code>
+### 多类
+
+采用的数量：8824
+**1**.acne  6类（acne mole1 mole2 pimple scar spot）3239张
+[1](https://universe.roboflow.com/buyumedatasets/acne-new)
+
+&gt; 筛选：mole1和2合并为moles，pimple合并到acne，spot保留，scar删除。
+
+```python title:&quot;alter.py&quot;
+import os
+import json
+
+def process_full_dataset():
+    label_dir = &#39;labels&#39;
+    image_dir = &#39;images&#39;
+    img_exts = [&#39;.jpg&#39;, &#39;.jpeg&#39;, &#39;.png&#39;, &#39;.bmp&#39;, &#39;.webp&#39;]
+
+    # 1. TXT 映射 (旧 ID : 新 ID) - 顺序: spot(0), acne(1), mole(2)
+    txt_mapping = {
+        &#39;5&#39;: &#39;0&#39;, # spot -&gt; spot
+        &#39;0&#39;: &#39;1&#39;, # acne -&gt; acne
+        &#39;3&#39;: &#39;1&#39;, # pimple -&gt; acne
+        &#39;1&#39;: &#39;2&#39;, # mole1 -&gt; mole
+        &#39;2&#39;: &#39;2&#39;  # mole2 -&gt; mole
+    }
+
+    # 2. JSON 映射 (旧类名 : 新类名)
+    json_mapping = {
+        &#39;spot&#39;: &#39;spot&#39;,
+        &#39;acne&#39;: &#39;acne&#39;,
+        &#39;pimple&#39;: &#39;acne&#39;,
+        &#39;mole1&#39;: &#39;mole&#39;,
+        &#39;mole2&#39;: &#39;mole&#39;
+    }
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        print(&quot;错误：请确保脚本位于 images 和 labels 文件夹同级目录下！&quot;)
+        return
+
+    txt_files = [f for f in os.listdir(label_dir) if f.endswith(&#39;.txt&#39;) and f != &#39;classes.txt&#39;]
+    
+    count_kept = 0
+    count_deleted = 0
+
+    print(f&quot;开始同步处理 TXT 和 JSON 文件...&quot;)
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- A. 处理 TXT 内容 ---
+        new_txt_lines = []
+        try:
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5 and parts[0] in txt_mapping:
+                    parts[0] = txt_mapping[parts[0]]
+                    new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;读取 TXT 出错 {txt_name}: {e}&quot;)
+            continue
+
+        # --- B. 处理 JSON 内容 (如果存在) ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                # 过滤并修改 shapes 列表
+                new_shapes = []
+                for shape in data.get(&#39;shapes&#39;, []):
+                    old_label = shape.get(&#39;label&#39;)
+                    if old_label in json_mapping:
+                        shape[&#39;label&#39;] = json_mapping[old_label]
+                        new_shapes.append(shape)
+                
+                # 更新 JSON 数据
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except Exception as e:
+                print(f&quot;处理 JSON 出错 {json_path}: {e}&quot;)
+
+        # --- C. 执行文件更新或删除 ---
+        # 只要 TXT 处理后为空，就认为该图片不需要了（即使 JSON 里可能有别的）
+        if not new_txt_lines:
+            # 1. 删 TXT
+            if os.path.exists(txt_path): os.remove(txt_path)
+            # 2. 删 JSON
+            if os.path.exists(json_path): os.remove(json_path)
+            # 3. 删图片
+            for ext in img_exts:
+                img_path = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_path):
+                    os.remove(img_path)
+                    break
+            count_deleted += 1
+        else:
+            # 1. 保存修改后的 TXT
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # 2. 保存修改后的 JSON (如果原本有 JSON)
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            
+            count_kept += 1
+
+    # D. 更新 classes.txt
+    with open(os.path.join(label_dir, &#39;classes.txt&#39;), &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\nacne\nmole\n&quot;)
+
+    print(&quot;-&quot; * 40)
+    print(f&quot;同步处理完成！&quot;)
+    print(f&quot;保留并修改: {count_kept} 组 (TXT 和 JSON 已同步)&quot;)
+    print(f&quot;删除无效文件: {count_deleted} 组&quot;)
+    print(f&quot;当前类别顺序: 0:spot, 1:acne, 2:mole&quot;)
+
+if __name__ ** &quot;__main__&quot;:
+    process_full_dataset()</code></pre>
+<p>修改data.yaml文件</p>
+<pre class="bash"><code>nc: 3 
+names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre>
+<p>仅有train文件，将其分为常规三类。</p>
+<p>```python title:“split.py” import os import random import shutil</p>
+<p>def split_train_dataset(train_ratio=0.7, valid_ratio=0.2): # 1. 定义路径 base_train_img = os.path.join(‘train’, ‘images’) base_train_lab = os.path.join(‘train’, ‘labels’)</p>
+<pre><code>if not os.path.exists(base_train_img) or not os.path.exists(base_train_lab):
+    print(&quot;错误：找不到 &#39;train/images&#39; 或 &#39;train/labels&#39; 文件夹！&quot;)
+    return
+
+# 2. 获取所有图片的文件名（不含后缀）
+# 过滤掉隐藏文件
+all_names = [os.path.splitext(f)[0] for f in os.listdir(base_train_img) 
+             if not f.startswith(&#39;.&#39;) and not f.endswith(&#39;.json&#39;)]
+
+# 随机打乱
+random.seed(42) # 固定随机种子，保证结果可复现
+random.shuffle(all_names)
+
+# 3. 计算拆分数量
+total_count = len(all_names)
+train_count = int(total_count * train_ratio)
+valid_count = int(total_count * valid_ratio)
+
+# 划分名单
+train_list = all_names[:train_count]
+valid_list = all_names[train_count:train_count + valid_count]
+test_list = all_names[train_count + valid_count:]
+
+# 4. 创建文件夹结构
+for sub in [&#39;valid&#39;, &#39;test&#39;]:
+    os.makedirs(os.path.join(sub, &#39;images&#39;), exist_ok=True)
+    os.makedirs(os.path.join(sub, &#39;labels&#39;), exist_ok=True)
+
+def move_files(name_list, target_sub):
+    print(f&quot;正在移动 {len(name_list)} 个文件到 {target_sub}...&quot;)
+    img_extensions = [&#39;.jpg&#39;, &#39;.jpeg&#39;, &#39;.png&#39;, &#39;.bmp&#39;, &#39;.webp&#39;]
+    
+    for name in name_list:
+        # 移动图片
+        moved_img = False
+        for ext in img_extensions:
+            src_img = os.path.join(base_train_img, name + ext)
+            if os.path.exists(src_img):
+                shutil.move(src_img, os.path.join(target_sub, &#39;images&#39;, name + ext))
+                moved_img = True
+                break
+        
+        # 移动对应的 TXT 标签
+        src_txt = os.path.join(base_train_lab, name + &quot;.txt&quot;)
+        if os.path.exists(src_txt):
+            shutil.move(src_txt, os.path.join(target_sub, &#39;labels&#39;, name + &quot;.txt&quot;))
+        
+        # 移动对应的 JSON (如果有)
+        src_json = os.path.join(base_train_img, name + &quot;.json&quot;)
+        if os.path.exists(src_json):
+            shutil.move(src_json, os.path.join(target_sub, &#39;images&#39;, name + &quot;.json&quot;))
+
+# 5. 执行移动 (Train 保持不动，只把 Valid 和 Test 移出去)
+move_files(valid_list, &#39;valid&#39;)
+move_files(test_list, &#39;test&#39;)
+
+print(&quot;-&quot; * 30)
+print(f&quot;拆分完成！&quot;)
+print(f&quot;Train (保留): {len(train_list)} 张&quot;)
+print(f&quot;Valid (移动): {len(valid_list)} 张&quot;)
+print(f&quot;Test  (移动): {len(test_list)} 张&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: split_train_dataset()</p>
+<pre><code>
+
+7.Acne 4类 （blackheads  dark spot  fore  papules） 1159张
+[7](https://universe.roboflow.com/new-workspace-ii6dw/acne-gsoza)
+
+&gt; 已下载。fore痘痘一类。仅一类。其他类需要删除。fore为acne。
+
+```python title:&quot;alter.py&quot;
+import os
+import json
+
+def process_and_clean_dataset():
+    # 基础配置
+    subfolders = [&#39;train&#39;, &#39;valid&#39;, &#39;test&#39;]
+    img_exts = [&#39;.jpg&#39;, &#39;.jpeg&#39;, &#39;.png&#39;, &#39;.bmp&#39;, &#39;.webp&#39;]
+    root_classes_file = &#39;classes.txt&#39;
+    
+    # 映射逻辑
+    old_target_idx = &#39;2&#39; # fore
+    new_target_idx = &#39;1&#39; # acne
+    new_label_name = &#39;acne&#39;
+
+    print(&quot;开始处理数据集...&quot;)
+
+    # 1. 遍历子文件夹
+    for sub in subfolders:
+        if not os.path.exists(sub):
+            continue
+            
+        print(f&quot;正在清洗文件夹: {sub}&quot;)
+        label_dir = os.path.join(sub, &#39;labels&#39;)
+        image_dir = os.path.join(sub, &#39;images&#39;)
+
+        if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+            continue
+
+        txt_files = [f for f in os.listdir(label_dir) if f.endswith(&#39;.txt&#39;) and f != &#39;classes.txt&#39;]
+        
+        kept_count = 0
+        deleted_count = 0
+
+        for txt_name in txt_files:
+            base_name = os.path.splitext(txt_name)[0]
+            txt_path = os.path.join(label_dir, txt_name)
+            json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+            
+            # --- 处理 TXT ---
+            new_txt_lines = []
+            try:
+                # 使用 errors=&#39;ignore&#39; 解决 0xb0 编码报错
+                with open(txt_path, &#39;rb&#39;) as f:
+                    content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+                
+                for line in content.splitlines():
+                    parts = line.strip().split()
+                    if len(parts) &gt;= 5 and parts[0] ** old_target_idx:
+                        parts[0] = new_target_idx
+                        new_txt_lines.append(&quot; &quot;.join(parts))
+            except Exception as e:
+                print(f&quot;读取 {txt_path} 出错: {e}&quot;)
+                continue
+
+            # --- 处理 JSON ---
+            new_json_data = None
+            if os.path.exists(json_path):
+                try:
+                    with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                        data = json.load(f)
+                    
+                    new_shapes = []
+                    for shape in data.get(&#39;shapes&#39;, []):
+                        if shape.get(&#39;label&#39;) ** &#39;fore&#39;:
+                            shape[&#39;label&#39;] = new_label_name
+                            new_shapes.append(shape)
+                    data[&#39;shapes&#39;] = new_shapes
+                    new_json_data = data
+                except: pass
+
+            # --- 物理清理或保存 ---
+            if not new_txt_lines:
+                # 删除全套文件
+                if os.path.exists(txt_path): os.remove(txt_path)
+                if os.path.exists(json_path): os.remove(json_path)
+                for ext in img_exts:
+                    img_p = os.path.join(image_dir, base_name + ext)
+                    if os.path.exists(img_p):
+                        os.remove(img_p)
+                        break
+                deleted_count += 1
+            else:
+                # 写入修改后的内容
+                with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+                if new_json_data:
+                    with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                        json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+                kept_count += 1
+        
+        print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count}&quot;)
+
+    # 2. 更新根目录下的 classes.txt
+    # 为了保证 acne 为数字 1，必须在第一行放置一个占位符或 spot
+    try:
+        with open(root_classes_file, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+            f.write(&quot;placeholder\nacne\n&quot;)
+        print(f&quot;\n根目录 {root_classes_file} 已成功更新。&quot;)
+    except Exception as e:
+        print(f&quot;更新根目录 classes.txt 失败: {e}&quot;)
+
+    print(&quot;\n所有任务已执行完毕！&quot;)
+
+if __name__ ** &quot;__main__&quot;:
+    process_and_clean_dataset()</code></pre>
+<p>class类为了使acne为1，前面加一个placeholder占位。 data.yaml也进行占位。</p>
+<pre class="bash"><code>nc: 2
+names: [&#39;placeholder&#39;, &#39;acne&#39;]</code></pre>
+<p>14.acne 3类（hyperpigmentation  inflamed  noninflamed） 921张 <a href="https://universe.roboflow.com/acneagent/acne-c5qud">14</a></p>
+<blockquote>
+<p>已下载。hyperpigmentation为spot，inflamed和noninflamed合并为acne.</p>
+</blockquote>
+<p>```python title:“alter.py” import os import json</p>
+<p>def process_dataset(): # 配置 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
+<pre><code># TXT 索引映射: 0-&gt;0, 1-&gt;1, 2-&gt;1
+txt_mapping = {
+    &#39;0&#39;: &#39;0&#39;, # hyperpigmentation -&gt; spot
+    &#39;1&#39;: &#39;1&#39;, # inflamed -&gt; acne
+    &#39;2&#39;: &#39;1&#39;  # noninflamed -&gt; acne
+}
+
+# JSON 标签映射
+json_mapping = {
+    &#39;hyperpigmentation&#39;: &#39;spot&#39;,
+    &#39;inflamed&#39;: &#39;acne&#39;,
+    &#39;noninflamed&#39;: &#39;acne&#39;
+}
+
+print(&quot;开始处理数据集并合并类别...&quot;)
+
+for sub in subfolders:
+    if not os.path.exists(sub):
+        continue
+        
+    print(f&quot;正在处理文件夹: {sub}&quot;)
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    image_dir = os.path.join(sub, &#39;images&#39;)
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        continue
+
+    # 获取所有有效的 txt 文件，跳过 Mac 隐藏文件
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+    
+    kept_count = 0
+    deleted_count = 0
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- 1. 处理 TXT ---
+        new_txt_lines = []
+        try:
+            # 使用二进制读取并忽略错误，彻底解决 0xb0 问题
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5:
+                    old_cls = parts[0]
+                    if old_cls in txt_mapping:
+                        parts[0] = txt_mapping[old_cls]
+                        new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;读取 {txt_path} 失败: {e}&quot;)
+            continue
+
+        # --- 2. 处理 JSON ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                new_shapes = []
+                for shape in data.get(&#39;shapes&#39;, []):
+                    old_label = shape.get(&#39;label&#39;)
+                    if old_label in json_mapping:
+                        shape[&#39;label&#39;] = json_mapping[old_label]
+                        new_shapes.append(shape)
+                
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except:
+                pass
+
+        # --- 3. 决定保留还是删除 ---
+        if not new_txt_lines:
+            # 删除全套文件
+            if os.path.exists(txt_path): os.remove(txt_path)
+            if os.path.exists(json_path): os.remove(json_path)
+            for ext in img_exts:
+                img_p = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_p):
+                    os.remove(img_p)
+                    break
+            deleted_count += 1
+        else:
+            # 保存修改后的 TXT
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # 保存修改后的 JSON
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            kept_count += 1
+    
+    print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count}&quot;)
+
+# 4. 更新根目录下的 classes.txt
+try:
+    with open(&#39;classes.txt&#39;, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\nacne\n&quot;)
+    print(&quot;\n根目录 classes.txt 已更新为: 0:spot, 1:acne&quot;)
+except:
+    print(&quot;\n警告: 未能更新根目录 classes.txt&quot;)
+
+print(&quot;\n所有任务已执行完毕！&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 2 
+names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre>
+<p>19.Acne 8类（Веснушка  Морщина  Пигментация  Постакне (рубец)  Прыщ  Расширенная пора  Родинка  Черная точка 雀斑 皱纹 色素沉着 痤疮后疤痕 粉刺 毛孔粗大 痣 黑头） 845张 <a href="https://universe.roboflow.com/acne-mdodj/acne-mz8ar">19</a></p>
+<blockquote>
+<p>已下载。Веснушка雀斑为spot，Пигментация色素沉着为spot，即前二者合并为spot，Прыщ疙瘩即acne，Родинка痣为mole。</p>
+</blockquote>
+<p>```python title:“alter.py” import os import json</p>
+<p>def process_dataset(): # 配置子文件夹 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
+<pre><code># TXT 索引映射 (字符串形式匹配)
+txt_mapping = {
+    &#39;0&#39;: &#39;0&#39;, # &#39;----&#39; -&gt; spot
+    &#39;2&#39;: &#39;0&#39;, # &#39;------ -----&#39; -&gt; spot
+    &#39;4&#39;: &#39;1&#39;, # &#39;--------&#39; -&gt; acne
+    &#39;6&#39;: &#39;2&#39;  # &#39;-----------&#39; -&gt; mole
+}
+
+# JSON 标签字符串映射
+json_mapping = {
+    &#39;----&#39;: &#39;spot&#39;,
+    &#39;------ -----&#39;: &#39;spot&#39;,
+    &#39;--------&#39;: &#39;acne&#39;,
+    &#39;-----------&#39;: &#39;mole&#39;
+}
+
+print(&quot;开始处理横线格式的数据集...&quot;)
+
+for sub in subfolders:
+    if not os.path.exists(sub):
+        continue
+        
+    print(f&quot;正在处理文件夹: {sub}&quot;)
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    image_dir = os.path.join(sub, &#39;images&#39;)
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        continue
+
+    # 过滤掉 Mac 隐藏文件和根目录 classes.txt
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+    
+    kept_count = 0
+    deleted_count = 0
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- 1. 处理 TXT (修改索引) ---
+        new_txt_lines = []
+        try:
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5:
+                    old_cls = parts[0]
+                    if old_cls in txt_mapping:
+                        parts[0] = txt_mapping[old_cls]
+                        new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;解析 TXT 失败 {txt_path}: {e}&quot;)
+            continue
+
+        # --- 2. 处理 JSON (修改横线标签) ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                new_shapes = []
+                for shape in data.get(&#39;shapes&#39;, []):
+                    old_label = shape.get(&#39;label&#39;)
+                    if old_label in json_mapping:
+                        shape[&#39;label&#39;] = json_mapping[old_label]
+                        new_shapes.append(shape)
+                
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except Exception as e:
+                print(f&quot;解析 JSON 失败 {json_path}: {e}&quot;)
+
+        # --- 3. 保存或删除 ---
+        if not new_txt_lines:
+            # 删除全套文件
+            if os.path.exists(txt_path): os.remove(txt_path)
+            if os.path.exists(json_path): os.remove(json_path)
+            for ext in img_exts:
+                img_p = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_p):
+                    os.remove(img_p)
+                    break
+            deleted_count += 1
+        else:
+            # 写入修改后的 TXT
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # 写入修改后的 JSON
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            kept_count += 1
+    
+    print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count}&quot;)
+
+# 4. 更新同级目录的 classes.txt
+try:
+    with open(&#39;classes.txt&#39;, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\nacne\nmole\n&quot;)
+    print(&quot;\n根目录 classes.txt 已重写为: spot, acne, mole&quot;)
+except Exception as e:
+    print(f&quot;\n无法更新根目录 classes.txt: {e}&quot;)
+
+print(&quot;\n所有操作已完成！请记得手动更新 data.yaml。&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 3 
+names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre>
+<p>21.spots 10类（Acne, Blackheads, Dark-Spots, Dry-Skin, Englarged-Pores, Eyebags, Oily-Skin, Skin-Redness, Whiteheads, Wrinkles）2660张 <a href="https://app.roboflow.com/swilder/skin-problem-detection-relabel-clean3-dtinq/1">21</a></p>
+<blockquote>
+<p>已下载。Dark-Spots为spot，Acne为acne</p>
+</blockquote>
+<p>```python title:“alter.py” import os import json</p>
+<p>def process_dataset(): # 子文件夹列表 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
+<pre><code># TXT 索引映射: 
+# 原 2 (Dark-Spots) -&gt; 新 0 (spot)
+# 原 0 (Acne) -&gt; 新 1 (acne)
+txt_mapping = {
+    &#39;2&#39;: &#39;0&#39;, 
+    &#39;0&#39;: &#39;1&#39;
+}
+
+# JSON 标签字符串映射
+json_mapping = {
+    &#39;Dark-Spots&#39;: &#39;spot&#39;,
+    &#39;Acne&#39;: &#39;acne&#39;
+}
+
+print(&quot;开始清洗数据集，目标类：spot(0), acne(1)...&quot;)
+
+for sub in subfolders:
+    if not os.path.exists(sub):
+        continue
+        
+    print(f&quot;正在处理文件夹: {sub}&quot;)
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    image_dir = os.path.join(sub, &#39;images&#39;)
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        continue
+
+    # 遍历 labels 文件夹下的 txt，跳过隐藏文件和 classes.txt
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+    
+    kept_count = 0
+    deleted_count = 0
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- 1. 处理 TXT (修改索引并过滤) ---
+        new_txt_lines = []
+        try:
+            # 使用二进制读取以防编码错误 (0xb0)
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5:
+                    old_cls = parts[0]
+                    if old_cls in txt_mapping:
+                        parts[0] = txt_mapping[old_cls]
+                        new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;读取 TXT 失败 {txt_path}: {e}&quot;)
+            continue
+
+        # --- 2. 处理 JSON (同步标签名) ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                new_shapes = []
+                for shape in data.get(&#39;shapes&#39;, []):
+                    old_label = shape.get(&#39;label&#39;)
+                    if old_label in json_mapping:
+                        shape[&#39;label&#39;] = json_mapping[old_label]
+                        new_shapes.append(shape)
+                
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except:
+                pass
+
+        # --- 3. 决定保留还是彻底删除 ---
+        if not new_txt_lines:
+            # 删除该组所有文件
+            if os.path.exists(txt_path): os.remove(txt_path)
+            if os.path.exists(json_path): os.remove(json_path)
+            for ext in img_exts:
+                img_p = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_p):
+                    os.remove(img_p)
+                    break
+            deleted_count += 1
+        else:
+            # 写入修改后的 TXT
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # 写入修改后的 JSON
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            kept_count += 1
+    
+    print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count} 组无效数据&quot;)
+
+# 4. 更新同级目录的 classes.txt
+try:
+    with open(&#39;classes.txt&#39;, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\nacne\n&quot;)
+    print(&quot;\n根目录 classes.txt 已更新: 0:spot, 1:acne&quot;)
+except:
+    print(&quot;\n警告: 无法更新根目录 classes.txt&quot;)
+
+print(&quot;\n所有操作已完成！&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 2 
+names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre>
+<h3 id="单类">单类</h3>
+<h4 id="acne">acne</h4>
+<p>采用的数量：8322 3.acne 905张 <a href="https://universe.roboflow.com/acne-qmv2v/acne-ctiit">3</a> 将0改为1.</p>
+<p>```python title:“alter.py” import os</p>
+<p>def change_class_index(): # 目标文件夹 subfolders = [‘train’, ‘valid’, ‘test’]</p>
+<pre><code>count_modified = 0
+print(&quot;开始修改类别索引：从 0 改为 1...&quot;)
+
+for sub in subfolders:
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    
+    # 检查文件夹是否存在
+    if not os.path.exists(label_dir):
+        print(f&quot;跳过 {sub}: 找不到 labels 文件夹&quot;)
+        continue
+        
+    print(f&quot;正在处理: {sub}/labels&quot;)
+
+    # 获取目录下所有 txt 文件，并排除隐藏文件
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+
+    for txt_name in txt_files:
+        file_path = os.path.join(label_dir, txt_name)
+        
+        try:
+            # 1. 读取内容
+            with open(file_path, &#39;r&#39;, encoding=&#39;utf-8&#39;, errors=&#39;ignore&#39;) as f:
+                lines = f.readlines()
+            
+            # 2. 修改每一行开头的 0 为 1
+            new_lines = []
+            modified_this_file = False
+            for line in lines:
+                parts = line.strip().split()
+                if len(parts) &gt; 0:
+                    if parts[0] ** &#39;0&#39;:
+                        parts[0] = &#39;1&#39;
+                        modified_this_file = True
+                    new_lines.append(&quot; &quot;.join(parts))
+            
+            # 3. 写回文件
+            if modified_this_file:
+                with open(file_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    f.write(&quot;\n&quot;.join(new_lines) + &quot;\n&quot;)
+                count_modified += 1
+                
+        except Exception as e:
+            print(f&quot;处理文件 {txt_name} 时出错: {e}&quot;)
+
+print(&quot;-&quot; * 30)
+print(f&quot;处理完成！&quot;)
+print(f&quot;共成功修改了 {count_modified} 个标注文件。&quot;)
+print(&quot;请记得将 data.yaml 中的 nc 改为 2，并确保索引 1 对应正确的类名。&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: change_class_index()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 2 
+names: [&#39;placeholder&#39;, &#39;acne&#39;] # 索引 0 留个占位符</code></pre>
+<p>7.acne 1419张 <a href="https://universe.roboflow.com/yolotest-bu1i2/acne-ho1jq">7</a> 13.acne 800张 <a href="https://universe.roboflow.com/tezim/acne-k7v7j">13</a></p>
+<p>17.acne 1419张 <a href="https://universe.roboflow.com/learning-jth0d/acne-hrslq">17</a></p>
+<h4 id="pigmentation">pigmentation</h4>
+<p>无</p>
+<h4 id="spots">spots</h4>
+<p>4.spots 75张 <a href="https://app.roboflow.com/swilder/spots-nizes-dtm7v/1">4</a></p>
+<blockquote>
+<p>已下载。删除non spots类</p>
+</blockquote>
+<p>```python title:“alter.py” import os import json</p>
+<p>def process_spot_dataset(): # 基础配置 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
+<pre><code># 目标：只保留索引 0 (spot)
+target_idx = &#39;0&#39;
+target_label_name = &#39;spot&#39;
+
+print(&quot;开始清理数据集，仅保留 &#39;spot&#39; 类...&quot;)
+
+for sub in subfolders:
+    if not os.path.exists(sub):
+        continue
+        
+    print(f&quot;正在处理文件夹: {sub}&quot;)
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    image_dir = os.path.join(sub, &#39;images&#39;)
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        print(f&quot;跳过 {sub}: 缺少 images 或 labels 文件夹&quot;)
+        continue
+
+    # 获取所有有效 txt 文件
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+    
+    kept_count = 0
+    deleted_count = 0
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- 1. 处理 TXT (只保留索引 0) ---
+        new_txt_lines = []
+        try:
+            # 使用二进制读取并忽略错误，防止 Mac 编码报错
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5 and parts[0] ** target_idx:
+                    new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;读取 TXT 失败 {txt_path}: {e}&quot;)
+            continue
+
+        # --- 2. 处理 JSON (只保留 label 为 spot 的 shapes) ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                # 过滤 shapes
+                new_shapes = [shape for shape in data.get(&#39;shapes&#39;, []) 
+                              if shape.get(&#39;label&#39;) ** target_label_name]
+                
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except Exception as e:
+                print(f&quot;处理 JSON 失败 {json_path}: {e}&quot;)
+
+        # --- 3. 执行删除或写回 ---
+        if not new_txt_lines:
+            # --- 删除该组所有关联文件 ---
+            if os.path.exists(txt_path): os.remove(txt_path)
+            if os.path.exists(json_path): os.remove(json_path)
+            # 寻找并删除图片
+            for ext in img_exts:
+                img_p = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_p):
+                    os.remove(img_p)
+                    break
+            deleted_count += 1
+        else:
+            # --- 写入修改后的 TXT ---
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # --- 写入修改后的 JSON ---
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            kept_count += 1
+    
+    print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count} 组无效文件&quot;)
+
+# 4. 更新同级目录的 classes.txt
+try:
+    with open(&#39;classes.txt&#39;, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\n&quot;)
+    print(&quot;\n根目录 classes.txt 已更新为: spot&quot;)
+except:
+    pass
+
+print(&quot;\n所有操作已完成！&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: process_spot_dataset()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 1 
+names: [&#39;spot&#39;]</code></pre>
+<h4 id="pimple">pimple</h4>
+<p>1.pimple on face 35张 <a href="https://app.roboflow.com/swilder/pimple-on-face-sjq4e/1">1</a></p>
+<blockquote>
+<p>已下载。仅有一类，问题和spots1一样。</p>
+</blockquote>
+<h3 id="总结">总结</h3>
+<p>最后比例 train 斑：痘：痣=10：35：1</p>
+<p>但是第一轮训练之后发现单一类不能直接加进去。 只将三类都有的两个数据集合并进行训练。</p>
+<h2 id="医院数据集">医院数据集</h2>
+<h3 id="数据标注">数据标注</h3>
+<h4 id="标注规范">标注规范</h4>
+<p>本项目需要标注以下三类目标：</p>
+<ol type="1">
+<li><p>spot —— 斑点</p></li>
+<li><p>acne —— 痘痘</p></li>
+<li><p>mole —— 黑痣</p></li>
+</ol>
+<p>全部是按个数标注。</p>
+<h5 id="类别定义与基础标注规则">1.类别定义与基础标注规则</h5>
+<h6 id="spot">1.1spot</h6>
+<p>斑 <strong>颜色</strong>： 浅褐色、黄褐色、咖啡色。 <strong>特征</strong>： 边界模糊、不规则。通常是成片出现（如雀斑）或大面积出现（如黄褐斑）。 <strong>立体感</strong>： 绝对平整，完全没有凸起。 <strong>判定技巧</strong>： 边缘像水彩画晕染开的、颜色比痣浅、形状不规则的，归为“斑”。</p>
+<p><strong>注意事项</strong>：</p>
+<ol type="1">
+<li>对于斑点是这种一片式的，标注这些脸上干净的，明显的，容易标注的斑点。</li>
+</ol>
+<div class="image-placeholder">图片未发布：Pasted image 20260316001714.png</div>
+<h6 id="acne-1">1.2acne</h6>
+<p>痘 <strong>颜色</strong>： 鲜红色、暗红色、淡粉色，或者带有黄白色的脓头。 <strong>特征</strong>： 伴有炎症反应（周围皮肤发红发亮）。 <strong>立体感</strong>： 明显的凸起。在侧光下会有阴影。 <strong>判定技巧</strong>： 只要是红色系且中心有隆起的，全部归为“痘”。</p>
+<h6 id="mole">1.3mole</h6>
+<p>痣 <strong>颜色</strong>： 深褐色、黑色、纯黑色。 <strong>特征</strong>： 边界非常清晰、锐利，形状通常趋于圆形或椭圆形。 <strong>立体感</strong>： 哪怕是平的痣，其色素分布通常非常均匀且深。 <strong>判定技巧</strong>： 颜色极深的、边缘不虚化的，优先标为“痣”。</p>
+<h6 id="标注规则">标注规则</h6>
+<p>人脸上肉眼可见的斑痘痣，都要<strong>按个数全部标注</strong>，不能<strong>漏标</strong>，对于不属于这三类的则不标注。</p>
+<h5 id="易混淆情况">2.易混淆情况</h5>
+<h6 id="区分斑和痣">2.1区分斑和痣</h6>
+<ol type="1">
+<li>按照边缘规则与否进行区分，绿色为斑，红色为痣。</li>
+</ol>
+<div class="image-placeholder">图片未发布：Pasted image 20260316004240.png</div>
+<ol start="2" type="1">
+<li>按照颜色均为深黑色或墨灰色，按照边界特征，下方那个点边缘非常锐利、清晰，上方那个点虽然边缘稍显模糊，但中心色核非常深且圆。按照视觉厚度二者均凸起，红色框均为痣。</li>
+</ol>
+<div class="image-placeholder">图片未发布：Pasted image 20260316004521.png</div>
+<h6 id="不在这三类中">2.2不在这三类中</h6>
+<p>此类为痘坑，无需标注</p>
+<div class="image-placeholder">图片未发布：Pasted image 20260316003849.png</div>
+<h5 id="不需要标注但保留的图片">3.不需要标注但保留的图片</h5>
+<p>图中无标注三类但不能删除。 这些图仍会用于模型训练中的背景学习。</p>
+<h5 id="不正经建议">4.不正经建议</h5>
+<p>实在不确定的可以发图片问ai，设定是皮肤科医生，熟练辨认这三类。ai的回答你自己可以信服就分类，不信服按自己想法（遵循以上定义）。</p>
+<h4 id="标注中出现的问题">标注中出现的问题</h4>
+<ol type="1">
+<li><p>人脸以外但其他皮肤有斑痘痣，需要标注。即只要出现斑痘痣都要标注。 模型并不自带“人脸区域”的概念。如果你不标，模型会将这些区域视为“负样本（背景）”，从而抑制它对类似特征的敏感度。</p></li>
+<li><p>老龄皮肤斑点轮廓不清晰，不标注。 轮廓实在太模糊，跟周围正常皮肤已经融为一体的图片删去。</p></li>
+<li><p>整体图像模糊的图片也删除。</p></li>
+</ol>
+<h2 id="训练前数据处理">训练前数据处理</h2>
+<p>json文件转换为txt文件，将存json文件的名字修改为0</p>
+<p>```python title:“alter.py” import os import json import random import shutil</p>
+<h1 id="section-2">**=======================</h1>
+<h1 id="配置区">配置区</h1>
+<h1 id="section-3">=========================</h1>
+<p>DATA_SOURCE_DIR = “0” OUTPUT_DIR = “dataset” TRAIN_RATIO = 0.8</p>
+<p>LABEL_MAP = { “1spot_斑点”: 0, “2acne_痘痘”: 1, “3mole_⿊痣”: 2 }</p>
+<p>def convert(size, box): img_w, img_h = size xmin, ymin, xmax, ymax = box if img_w ** 0 or img_h ** 0: return None return ((xmin + xmax) / 2.0 / img_w, (ymin + ymax) / 2.0 / img_h, (xmax - xmin) / img_w, (ymax - ymin) / img_h)</p>
+<p>def process(): target_path = os.path.join(os.getcwd(), DATA_SOURCE_DIR) if not os.path.exists(target_path): print(f“❌ 错误：找不到文件夹 ‘{DATA_SOURCE_DIR}’”) return</p>
+<pre><code># 1. 扫描文件，同时过滤掉 macOS 的隐藏文件 (._ 开头)
+all_files = os.listdir(target_path)
+json_files = [f for f in all_files if f.lower().endswith(&#39;.json&#39;) and not f.startswith(&#39;._&#39;)]
+print(f&quot;📂 找到有效 JSON 文件数: {len(json_files)}&quot;)
+
+if os.path.exists(OUTPUT_DIR): shutil.rmtree(OUTPUT_DIR)
+for s in [&#39;train&#39;, &#39;val&#39;]:
+    os.makedirs(os.path.join(OUTPUT_DIR, &#39;images&#39;, s), exist_ok=True)
+    os.makedirs(os.path.join(OUTPUT_DIR, &#39;labels&#39;, s), exist_ok=True)
+
+random.shuffle(json_files)
+split_idx = int(len(json_files) * TRAIN_RATIO)
+
+total_boxes = 0
+actual_labels = set()
+processed_count = 0
+
+print(&quot;🚀 正在转换并拷贝文件，请稍候...&quot;)
+
+for i, jname in enumerate(json_files):
+    split = &#39;train&#39; if i &lt; split_idx else &#39;val&#39;
+    json_path = os.path.join(target_path, jname)
+    
+    data = None
+    for encoding in [&#39;utf-8&#39;, &#39;gbk&#39;, &#39;gb18030&#39;]:
+        try:
+            with open(json_path, &#39;r&#39;, encoding=encoding) as f:
+                data = json.load(f)
+            break
+        except:
+            continue
+    
+    if data is None: continue
+
+    img_w = data.get(&#39;imageWidth&#39;, 0)
+    img_h = data.get(&#39;imageHeight&#39;, 0)
+    base_name = os.path.splitext(jname)[0]
+    
+    img_full_name = None
+    for ext in [&#39;.jpg&#39;, &#39;.JPG&#39;, &#39;.png&#39;, &#39;.PNG&#39;, &#39;.jpeg&#39;, &#39;.JPEG&#39;]:
+        if os.path.exists(os.path.join(target_path, base_name + ext)):
+            img_full_name = base_name + ext
+            break
+    
+    if not img_full_name: continue
+
+    lines = []
+    for shape in data.get(&#39;shapes&#39;, []):
+        label = shape[&#39;label&#39;]
+        actual_labels.add(label)
+        if label in LABEL_MAP:
+            pts = shape[&#39;points&#39;]
+            if len(pts) &lt; 2: continue
+            xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+            bbox = convert((img_w, img_h), (min(xs), min(ys), max(xs), max(ys)))
+            if bbox:
+                lines.append(f&quot;{LABEL_MAP[label]} {&#39; &#39;.join([f&#39;{x:.6f}&#39; for x in bbox])}&quot;)
+                total_boxes += 1
+    
+    if lines:
+        with open(os.path.join(OUTPUT_DIR, &#39;labels&#39;, split, base_name + &#39;.txt&#39;), &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+            f.write(&#39;\n&#39;.join(lines))
+        shutil.copy(os.path.join(target_path, img_full_name), 
+                    os.path.join(OUTPUT_DIR, &#39;images&#39;, split, img_full_name))
+
+    # 打印进度
+    processed_count += 1
+    if processed_count % 100 ** 0:
+        print(f&quot;⏳ 已处理 {processed_count}/{len(json_files)} 个文件...&quot;)
+
+# 生成 YAML
+names = [n[0] for n in sorted(LABEL_MAP.items(), key=lambda x: x[1])]
+with open(os.path.join(OUTPUT_DIR, &#39;data.yaml&#39;), &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+    f.write(f&quot;train: images/train\nval: images/val\nnc: {len(names)}\nnames: {names}\n&quot;)
+
+print(&quot;\n&quot; + &quot;=&quot;*40)
+print(&quot;📊 最终转换报告:&quot;)
+print(f&quot;✅ 成功提取的标注框总数: {total_boxes}&quot;)
+print(f&quot;🏷️  JSON里实际发现的标签名: {list(actual_labels)}&quot;)
+print(f&quot;📁 数据集路径: {os.path.abspath(OUTPUT_DIR)}&quot;)
+print(&quot;=&quot;*40)</code></pre>
+<p>if <strong>name</strong> ** ‘<strong>main</strong>’: process()</p>
+<pre><code>划分数据集为train和val，要求再加上test。
+
+```python title:&quot;avert.py&quot;
+import os
+import random
+import shutil
+
+random.seed(42)  # 固定随机结果，可复现
+
+ROOT = os.getcwd()
+
+IMG_DIR = os.path.join(ROOT, &quot;images&quot;)
+LBL_DIR = os.path.join(ROOT, &quot;labels&quot;)
+
+SPLITS = [&quot;train&quot;, &quot;val&quot;]
+NEW_SPLITS = [&quot;train&quot;, &quot;val&quot;, &quot;test&quot;]
+
+
+def collect_images():
+    &quot;&quot;&quot;
+    收集 images/train + images/val 下全部图片
+    返回 [(split, filename), ...]
+    &quot;&quot;&quot;
+    all_imgs = []
+
+    exts = {&quot;.jpg&quot;, &quot;.jpeg&quot;, &quot;.png&quot;, &quot;.bmp&quot;}
+
+    for split in SPLITS:
+        folder = os.path.join(IMG_DIR, split)
+
+        if not os.path.exists(folder):
+            continue
+
+        for f in os.listdir(folder):
+            ext = os.path.splitext(f)[1].lower()
+            if ext in exts:
+                all_imgs.append((split, f))
+
+    return all_imgs
+
+
+def make_dirs():
+    &quot;&quot;&quot;
+    创建 test 目录
+    &quot;&quot;&quot;
+    for base in [IMG_DIR, LBL_DIR]:
+        for split in NEW_SPLITS:
+            os.makedirs(os.path.join(base, split), exist_ok=True)
+
+
+def move_pair(old_split, filename, new_split):
+    &quot;&quot;&quot;
+    移动 image + label
+    &quot;&quot;&quot;
+    stem = os.path.splitext(filename)[0]
+
+    # image
+    img_src = os.path.join(IMG_DIR, old_split, filename)
+    img_dst = os.path.join(IMG_DIR, new_split, filename)
+
+    if os.path.abspath(img_src) != os.path.abspath(img_dst):
+        shutil.move(img_src, img_dst)
+
+    # label（可能不存在，背景图）
+    label_name = stem + &quot;.txt&quot;
+    lbl_src = os.path.join(LBL_DIR, old_split, label_name)
+    lbl_dst = os.path.join(LBL_DIR, new_split, label_name)
+
+    if os.path.exists(lbl_src):
+        if os.path.abspath(lbl_src) != os.path.abspath(lbl_dst):
+            shutil.move(lbl_src, lbl_dst)
+
+
+def main():
+    make_dirs()
+
+    samples = collect_images()
+    total = len(samples)
+
+    print(f&quot;总样本数: {total}&quot;)
+
+    random.shuffle(samples)
+
+    n_train = int(total * 0.8)
+    n_val = int(total * 0.1)
+    n_test = total - n_train - n_val
+
+    train_set = samples[:n_train]
+    val_set = samples[n_train:n_train + n_val]
+    test_set = samples[n_train + n_val:]
+
+    print(f&quot;train: {len(train_set)}&quot;)
+    print(f&quot;val:   {len(val_set)}&quot;)
+    print(f&quot;test:  {len(test_set)}&quot;)
+
+    for old_split, f in train_set:
+        move_pair(old_split, f, &quot;train&quot;)
+
+    for old_split, f in val_set:
+        move_pair(old_split, f, &quot;val&quot;)
+
+    for old_split, f in test_set:
+        move_pair(old_split, f, &quot;test&quot;)
+
+    print(&quot;划分完成&quot;)
+
+
+if __name__ ** &quot;__main__&quot;:
+    main()</code></pre>
+<h3 id="类似数据集">类似数据集</h3>
+<p>采用的 Melasma 数据集来自北京美医医学技术研究院。 Melasma 数据集,覆盖 4617 例色斑患者,每例对应 1 张图像,共有 4617 张图片。 将数据集按 9:1 进行划分,随机选择 90%的数据用于模型的训练,剩余的 10%作为测试集,用于评判深度网络模型的性能。 对于小目标的定义,COCO 数据集将目标像素面积小于 32×32 的物体归类为小目标(Small Object),目标像素面积介于 32×32 至 96×96 的归为中 等目标(Medium Object),目标像素面积超过 96×96 的归为大目标(Large Object)。 该人脸色斑数据集中小目标的占比达到 99.1%(共计 44713 个标注), 中等目标占比达 0.931%(共计 420 个标注)。这种极端的长尾分布特性主要源于两个医学事实:其一,早期病理性色斑多呈现微小点状特征;其二,临床采集时为保证病灶细节,普遍采用<strong>高倍率皮肤镜</strong>拍摄,导致相对成像尺寸缩小。</p>
+<h1 id="模型选择与训练">模型选择与训练</h1>
+<p><strong>环境</strong> pytorch、cuda 使用yolo <a href="https://github.com/ultralytics/ultralytics">yolo代码</a> 进入yolo文件夹下</p>
+<pre class="bash"><code># 先安装依赖
+pip install -e .
+
+# 运行训练脚本
+python train.py</code></pre>
+<p><strong>模型参数选择</strong> default.yaml <strong>训练前准备</strong> 数据集准备 images:存放图片 train：训练集图片 val：验证集图片 labels：存放标签 train：训练集标签文件，要与训练集图片名称一一对应 val：验证集标签文件，要与验证集图片名称一一对应</p>
+<p>还有另一种存放方式 train images labels vaild images labels test images labels</p>
+<p>解决过拟合主要靠：</p>
+<ol type="1">
+<li><p>数据增强</p></li>
+<li><p>使用合适的模型大小，比如 yolov8n、yolov8s</p></li>
+<li><p>不要训练太多 epoch</p></li>
+<li><p>使用 early stopping</p></li>
+<li><p>增加数据量</p></li>
+<li><p>检查标注质量</p></li>
+<li><p>保证 train/val/test 分布一致</p></li>
+</ol>
+<p><strong>注意</strong> 数据集描述文件 与YOLOV5不同，path不再是从项目根目录写起，而是从datasets文件夹写起 数据集描述文件 数据地址从datasets目录里开始写起，且就放在根目录下 调整数据集目录后再次训练 删除 ~/AppData/Roaming/Ultralytics文件夹下的settings.yaml</p>
+<p>train.py</p>
+<p>```python title:“train.py” from ultralytics import YOLO</p>
+<p>if <strong>name</strong> ** ‘<strong>main</strong>’: model = YOLO(“ultralytics/cfg/models/v8/yolov8n.yaml”) model.train( data=‘/data_1/xgd/zhy/ultralytics-8.2.0/datasets/dataset-l/data.yaml’, cache=True, imgsz=640, epochs=300, batch=64, workers=8, optimizer=“SGD”, project=“/data_1/xgd/zhy/ultralytics-8.2.0/l/runs/train”,<br />
+name=“yolov8n-spot”, device=“1”,<br />
+)</p>
+<pre><code>
+### 关注问题
+
+1.小目标检测的论文。小目标检测与高像素检测
+2.对于train的参数修改
+比如数据增强之类的
+
+医院数据集训练结果
+图像像素：3456X5184
+
+问题：
+阈值设置的什么？
+阈值默认值
+**conf=0.001** 和 **iou=0.7**
+
+**results.png**
+模型最后收敛了吗？
+是否出现了过拟合？
+
+每个类别的PR曲线
+‘斑点’（spot）这一类拉低了整体分数？
+需要针对性地增加‘斑点’的数据，或者单独调整这一类的损失权重。
+
+分析漏检原因
+val_batch_labels.jpg 和 val_batch_pred.jpg 的对比。
+模型没画框：Recall 问题，要降低 conf 阈值，或者强化小目标检测层。
+模型框偏了：Box Loss 问题，要检查标注是否规范。
+
+- 测试时，尝试把 NMS 的 conf_threshold 调低一点（比如从 0.5 降到 0.25），看看浅色斑点是否能出来。如果能出来，说明模型学到了，只是不够自信。
+
+## 切图训练
+
+操作步骤：
+
+1. 批量切割大图为小图并处理标签
+
+2. 删除没有标注的小图及其标签
+
+3. 训练模型
+
+4. 预测时切图并合并结果
+
+### 1+2. 批量切割大图为小图并处理标签
+
+对数据集中的所有图像和标签进行批量切割，并确保每个小图的标签是准确的。如果小图没有标签，就删除该小图及其标签。
+
+```python title:&quot;cut.py&quot;
+import os
+import cv2
+import shutil
+from pathlib import Path
+
+def split_image_and_labels(image_path, label_path, output_image_folder, output_label_folder, crop_size=(640, 640), overlap_ratio=0.2, min_area_ratio=0.0001):
+    &quot;&quot;&quot;切割单张图像及其标签，解决文件名冲突及小目标过滤问题&quot;&quot;&quot;
+    image = cv2.imread(image_path)
+    if image is None: return
+    h, w, _ = image.shape
+    crop_h, crop_w = crop_size
+    img_stem = Path(image_path).stem # 获取原文件名，防止覆盖
+
+    with open(label_path, &#39;r&#39;) as f:
+        labels = f.readlines()
+
+    crop_idx = 0
+    # 计算步长
+    step_y = int(crop_h * (1 - overlap_ratio))
+    step_x = int(crop_w * (1 - overlap_ratio))
+
+    for y in range(0, h, step_y):
+        for x in range(0, w, step_x):
+            # 边界处理：如果最后一块超界，则强制靠边
+            curr_y = y if y + crop_h &lt;= h else h - crop_h
+            curr_x = x if x + crop_w &lt;= w else w - crop_w
+            
+            if curr_y &lt; 0 or curr_x &lt; 0: continue # 原图比640还小的情况
+
+            # 这里的命名加入 img_stem 确保唯一性
+            crop_filename = f&quot;{img_stem}_id{crop_idx}&quot;
+            crop_image_path = os.path.join(output_image_folder, f&quot;{crop_filename}.jpg&quot;)
+            
+            crop_labels = []
+            for label in labels:
+                parts = label.strip().split()
+                if not parts: continue
+                cls = parts[0]
+                xc, yc, nw, nh = map(float, parts[1:])
+                
+                # 像素级绝对坐标（大图）
+                abs_xc, abs_yc = xc * w, yc * h
+                abs_w, abs_h = nw * w, nh * h
+                
+                # 判断中心点是否在当前切片内 (SAHI 核心逻辑)
+                if curr_x &lt;= abs_xc &lt; curr_x + crop_w and curr_y &lt;= abs_yc &lt; curr_y + crop_h:
+                    # 计算在小图中的相对坐标
+                    new_xc = (abs_xc - curr_x) / crop_w
+                    new_yc = (abs_yc - curr_y) / crop_h
+                    new_nw = abs_w / crop_w
+                    new_nh = abs_h / crop_h
+                    
+                    # 面积过滤（对于斑点，比例要设得极低）
+                    if (new_nw * new_nh) &gt;= min_area_ratio:
+                        # 限制边界在 0-1 之间
+                        new_xc = max(min(new_xc, 0.999), 0.001)
+                        new_yc = max(min(new_yc, 0.999), 0.001)
+                        crop_labels.append(f&quot;{cls} {new_xc:.6f} {new_yc:.6f} {new_nw:.6f} {new_nh:.6f}&quot;)
+            
+            # 只有当切片内有目标时才保存
+            if crop_labels:
+                crop = image[curr_y:curr_y+crop_h, curr_x:curr_x+crop_w]
+                cv2.imwrite(crop_image_path, crop)
+                crop_label_path = os.path.join(output_label_folder, f&quot;{crop_filename}.txt&quot;)
+                with open(crop_label_path, &#39;w&#39;) as f:
+                    f.write(&quot;\n&quot;.join(crop_labels))
+            
+            crop_idx += 1
+            # 如果已经到了边界，跳出当前行的横向循环
+            if curr_x + crop_w &gt;= w: break
+        if curr_y + crop_h &gt;= h: break
+
+def batch_process(image_folder, label_folder, output_root):
+    &quot;&quot;&quot;批量处理&quot;&quot;&quot;
+    for sub in [&#39;train&#39;, &#39;val&#39;, &#39;test&#39;]:
+        img_in = os.path.join(image_folder, sub)
+        lbl_in = os.path.join(label_folder, sub)
+        img_out = os.path.join(output_root, &quot;images&quot;, sub)
+        lbl_out = os.path.join(output_root, &quot;labels&quot;, sub)
+        
+        if not os.path.exists(img_in): 
+            print(f&quot;跳过不存在的文件夹: {sub}&quot;)
+            continue
+            
+        os.makedirs(img_out, exist_ok=True)
+        os.makedirs(lbl_out, exist_ok=True)
+
+        print(f&quot;正在处理 {sub} 文件夹...&quot;)
+        images = [f for f in os.listdir(img_in) if f.lower().endswith((&#39;.jpg&#39;, &#39;.jpeg&#39;, &#39;.png&#39;))]
+        
+        from tqdm import tqdm
+        for img_name in tqdm(images):
+            img_path = os.path.join(img_in, img_name)
+            # 自动匹配 txt 名字
+            lbl_name = os.path.splitext(img_name)[0] + &quot;.txt&quot;
+            lbl_path = os.path.join(lbl_in, lbl_name)
+            
+            if os.path.exists(lbl_path):
+                split_image_and_labels(img_path, lbl_path, img_out, lbl_out)
+
+# --- 执行 ---
+output_root = &quot;./Hosdataset-split&quot;
+# 建议先清空旧的输出文件夹，防止干扰
+if os.path.exists(output_root):
+    print(&quot;正在清理旧的 split 文件夹...&quot;)
+    shutil.rmtree(output_root)
+
+batch_process(
+    image_folder=&quot;./Hosdataset/images&quot;,
+    label_folder=&quot;./Hosdataset/labels&quot;,
+    output_root=output_root
+)
+print(&quot;🚀 处理完成！&quot;)</code></pre>
+<h3 id="训练模型">训练模型</h3>
+<ol type="1">
+<li>清理 Ultralytics 配置文件 在终端运行以下命令：</li>
+</ol>
+<pre class="bash"><code>yolo settings reset</code></pre>
+<ol start="2" type="1">
+<li>多卡训练</li>
+</ol>
+<pre class="bash"><code>export PYTHONPATH=$PYTHONPATH:. 
+python train_1.py</code></pre>
+<ol start="3" type="1">
+<li>清理内存</li>
+</ol>
+<pre class="bash"><code>ps -ef | grep &#39;envs/pyj_zhy&#39; | grep -v grep | awk &#39;{print $2}&#39; | xargs -r kill -9</code></pre>
+<h3 id="训练结果">训练结果</h3>
+<h3 id="测试">测试</h3>
+<p>流程</p>
+<pre class="text"><code>加载模型
+    ↓
+读取test大图
+    ↓
+切片推理
+    ↓
+框坐标映射回原图
+    ↓
+全局NMS
+    ↓
+保存预测txt</code></pre>
+<p>步骤 pip install sahi 代码</p>
+<p>```python title:“test_predict.py” from sahi import AutoDetectionModel from sahi.predict import get_sliced_prediction</p>
+<p>import os import cv2</p>
+<h1 id="配置">=======** 配置 **=======</h1>
+<p>TEST_IMG_DIR = “./Hosdataset/images/test” SAVE_PRED_DIR = “./pred_labels”</p>
+<p>os.makedirs(SAVE_PRED_DIR, exist_ok=True)</p>
+<h1 id="加载模型">=======** 加载模型 **=======</h1>
+<p>detection_model = AutoDetectionModel.from_pretrained( model_type=‘yolov8’, model_path=‘best.pt’, confidence_threshold=0.25, device=‘cuda:0’ )</p>
+<h1 id="遍历-test">=======** 遍历 test **=======</h1>
+<p>for img_name in os.listdir(TEST_IMG_DIR):</p>
+<pre><code>if not img_name.endswith((&#39;.jpg&#39;, &#39;.png&#39;, &#39;.jpeg&#39;)):
+    continue
+
+img_path = os.path.join(TEST_IMG_DIR, img_name)
+
+image = cv2.imread(img_path)
+h, w = image.shape[:2]
+
+# =======** SAHI切片推理 **=======
+result = get_sliced_prediction(
+    img_path,
+    detection_model,
+    slice_height=640,
+    slice_width=640,
+    overlap_height_ratio=0.2,
+    overlap_width_ratio=0.2
+)
+
+# =======** 保存预测txt **=======
+txt_name = os.path.splitext(img_name)[0] + &quot;.txt&quot;
+txt_path = os.path.join(SAVE_PRED_DIR, txt_name)
+
+with open(txt_path, &#39;w&#39;) as f:
+
+    for obj in result.object_prediction_list:
+
+        # 类别
+        cls_id = obj.category.id
+
+        # 置信度
+        score = obj.score.value
+
+        # bbox
+        x1, y1, x2, y2 = obj.bbox.to_xyxy()
+
+        # 转YOLO格式
+        xc = ((x1 + x2) / 2) / w
+        yc = ((y1 + y2) / 2) / h
+        bw = (x2 - x1) / w
+        bh = (y2 - y1) / h
+
+        line = f&quot;{cls_id} {xc} {yc} {bw} {bh} {score}\n&quot;
+
+        f.write(line)</code></pre>
+<p>print(“预测完成”)</p>
+<pre><code>
+```bash
+result.object_prediction_list</code></pre>
+<p>评估指标 pip install sahi pycocotools 评估用coco格式</p>
+<pre class="txt"><code>YOLO test labels
+      ↓
+转COCO json
+
+SAHI滑窗推理
+      ↓
+生成预测json
+
+COCO evaluator
+      ↓
+输出：
+mAP50
+mAP50-95
+Precision
+Recall</code></pre>
+<pre class="txt"><code>instances_test.json</code></pre>
+<h2 id="划分数据集">划分数据集</h2>
+<p>simple dataset train:val:test=8:1:1。 总图片数量：713 train: 570 val:   71 test:  72</p>
+<p>simple dataset split 仅切分了train和val，test未修改 Train split:8035 Proportion: 88.09%</p>
+<p>Val split:1014 Proportion: 11.12%</p>
+<p>Test split:72 Proportion: 0.79%</p>
+<p>Total images in the dataset: 9121</p>
+<p>simple dataset split (删除部分背景图) Train split: Images: 6932 Labels: 6932 Proportion: 87.92%</p>
+<p>Val split: Images: 880 Labels: 880 Proportion: 11.16%</p>
+<p>Test split: Images: 72 Labels: 72 Proportion: 0.91%</p>
+<p>Total images in the dataset: 7884</p>
+<p>006 测试大数据集</p>
+<p>firdataset新标注的数据集 Train split: Images: 1455 Labels: 1455 Proportion: 79.99%</p>
+<p>Val split: Images: 182 Labels: 182 Proportion: 10.01%</p>
+<p>Test split: Images: 182 Labels: 182 Proportion: 10.01%</p>
+<p>Total images in the dataset: 1819</p>
+<p>原来的数据集 Train split: Images: 37477 Labels: 37477 Proportion: 79.84%</p>
+<p>Val split: Images: 4604 Labels: 4604 Proportion: 9.81%</p>
+<p>Test split: Images: 4858 Labels: 4858 Proportion: 10.35%</p>
+<p>Total images in the dataset: 46939</p>
+<h1 id="数据集记录">数据集记录</h1>
+<div class="line-block">数据集版本 | 训练集数量 | 验证集图片数量 | 新增或修改内容 | 验证集实例总数 | 各类别实例分布 (Instances) |</div>
+<div class="line-block">:—- | :—- | :——- | :—— | :——– | :—————————————————- |</div>
+<div class="line-block"><code>-</code> | <code>-</code> | <strong>551张</strong> | - | <strong>8799个</strong> | <strong>spot:</strong> 3199个<br><strong>acne:</strong> 2491个<br><strong>mole:</strong> 3109个 |</div>
+<p>数据集像素大小：5184X3456 设备相机拍摄像素大小：6000X4000</p>
+<p>yolov8 修改 未改</p>
+<p><code>python title:"train.py" results = model.train(data='/home/yious/nwpu_work/zhao/ultralytics-main/datasets/onlydataset-split-big/data.yaml',                            epochs=300,                            imgsz=640,                            workers=16,                           batch=256,                           device=[0, 1, 2, 3],                            project="/home/yious/nwpu_work/zhao/yolov8-small-target-detection-main/only-split-big/run",                           name="yolo8n_only_split_big",                           amp=False                           )</code></p>
+<p>```python title:“train.py” results = model.train( data=‘/home/yious/nwpu_work/zhao/ultralytics-main/datasets/onlydataset-split-big/data.yaml’, epochs=300, imgsz=1280, batch=32, workers=16, device=[0, 1, 2, 3], project=“/home/yious/nwpu_work/zhao/yolov8-small-target-detection-main/only-split-big/run”, name=“yolo8s_only_split_big_img1280”, pretrained=True, patience=50, close_mosaic=30, cos_lr=True, amp=True,</p>
+<pre><code># 数据增强
+mosaic=0.5,
+mixup=0.0,
+copy_paste=0.0,
+
+degrees=5.0,
+translate=0.05,
+scale=0.3,
+shear=0.0,
+perspective=0.0,
+
+fliplr=0.5,
+flipud=0.0,
+
+hsv_h=0.005,
+hsv_s=0.2,
+hsv_v=0.15,
+
+weight_decay=0.0005</code></pre>
+<p>)</p>
+<pre><code>1536
+1920
+
+&gt; 图片未发布：Pasted image 20260428184539.png
+即使分辨率处理加到1980，效果还是很差，所以应该还是切图训练。
+
+```python title:&quot;cut.py&quot;
+import os
+import cv2
+import shutil
+from pathlib import Path
+
+
+# =========================
+# 你需要修改的参数
+# =========================
+
+src_root = Path(&quot;simdataset&quot;)
+dst_root = Path(&quot;simdataset-split&quot;)
+
+tile_size = 1280
+overlap = 0.25
+stride = int(tile_size * (1 - overlap))
+
+# 是否保留无目标切图
+# 对检测任务建议保留一部分背景图，不能全不要
+keep_empty = True
+
+# 如果无目标切图太多，可以设置比例，比如 0.2 表示只保留 20%
+empty_keep_ratio = 0.2
+
+# 目标被切到太小的时候是否丢弃
+# 比如一个框只剩原来的 10%，一般可以丢掉
+min_area_ratio = 0.3
+
+img_exts = [&quot;.jpg&quot;, &quot;.jpeg&quot;, &quot;.png&quot;, &quot;.bmp&quot;, &quot;.webp&quot;]
+
+
+def yolo_to_xyxy(label, img_w, img_h):
+    cls, xc, yc, w, h = label
+    x1 = (xc - w / 2) * img_w
+    y1 = (yc - h / 2) * img_h
+    x2 = (xc + w / 2) * img_w
+    y2 = (yc + h / 2) * img_h
+    return int(cls), x1, y1, x2, y2
+
+
+def xyxy_to_yolo(cls, x1, y1, x2, y2, tile_w, tile_h):
+    xc = ((x1 + x2) / 2) / tile_w
+    yc = ((y1 + y2) / 2) / tile_h
+    w = (x2 - x1) / tile_w
+    h = (y2 - y1) / tile_h
+    return cls, xc, yc, w, h
+
+
+def read_yolo_labels(label_path, img_w, img_h):
+    boxes = []
+    if not label_path.exists():
+        return boxes
+
+    with open(label_path, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+        lines = f.readlines()
+
+    for line in lines:
+        parts = line.strip().split()
+        if len(parts) != 5:
+            continue
+
+        cls = int(float(parts[0]))
+        xc = float(parts[1])
+        yc = float(parts[2])
+        w = float(parts[3])
+        h = float(parts[4])
+
+        boxes.append(yolo_to_xyxy((cls, xc, yc, w, h), img_w, img_h))
+
+    return boxes
+
+
+def get_start_positions(length, tile_size, stride):
+    &quot;&quot;&quot;
+    生成滑窗起点，保证最后一块贴到图像边缘。
+    &quot;&quot;&quot;
+    if length &lt;= tile_size:
+        return [0]
+
+    positions = list(range(0, length - tile_size + 1, stride))
+
+    last = length - tile_size
+    if positions[-1] != last:
+        positions.append(last)
+
+    return positions
+
+
+def tile_one_image(img_path, label_path, out_img_dir, out_label_dir):
+    img = cv2.imread(str(img_path))
+    if img is None:
+        print(f&quot;无法读取图片: {img_path}&quot;)
+        return
+
+    img_h, img_w = img.shape[:2]
+    boxes = read_yolo_labels(label_path, img_w, img_h)
+
+    x_starts = get_start_positions(img_w, tile_size, stride)
+    y_starts = get_start_positions(img_h, tile_size, stride)
+
+    for y0 in y_starts:
+        for x0 in x_starts:
+            x1_tile = x0
+            y1_tile = y0
+            x2_tile = min(x0 + tile_size, img_w)
+            y2_tile = min(y0 + tile_size, img_h)
+
+            tile = img[y1_tile:y2_tile, x1_tile:x2_tile]
+            tile_h, tile_w = tile.shape[:2]
+
+            tile_labels = []
+
+            for cls, bx1, by1, bx2, by2 in boxes:
+                # 原始框面积
+                box_area = max(0, bx2 - bx1) * max(0, by2 - by1)
+
+                # 计算与 tile 的交集
+                inter_x1 = max(bx1, x1_tile)
+                inter_y1 = max(by1, y1_tile)
+                inter_x2 = min(bx2, x2_tile)
+                inter_y2 = min(by2, y2_tile)
+
+                inter_w = max(0, inter_x2 - inter_x1)
+                inter_h = max(0, inter_y2 - inter_y1)
+                inter_area = inter_w * inter_h
+
+                if inter_area &lt;= 0:
+                    continue
+
+                # 如果目标被切得太小，则丢弃
+                if box_area &gt; 0 and inter_area / box_area &lt; min_area_ratio:
+                    continue
+
+                # 转换成 tile 内坐标
+                new_x1 = inter_x1 - x1_tile
+                new_y1 = inter_y1 - y1_tile
+                new_x2 = inter_x2 - x1_tile
+                new_y2 = inter_y2 - y1_tile
+
+                # 太小的框也可以过滤
+                if new_x2 - new_x1 &lt; 2 or new_y2 - new_y1 &lt; 2:
+                    continue
+
+                yolo_label = xyxy_to_yolo(
+                    cls,
+                    new_x1,
+                    new_y1,
+                    new_x2,
+                    new_y2,
+                    tile_w,
+                    tile_h
+                )
+
+                tile_labels.append(yolo_label)
+
+            # 是否保留空切图
+            if len(tile_labels) ** 0:
+                if not keep_empty:
+                    continue
+
+                # 简单按照文件名 hash 做一个稳定采样，避免随机导致每次不同
+                key = hash(f&quot;{img_path.stem}_{x0}_{y0}&quot;) % 10000 / 10000
+                if key &gt; empty_keep_ratio:
+                    continue
+
+            out_name = f&quot;{img_path.stem}_x{x0}_y{y0}&quot;
+            out_img_path = out_img_dir / f&quot;{out_name}.jpg&quot;
+            out_label_path = out_label_dir / f&quot;{out_name}.txt&quot;
+
+            cv2.imwrite(str(out_img_path), tile)
+
+            with open(out_label_path, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+                for cls, xc, yc, w, h in tile_labels:
+                    # 防止数值越界
+                    xc = min(max(xc, 0), 1)
+                    yc = min(max(yc, 0), 1)
+                    w = min(max(w, 0), 1)
+                    h = min(max(h, 0), 1)
+                    f.write(f&quot;{cls} {xc:.6f} {yc:.6f} {w:.6f} {h:.6f}\n&quot;)
+
+
+def process_split(split):
+    src_img_dir = src_root / &quot;images&quot; / split
+    src_label_dir = src_root / &quot;labels&quot; / split
+
+    dst_img_dir = dst_root / &quot;images&quot; / split
+    dst_label_dir = dst_root / &quot;labels&quot; / split
+
+    dst_img_dir.mkdir(parents=True, exist_ok=True)
+    dst_label_dir.mkdir(parents=True, exist_ok=True)
+
+    img_paths = []
+    for ext in img_exts:
+        img_paths.extend(src_img_dir.glob(f&quot;*{ext}&quot;))
+        img_paths.extend(src_img_dir.glob(f&quot;*{ext.upper()}&quot;))
+
+    img_paths = sorted(img_paths)
+
+    print(f&quot;[{split}] 找到图片数量: {len(img_paths)}&quot;)
+
+    for i, img_path in enumerate(img_paths):
+        label_path = src_label_dir / f&quot;{img_path.stem}.txt&quot;
+        tile_one_image(img_path, label_path, dst_img_dir, dst_label_dir)
+
+        if (i + 1) % 20 ** 0:
+            print(f&quot;[{split}] 已处理 {i + 1}/{len(img_paths)}&quot;)
+
+    print(f&quot;[{split}] 完成&quot;)
+
+
+def main():
+    for split in [&quot;train&quot;, &quot;val&quot;]:
+        process_split(split)
+
+    print(&quot;全部切图完成！&quot;)
+    print(f&quot;输出目录: {dst_root}&quot;)
+
+
+if __name__ ** &quot;__main__&quot;:
+    main()</code></pre>
+<p>仅对train和val进行处理，test仍为大图。</p>
+<p>```python title:“train.py” from ultralytics import YOLO</p>
+<p>model = YOLO(“yolov8s.pt”)</p>
+<p>results = model.train( data=“/home/yious/nwpu_work/zhao/ultralytics-main/datasets/onlydataset-tile-1280/data.yaml”, epochs=300, imgsz=1280, batch=16, workers=16, device=[0, 1, 2, 3], project=“/home/yious/nwpu_work/zhao/yolov8-small-target-detection-main/only-tile-1280/run”, name=“yolov8s_tile1280”, pretrained=True, patience=50, close_mosaic=30, cos_lr=True, amp=True,</p>
+<pre><code>mosaic=0.5,
+mixup=0.0,
+copy_paste=0.0,
+
+degrees=5.0,
+translate=0.05,
+scale=0.3,
+shear=0.0,
+perspective=0.0,
+
+fliplr=0.5,
+flipud=0.0,
+
+hsv_h=0.005,
+hsv_s=0.2,
+hsv_v=0.15,
+
+weight_decay=0.0005</code></pre>
+<p>)</p>
+<pre><code>验证
+
+```python title:&quot;val&quot;
+from ultralytics import YOLO
+
+model = YOLO(&quot;/home/yious/nwpu_work/zhao/yolov8-small-target-detection-main/only-tile-1280/run/yolov8s_tile1280/weights/best.pt&quot;)
+
+metrics = model.val(
+    data=&quot;/home/yious/nwpu_work/zhao/ultralytics-main/datasets/onlydataset-tile-1280/data.yaml&quot;,
+    imgsz=1280,
+    batch=16,
+    device=[0, 1, 2, 3]
+)
+
+print(metrics)</code></pre>
+<p>大分辨率测试</p>
+<p>```python title:“val or test” import cv2 import torch import numpy as np from pathlib import Path from ultralytics import YOLO from torchvision.ops import nms</p>
+<h1 id="section-4">**=======================</h1>
+<h1 id="你需要修改的参数">你需要修改的参数</h1>
+<h1 id="section-5">=========================</h1>
+<p>model_path = “/home/yious/nwpu_work/zhao/yolov8-small-target-detection-main/only-tile-1280/run/yolov8s_tile1280/weights/best.pt”</p>
+<p>image_path = “/path/to/your/big_image.jpg”</p>
+<p>save_path = “/path/to/save/result.jpg”</p>
+<p>tile_size = 1280 overlap = 0.25 stride = int(tile_size * (1 - overlap))</p>
+<p>conf_thres = 0.25 iou_thres = 0.5</p>
+<p>device = 0</p>
+<p>def get_start_positions(length, tile_size, stride): if length &lt;= tile_size: return [0]</p>
+<pre><code>positions = list(range(0, length - tile_size + 1, stride))
+last = length - tile_size
+
+if positions[-1] != last:
+    positions.append(last)
+
+return positions</code></pre>
+<p>def class_aware_nms(boxes, scores, classes, iou_thres=0.5): """ 按类别分别做 NMS boxes: Nx4, xyxy scores: N classes: N """ if len(boxes) ** 0: return []</p>
+<pre><code>boxes_t = torch.tensor(boxes, dtype=torch.float32)
+scores_t = torch.tensor(scores, dtype=torch.float32)
+classes_t = torch.tensor(classes, dtype=torch.int64)
+
+keep_all = []
+
+for cls in classes_t.unique():
+    idx = torch.where(classes_t ** cls)[0]
+    keep = nms(boxes_t[idx], scores_t[idx], iou_thres)
+    keep_all.extend(idx[keep].tolist())
+
+return keep_all</code></pre>
+<p>def sliding_window_inference(model, img): h, w = img.shape[:2]</p>
+<pre><code>x_starts = get_start_positions(w, tile_size, stride)
+y_starts = get_start_positions(h, tile_size, stride)
+
+all_boxes = []
+all_scores = []
+all_classes = []
+
+for y0 in y_starts:
+    for x0 in x_starts:
+        x1 = x0
+        y1 = y0
+        x2 = min(x0 + tile_size, w)
+        y2 = min(y0 + tile_size, h)
+
+        tile = img[y1:y2, x1:x2]
+
+        results = model.predict(
+            source=tile,
+            imgsz=tile_size,
+            conf=conf_thres,
+            iou=iou_thres,
+            device=device,
+            verbose=False
+        )
+
+        result = results[0]
+
+        if result.boxes is None or len(result.boxes) ** 0:
+            continue
+
+        boxes = result.boxes.xyxy.cpu().numpy()
+        scores = result.boxes.conf.cpu().numpy()
+        classes = result.boxes.cls.cpu().numpy().astype(int)
+
+        for box, score, cls in zip(boxes, scores, classes):
+            bx1, by1, bx2, by2 = box
+
+            # 映射回原图坐标
+            bx1 += x1
+            bx2 += x1
+            by1 += y1
+            by2 += y1
+
+            # 防止越界
+            bx1 = max(0, min(bx1, w - 1))
+            by1 = max(0, min(by1, h - 1))
+            bx2 = max(0, min(bx2, w - 1))
+            by2 = max(0, min(by2, h - 1))
+
+            all_boxes.append([bx1, by1, bx2, by2])
+            all_scores.append(float(score))
+            all_classes.append(int(cls))
+
+keep = class_aware_nms(all_boxes, all_scores, all_classes, iou_thres=iou_thres)
+
+final_boxes = [all_boxes[i] for i in keep]
+final_scores = [all_scores[i] for i in keep]
+final_classes = [all_classes[i] for i in keep]
+
+return final_boxes, final_scores, final_classes</code></pre>
+<p>def draw_results(img, boxes, scores, classes): names = { 0: “ban”, 1: “dou”, 2: “zhi” }</p>
+<pre><code>for box, score, cls in zip(boxes, scores, classes):
+    x1, y1, x2, y2 = map(int, box)
+    label = f&quot;{names.get(cls, str(cls))} {score:.2f}&quot;
+
+    color = (0, 255, 0)
+    if cls ** 1:
+        color = (0, 0, 255)
+    elif cls ** 2:
+        color = (255, 0, 0)
+
+    cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
+    cv2.putText(
+        img,
+        label,
+        (x1, max(0, y1 - 5)),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.6,
+        color,
+        2
+    )
+
+return img</code></pre>
+<p>def main(): model = YOLO(model_path)</p>
+<pre><code>img = cv2.imread(image_path)
+if img is None:
+    raise RuntimeError(f&quot;无法读取图片: {image_path}&quot;)
+
+boxes, scores, classes = sliding_window_inference(model, img)
+
+print(f&quot;最终检测框数量: {len(boxes)}&quot;)
+
+vis = draw_results(img.copy(), boxes, scores, classes)
+
+save_path_obj = Path(save_path)
+save_path_obj.parent.mkdir(parents=True, exist_ok=True)
+cv2.imwrite(str(save_path_obj), vis)
+
+print(f&quot;结果保存到: {save_path}&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: main()</p>
+<pre><code>
+指标评估
+
+```bash
+model.val(data=&quot;切图数据集data.yaml&quot;, imgsz=1280)</code></pre>
+<p>```python title:“pr” import cv2 import torch import numpy as np from pathlib import Path from ultralytics import YOLO from torchvision.ops import nms</p>
+<h1 id="section-6">=========================</h1>
+<h1 id="修改这些路径">修改这些路径</h1>
+<h1 id="section-7">=========================</h1>
+<p>model_path = “/home/yious/nwpu_work/zhao/yolov8-small-target-detection-main/only-tile-1280/run/yolov8s_tile1280/weights/best.pt”</p>
+<p>val_img_dir = Path(“/home/yious/nwpu_work/zhao/ultralytics-main/datasets/onlydataset-split-big/images/val”) val_label_dir = Path(“/home/yious/nwpu_work/zhao/ultralytics-main/datasets/onlydataset-split-big/labels/val”)</p>
+<p>num_classes = 3</p>
+<p>tile_size = 1280 overlap = 0.25 stride = int(tile_size * (1 - overlap))</p>
+<p>conf_thres = 0.25 nms_iou_thres = 0.5</p>
+<h1 id="评估时判定预测正确的-iou-阈值">评估时判定预测正确的 IoU 阈值</h1>
+<p>match_iou_thres = 0.5</p>
+<p>device = 0</p>
+<p>img_exts = [“.jpg”, “.jpeg”, “.png”, “.bmp”, “.webp”]</p>
+<p>def get_start_positions(length, tile_size, stride): if length &lt;= tile_size: return [0]</p>
+<pre><code>positions = list(range(0, length - tile_size + 1, stride))
+last = length - tile_size
+
+if positions[-1] != last:
+    positions.append(last)
+
+return positions</code></pre>
+<p>def class_aware_nms(boxes, scores, classes, iou_thres=0.5): if len(boxes) ** 0: return []</p>
+<pre><code>boxes_t = torch.tensor(boxes, dtype=torch.float32)
+scores_t = torch.tensor(scores, dtype=torch.float32)
+classes_t = torch.tensor(classes, dtype=torch.int64)
+
+keep_all = []
+
+for cls in classes_t.unique():
+    idx = torch.where(classes_t ** cls)[0]
+    keep = nms(boxes_t[idx], scores_t[idx], iou_thres)
+    keep_all.extend(idx[keep].tolist())
+
+return keep_all</code></pre>
+<p>def sliding_window_inference(model, img): h, w = img.shape[:2]</p>
+<pre><code>x_starts = get_start_positions(w, tile_size, stride)
+y_starts = get_start_positions(h, tile_size, stride)
+
+all_boxes = []
+all_scores = []
+all_classes = []
+
+for y0 in y_starts:
+    for x0 in x_starts:
+        x1 = x0
+        y1 = y0
+        x2 = min(x0 + tile_size, w)
+        y2 = min(y0 + tile_size, h)
+
+        tile = img[y1:y2, x1:x2]
+
+        results = model.predict(
+            source=tile,
+            imgsz=tile_size,
+            conf=conf_thres,
+            iou=nms_iou_thres,
+            device=device,
+            verbose=False
+        )
+
+        result = results[0]
+
+        if result.boxes is None or len(result.boxes) ** 0:
+            continue
+
+        boxes = result.boxes.xyxy.cpu().numpy()
+        scores = result.boxes.conf.cpu().numpy()
+        classes = result.boxes.cls.cpu().numpy().astype(int)
+
+        for box, score, cls in zip(boxes, scores, classes):
+            bx1, by1, bx2, by2 = box
+
+            bx1 += x1
+            bx2 += x1
+            by1 += y1
+            by2 += y1
+
+            bx1 = max(0, min(bx1, w - 1))
+            by1 = max(0, min(by1, h - 1))
+            bx2 = max(0, min(bx2, w - 1))
+            by2 = max(0, min(by2, h - 1))
+
+            all_boxes.append([bx1, by1, bx2, by2])
+            all_scores.append(float(score))
+            all_classes.append(int(cls))
+
+keep = class_aware_nms(all_boxes, all_scores, all_classes, iou_thres=nms_iou_thres)
+
+final_boxes = [all_boxes[i] for i in keep]
+final_scores = [all_scores[i] for i in keep]
+final_classes = [all_classes[i] for i in keep]
+
+return final_boxes, final_scores, final_classes</code></pre>
+<p>def read_gt_yolo(label_path, img_w, img_h): gt_boxes = [] gt_classes = []</p>
+<pre><code>if not label_path.exists():
+    return gt_boxes, gt_classes
+
+with open(label_path, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+    lines = f.readlines()
+
+for line in lines:
+    parts = line.strip().split()
+    if len(parts) != 5:
+        continue
+
+    cls = int(float(parts[0]))
+    xc = float(parts[1])
+    yc = float(parts[2])
+    bw = float(parts[3])
+    bh = float(parts[4])
+
+    x1 = (xc - bw / 2) * img_w
+    y1 = (yc - bh / 2) * img_h
+    x2 = (xc + bw / 2) * img_w
+    y2 = (yc + bh / 2) * img_h
+
+    gt_boxes.append([x1, y1, x2, y2])
+    gt_classes.append(cls)
+
+return gt_boxes, gt_classes</code></pre>
+<p>def box_iou(box1, box2): x1 = max(box1[0], box2[0]) y1 = max(box1[1], box2[1]) x2 = min(box1[2], box2[2]) y2 = min(box1[3], box2[3])</p>
+<pre><code>inter = max(0, x2 - x1) * max(0, y2 - y1)
+
+area1 = max(0, box1[2] - box1[0]) * max(0, box1[3] - box1[1])
+area2 = max(0, box2[2] - box2[0]) * max(0, box2[3] - box2[1])
+
+union = area1 + area2 - inter
+
+if union &lt;= 0:
+    return 0.0
+
+return inter / union</code></pre>
+<p>def evaluate_one_image(pred_boxes, pred_scores, pred_classes, gt_boxes, gt_classes): """ 对一张图统计每类 TP FP FN """ tp = [0] * num_classes fp = [0] * num_classes fn = [0] * num_classes</p>
+<pre><code>pred_indices_by_cls = {c: [] for c in range(num_classes)}
+gt_indices_by_cls = {c: [] for c in range(num_classes)}
+
+for i, c in enumerate(pred_classes):
+    if c in pred_indices_by_cls:
+        pred_indices_by_cls[c].append(i)
+
+for i, c in enumerate(gt_classes):
+    if c in gt_indices_by_cls:
+        gt_indices_by_cls[c].append(i)
+
+for cls in range(num_classes):
+    pred_idxs = pred_indices_by_cls[cls]
+    gt_idxs = gt_indices_by_cls[cls]
+
+    # 按置信度从高到低匹配
+    pred_idxs = sorted(pred_idxs, key=lambda i: pred_scores[i], reverse=True)
+
+    matched_gt = set()
+
+    for pi in pred_idxs:
+        best_iou = 0
+        best_gi = -1
+
+        for gi in gt_idxs:
+            if gi in matched_gt:
+                continue
+
+            iou = box_iou(pred_boxes[pi], gt_boxes[gi])
+
+            if iou &gt; best_iou:
+                best_iou = iou
+                best_gi = gi
+
+        if best_iou &gt;= match_iou_thres:
+            tp[cls] += 1
+            matched_gt.add(best_gi)
+        else:
+            fp[cls] += 1
+
+    fn[cls] += len(gt_idxs) - len(matched_gt)
+
+return tp, fp, fn</code></pre>
+<p>def main(): model = YOLO(model_path)</p>
+<pre><code>img_paths = []
+for ext in img_exts:
+    img_paths.extend(val_img_dir.glob(f&quot;*{ext}&quot;))
+    img_paths.extend(val_img_dir.glob(f&quot;*{ext.upper()}&quot;))
+
+img_paths = sorted(img_paths)
+
+total_tp = [0] * num_classes
+total_fp = [0] * num_classes
+total_fn = [0] * num_classes
+
+print(f&quot;验证大图数量: {len(img_paths)}&quot;)
+
+for idx, img_path in enumerate(img_paths):
+    img = cv2.imread(str(img_path))
+    if img is None:
+        print(f&quot;无法读取: {img_path}&quot;)
+        continue
+
+    h, w = img.shape[:2]
+
+    label_path = val_label_dir / f&quot;{img_path.stem}.txt&quot;
+
+    gt_boxes, gt_classes = read_gt_yolo(label_path, w, h)
+
+    pred_boxes, pred_scores, pred_classes = sliding_window_inference(model, img)
+
+    tp, fp, fn = evaluate_one_image(
+        pred_boxes,
+        pred_scores,
+        pred_classes,
+        gt_boxes,
+        gt_classes
+    )
+
+    for c in range(num_classes):
+        total_tp[c] += tp[c]
+        total_fp[c] += fp[c]
+        total_fn[c] += fn[c]
+
+    print(f&quot;[{idx + 1}/{len(img_paths)}] {img_path.name} done&quot;)
+
+print(&quot;\n**======** Evaluation Result **======**&quot;)
+
+macro_p = []
+macro_r = []
+
+for c in range(num_classes):
+    p = total_tp[c] / (total_tp[c] + total_fp[c] + 1e-9)
+    r = total_tp[c] / (total_tp[c] + total_fn[c] + 1e-9)
+
+    macro_p.append(p)
+    macro_r.append(r)
+
+    print(f&quot;Class {c}: TP={total_tp[c]}, FP={total_fp[c]}, FN={total_fn[c]}, P={p:.4f}, R={r:.4f}&quot;)
+
+print(&quot;---------------------------------------&quot;)
+print(f&quot;Macro Precision: {np.mean(macro_p):.4f}&quot;)
+print(f&quot;Macro Recall:    {np.mean(macro_r):.4f}&quot;)
+
+total_TP = sum(total_tp)
+total_FP = sum(total_fp)
+total_FN = sum(total_fn)
+
+micro_p = total_TP / (total_TP + total_FP + 1e-9)
+micro_r = total_TP / (total_TP + total_FN + 1e-9)
+
+print(f&quot;Micro Precision: {micro_p:.4f}&quot;)
+print(f&quot;Micro Recall:    {micro_r:.4f}&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: main() ``` train结果 zhy1</p>
+<p>当然，你可以分两类做工作。 一是筛选数据集，找到图中标注比较少，看起来很明显，区别很大的那一类数据组成容易集，用容易集来训3分类的模型，效果不好再训单类模型。 二是强化全量数据集的单类模型的性能，我们把它当做定位提取器，提取出斑痘痣的位置之后再后接分类模型。第二类工作也是需要清晰的类别标注的 单类定位模型，你也需要考虑到高精度，小目标这两个问题</p>
+<p>先强化定位能力，后面再完善分类能力 把类别标注成“可疑点”这样 有两个方向，1是继续完善模型标注，增强类别之间的差异。2是后接一个特征提取的模型，把裁剪出来的斑点图片换算成特征矩阵，然后用机器学习算法打标签（分类） 通过提取区域候选和分类</p>
+<h1 id="指标">指标</h1>
+<p>sensitivity，specificity，<strong>dice</strong></p>
+<h1 id="改进">改进</h1>
+<p>皮肤区域过滤 ↓ 单类病灶检测提高召回 ↓ 局部分类器区分斑/痘/痣 ↓ 斑类区域用分割模型处理 ↓ 后处理规则过滤</p>
+<h2 id="app">app</h2>
+<h2 id="sdk">SDK</h2>
+<p>SOFTWARE DEVELOPMENT KIT，软件开发工具包 SDK 是芯片厂商提供的一整套软件开发工具与基础代码，用来帮助开发者快速完成从系统启动、驱动适配到应用开发的全过程。</p>
+<div class="image-placeholder">图片未发布：Pasted image 20260526202620.png</div>
+<div class="image-placeholder">图片未发布：Pasted image 20260527123229.png</div>
+<div class="image-placeholder">图片未发布：Pasted image 20260527124240.png</div>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></div>
+<div><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></div>
+<div><a href="../articles/修改.html">检测与分割双模型协同方案</a></div>
+<div><a href="../articles/优化计划.html">人脸色斑检测优化计划</a></div>
+<div><a href="../articles/超市识别项目.html">超市识别项目：视频预处理、标注与 YOLO 训练</a></div>
+<div><a href="../articles/实验记录.html">人脸色斑检测实验记录</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/标注规范.html">人脸色斑检测标注规范</a></div>
+<div><a href="../articles/数据集.html">人脸色斑检测数据集整理笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="记录 PyTorch 环境配置、自定义 Dataset、Dataloader 和图像数据读取的基础实践。">
+  <title>PyTorch 入门笔记：Dataset 与 Dataloader - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>PyTorch 入门笔记：Dataset 与 Dataloader</span></h1>
+  <div class="postDesc">posted @ 2026-05-28 swilderyude 分类: <a href="../categories.html#ai-基础">AI 基础</a></div>
+  <p class="postSummary">记录 PyTorch 环境配置、自定义 Dataset、Dataloader 和图像数据读取的基础实践。</p>
+  <div class="postTags"><span>PyTorch</span> <span>Dataset</span> <span>深度学习</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#加载数据">加载数据</a></li>
+<li class="toc-level-2"><a href="#dataset类">Dataset类</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>显卡，驱动和CUDA Toolkit windows，开始菜单打开任务管理器，点击性能，查看GPU型号 网址查看GPU是否支持CUDA https://www.geforce.cn/hardware/technology/cuda/supported-gpus 下载pytorch命令可以继续问问ai</p>
+<p>创建test环境用于实践</p>
+<pre class="bash"><code>conda create --name test python=3.9 -y</code></pre>
+<p>查看pytorch网址后下载</p>
+<pre class="bash"><code>python -m pip install torch torchvision</code></pre>
+<p>可以安装jupyter显示</p>
+<pre class="bash"><code>conda install jupyter</code></pre>
+<p>使用</p>
+<pre class="bash"><code>jupyter notebook</code></pre>
+<p>下载其他包</p>
+<pre class="bash"><code>pip install opencv-python</code></pre>
+<h1 id="加载数据">加载数据</h1>
+<p>两个类：Dataset数据集、Dataloader数据装载器 Dataset 提供一种方式去获取数据及其label。如何获取每一个数据及其label，说明总共有多少的数据。 Dataloader 为后面的网络提供不同的数据形式。</p>
+<h2 id="dataset类">Dataset类</h2>
+<p>实践</p>
+<pre class="python"><code>from torch.utils.data import Dataset</code></pre>
+<p>说明书</p>
+<pre class="python"><code>help(Dataset)
+Dataset??</code></pre>
+<p><strong>自定义数据集读取代码</strong></p>
+<pre class="python"><code>from torch.utils.data import Dataset
+from PIL import Image
+import os
+
+class MyData(Dataset):
+    
+    def __init__(self, root_dir, label_dir):
+        self.root_dir = root_dir
+        self.label_dir = label_dir
+        self.path = os.path.join(self.root_dir, self.label_dir)
+        self.img_path = os.listdir(self.path)
+        
+    def __getitem__(self, idx):
+        img_name = self.img_path[idx]
+        img_item_path = os.path.join(self.root_dir, self.label_dir, img_name)
+        img = Image.open(img_item_path)
+        label = self.label_dir
+        return img, label</code></pre>
+<p><em>(注：代码没有引入 <code>Dataset</code>，在真实运行环境中，通常需要在开头加上 <code>from torch.utils.data import Dataset</code>)</em> self 将变量声明为生命周期随对象存续且在类内部全局可见的<strong>实例属性</strong>，不加则将其限定为仅在当前方法执行期间有效的<strong>局部变量</strong>。</p>
+<ol type="1">
+<li>导入工具包</li>
+</ol>
+<ul>
+<li><p><strong><code>PIL</code> (Python Imaging Library)</strong>: 这是Python中专门用来处理图像的工具包。<code>Image</code> 模块可以打开、读取图片。</p></li>
+<li><p><strong><code>os</code></strong>: 这是专门用来和操作系统（比如Windows的系统路径、文件夹等）打交道的工具包。</p></li>
+</ul>
+<ol type="1">
+<li>定义一个类</li>
+</ol>
+<pre class="python"><code>class MyData(Dataset):</code></pre>
+<p>类继承。</p>
+<ol start="3" type="1">
+<li>初始化方法</li>
+</ol>
+<pre class="python"><code>    def __init__(self, root_dir, label_dir):
+        self.root_dir = root_dir
+        self.label_dir = label_dir
+        self.path = os.path.join(self.root_dir, self.label_dir)
+        self.img_path = os.listdir(self.path)</code></pre>
+<p>带有双下划线的 <code>__init__</code> 是Python的构造方法，它会自动且最先运行。 前后都带双下划线的方法叫 “magic method” 或 “dunder method”（double underscore），由 Python 解释器在特定时机自动调用。<code>__init__</code>、<code>__str__</code>、<code>__len__</code> 等都属于这一类。</p>
+<ul>
+<li><p><strong><code>self</code></strong>: 代表“自己”。</p></li>
+<li><p><strong><code>root_dir</code> 和 <code>label_dir</code></strong>: 在启动时需要的两个地址。<code>root_dir</code> 是主文件夹 “dataset”，<code>label_dir</code> 是子文件夹 “cats” (猫)。</p></li>
+<li><p><strong><code>os.path.join</code></strong>: 路径拼接工具。它会把 <code>root_dir</code> 和 <code>label_dir</code> 拼成一个完整的路径（比如 <code>dataset/cats</code>）。它比直接用加号拼字符串好，因为它知道Windows用 <code>\</code>，Mac用 <code>/</code>，绝不会拼错。</p></li>
+<li><p><strong><code>os.listdir(self.path)</code></strong>: 它的作用是打开上面拼好的路径文件夹，把里面的所有图片文件名列成一个列表。</p></li>
+</ul>
+<ol start="4" type="1">
+<li>获取具体数据的方法</li>
+</ol>
+<pre class="python"><code>    def __getitem__(self, idx):
+        img_name = self.img_path[idx]
+        img_item_path = os.path.join(self.root_dir, self.label_dir, img_name)
+        img = Image.open(img_item_path)
+        label = self.label_dir
+        return img, label</code></pre>
+<p><code>__getitem__</code> 也是一个魔法方法。当机器收到指令“给我第 <code>idx</code> 个数据”时，就会触发这段代码。</p>
+<ul>
+<li><p><strong><code>idx</code></strong>: 意思是 Index（索引、序号）。如果你想要清单里的第0张图，<code>idx</code> 就是 0。</p></li>
+<li><p><strong><code>img_name = self.img_path[idx]</code></strong>: 从刚才整理好的文件名清单里，查出第 <code>idx</code> 个文件的名字。</p></li>
+<li><p><strong><code>img_item_path = ...</code></strong>: 再次使用路径拼接，把主文件夹、子文件夹、图片名字拼成一个最终的绝对路径。</p></li>
+<li><p><strong><code>Image.open(...)</code></strong>: 调用上面导入的图片工具包，真正地把这张图片打开，存入变量 <code>img</code> 中。</p></li>
+<li><p><strong><code>label = self.label_dir</code></strong>: 给这张图片贴上标签。在这里，它直接拿所在文件夹的名字作为这张图的标签。</p></li>
+<li><p><strong><code>return img, label</code></strong>: 把处理好的图片本身和它的标签一起给出。</p></li>
+</ul>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></div>
+<div><a href="../articles/python学习.html">Python 学习笔记</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/统计学习方法.html">统计学习方法笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

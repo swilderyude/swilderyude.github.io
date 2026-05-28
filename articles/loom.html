@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="整理 DataLoom 表格、字段类型、过滤排序、Source 自动生成行和导出功能。">
+  <title>Obsidian DataLoom 使用笔记 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>Obsidian DataLoom 使用笔记</span></h1>
+  <div class="postDesc">posted @ 2026-05-28 swilderyude 分类: <a href="../categories.html#工具与环境">工具与环境</a></div>
+  <p class="postSummary">整理 DataLoom 表格、字段类型、过滤排序、Source 自动生成行和导出功能。</p>
+  <div class="postTags"><span>Obsidian</span> <span>DataLoom</span> <span>知识管理</span></div>
+  
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p><strong>一、创建一个 Loom（表格）</strong>                                                     </p>
+<p>  三种方式任选其一：                                                            </p>
+<p>  1. 命令面板（Ctrl/Cmd + P）→ 输入 DataLoom: Create new lom                    </p>
+<p>  2. 文件浏览器中右键某个文件夹 → “New lom”</p>
+<p>  3. 在某个 Markdown 笔记里光标处插入：命令面板搜 DataLoom: Create new loom and embed it into current file，or仅搜embed，会以嵌入块的形式出现                              </p>
+<p>  新建后会得到一个 .loom 文件，本质是 JSON，但用 DataLoom 视图打开就是可视化表格。</p>
+<p>  <strong>二、表格基本操作</strong></p>
+<p>  - <strong>新增行</strong>：表格底部点 New row                                                  </p>
+<p>  - <strong>新增列</strong>：表格最右侧点 New column</p>
+<p>  - <strong>改列类型</strong>：点列名 → 选 `Type → 切换字段类型                                  </p>
+<p>  - <strong>拖动调整列宽</strong>：拖列分隔条；拖列名调整列顺序</p>
+<p>  - <strong>菜单</strong>：每个单元格、列头、行头点击都会弹出对应菜单                            </p>
+<p>  <strong>三、字段类型（最常用）</strong>                                                        </p>
+<p>  | 类型 | 用途 |                                                               </p>
+<p>  |—|           </p>
+<p>  | Text | 普通文本 |</p>
+<p>  | Number | 数字 |</p>
+<p>  | Tag | 单选标签 |                                                            </p>
+<p>  | Multi-tag | 多选标签 |</p>
+<p>  | Date | 日期，带日历选择器 |                                                 </p>
+<p>  | Checkbox | 勾选框 |</p>
+<p>  | File | 链接到 vault 中的文件（[wikilink]]） |                               </p>
+<p>  | Embed | 嵌入图片/文件预览 |                                                 </p>
+<p>  | Currency | 货币（可选符号） |                                               </p>
+<p>  | Last edited time / Creation time | 自动时间戳 |                             </p>
+<p>  | Source / Source file | 行来源（配合“从文件夹生成行”功能） |                 </p>
+<p>  <strong>四、视图过滤、排序、搜索</strong>                                                      </p>
+<p>  - <strong>筛选</strong>：左上角 Filter 按钮 → 添加规则（按字段、运算符、值）                   </p>
+<p>  - <strong>排序</strong>：点列头 → Sort ascending / descending，可多列叠加</p>
+<p>  - <strong>搜索</strong>：右上角放大镜，跨所有单元格全文搜索                                    </p>
+<p>  - <strong>切换视图</strong>：当前主要是 Table 视图；列可以隐藏（列菜单 → Toggle visibility）   </p>
+<p>  <strong>五、Source（自动从文件夹生成行）⭐ 这是它的杀手锏</strong>                             </p>
+<p>  打开表格右上角设置 → Sources → Add source：                                   </p>
+<p>  - <strong>Folder source</strong>：选一个文件夹，DataLoom                                       </p>
+<p>  会把里面的每个笔记自动作为一行；新增/删除笔记，表格自动同步</p>
+<p>  - <strong>Frontmatter 映射</strong>：笔记 YAML frontmatter 里的字段，可以映射到 DataLoom       </p>
+<p>  的列上自动填充                                                                </p>
+<p>  这样你可以把整个文件夹的笔记当成一个数据库管理（类似 Notion 的 Database 或    </p>
+<p>  Dataview）。    </p>
+<p>  <strong>六、嵌入到笔记</strong>                                                                </p>
+<p>  在普通笔记里写：                                                              </p>
+<p>  [我的表格.loom]]</p>
+<p>  就会把这个 lom 渲染进当前笔记。也可以用 DataLoom: Create new loom and embed it</p>
+<p>   into current file 命令一步到位。                                             </p>
+<p>  <strong>七、导出</strong>        </p>
+<p>  命令面板搜 DataLoom: Export → 支持导出 Markdown、CSV。                        </p>
+<p>  <strong>八、常用快捷键（在表格内）</strong>                                                    </p>
+<p>  - Enter：进入单元格编辑                                                       </p>
+<p>  - Esc：退出编辑</p>
+<p>  - Tab / Shift+Tab：跳到下一/上一单元格                                        </p>
+<p>  - ↑↓←→：移动选中单元格                                                        </p>
+<p>  —                                                                           </p>
+<p>  <strong>入门建议</strong>        </p>
+<p>  第一次用，建议这么走一遍：</p>
+<p>  1. 新建一个 lom，叫 读书清单                                                  </p>
+<p>  2. 加几列：书名 (Text)、作者 (Tag)、状态 (Tag: 在读/已读/想读)、评分 </p>
+<p>  (Number)、完成日期 (Date)                                                     </p>
+<p>  3. 录入几行，玩一下筛选和排序</p>
+<p>  4. 再做一个 Source: Folder                                                    </p>
+<p>  试——指向你的某个笔记文件夹，看它怎么自动把笔记拉成行                          </p>
+<p>  走通这套就基本掌握了，剩下的公式、聚合（Calculation 行：底部点字段下方可以选  </p>
+<p>  Sum/Average/Count 等）顺手就会。</p>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/linux命令.html">Linux 命令笔记</a></div>
+<div><a href="../articles/远程服务器.html">远程服务器使用笔记</a></div>
+<div><a href="../articles/x-anylabeling.html">X-AnyLabeling 标注工具使用记录</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/git.html">Git 使用笔记</a></div>
+<div><a href="../articles/latex.html">LaTeX 写作笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

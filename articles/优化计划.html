@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="围绕小目标检测、分割模型、切图推理、损失函数和多任务管线整理后续优化方向。">
+  <title>人脸色斑检测优化计划 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>人脸色斑检测优化计划</span></h1>
+  <div class="postDesc">posted @ 2026-05-12 swilderyude 分类: <a href="../categories.html#项目实践">项目实践</a></div>
+  <p class="postSummary">围绕小目标检测、分割模型、切图推理、损失函数和多任务管线整理后续优化方向。</p>
+  <div class="postTags"><span>优化</span> <span>小目标</span> <span>分割</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#一问题对应优化方案">一、问题对应优化方案</a></li>
+<li class="toc-level-2"><a href="#问题-235五官及非皮肤区域误检问题">问题 2、3、5：五官及非皮肤区域误检问题</a></li>
+<li class="toc-level-3"><a href="#原因分析">原因分析</a></li>
+<li class="toc-level-3"><a href="#优化方案">优化方案</a></li>
+<li class="toc-level-3"><a href="#使用限制说明">使用限制说明</a></li>
+<li class="toc-level-3"><a href="#开发周期">开发周期</a></li>
+<li class="toc-level-2"><a href="#问题-6检测后标签名称不一致">问题 6：检测后标签名称不一致</a></li>
+<li class="toc-level-3"><a href="#原因分析-1">原因分析</a></li>
+<li class="toc-level-3"><a href="#优化方案-1">优化方案</a></li>
+<li class="toc-level-3"><a href="#开发周期-1">开发周期</a></li>
+<li class="toc-level-2"><a href="#问题-17色斑密集及大量漏检问题">问题 1、7：色斑密集及大量漏检问题</a></li>
+<li class="toc-level-3"><a href="#当前核心问题">当前核心问题</a></li>
+<li class="toc-level-3"><a href="#标注示例需求">标注示例需求</a></li>
+<li class="toc-level-3"><a href="#漏检问题处理方案">漏检问题处理方案</a></li>
+<li class="toc-level-3"><a href="#开发周期-2">开发周期</a></li>
+<li class="toc-level-2"><a href="#问题-4痣漏检问题">问题 4：痣漏检问题</a></li>
+<li class="toc-level-3"><a href="#原因分析-2">原因分析</a></li>
+<li class="toc-level-3"><a href="#优化方案-2">优化方案</a></li>
+<li class="toc-level-3"><a href="#开发周期-3">开发周期</a></li>
+<li class="toc-level-1"><a href="#二测试图片规范">二、测试图片规范</a></li>
+<li class="toc-level-2"><a href="#正脸照片">1. 正脸照片</a></li>
+<li class="toc-level-2"><a href="#图片清晰">2. 图片清晰</a></li>
+<li class="toc-level-2"><a href="#尽量使用设备实际拍摄图片">3. 尽量使用设备实际拍摄图片</a></li>
+<li class="toc-level-1"><a href="#三当前整体优化安排">三、当前整体优化安排</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>根据当前测试反馈结果，针对现阶段模型存在的问题，结合目前实际开发与实现情况，现制定如下优化计划。</p>
+<h1 id="一问题对应优化方案">一、问题对应优化方案</h1>
+<h2 id="问题-235五官及非皮肤区域误检问题">问题 2、3、5：五官及非皮肤区域误检问题</h2>
+<p>当前问题表现是，将眼角识别为斑点、将耳朵识别为斑点、侧脸时将眉毛识别为痣。</p>
+<h3 id="原因分析">原因分析</h3>
+<p>当前检测模型直接对整张图片进行识别，没有对面部区域进行限制。 因此模型可能会将眼角纹理、眉毛阴影、耳朵区域、面部边缘区域误识别为病灶。 尤其在侧脸情况下，由于五官区域位置变化较大，更容易出现误检。</p>
+<h3 id="优化方案">优化方案</h3>
+<p>软件增加<strong>“检测前五官识别”功能</strong> 整体流程调整为，人脸图片 → 五官识别 → 去除五官区域 → 仅对剩余皮肤区域进行检测，通过该方式减少误检问题。</p>
+<h3 id="使用限制说明">使用限制说明</h3>
+<p>由于五官识别依赖正面人脸定位，因此，测试图片需为正脸照片。 侧脸情况下，五官位置容易偏移、部分五官被遮挡、五官识别稳定性下降，会直接影响后续病灶检测效果。 因此，后续参与测试的图片需尽量为正脸照片。</p>
+<h3 id="开发周期">开发周期</h3>
+<p>预计开发时间：<strong>1 周</strong> 内容包括五官区域识别、五官区域过滤、检测区域限制、正脸适配测试。</p>
+<h2 id="问题-6检测后标签名称不一致">问题 6：检测后标签名称不一致</h2>
+<p>当前问题表现：同一种类型存在不同名称显示。</p>
+<h3 id="原因分析-1">原因分析</h3>
+<p>属于软件显示层问题，并非模型识别问题。</p>
+<h3 id="优化方案-1">优化方案</h3>
+<p>直接统一软件检测后的标签名称，保证同一类别只显示唯一名称。</p>
+<h3 id="开发周期-1">开发周期</h3>
+<p>可直接修改，不涉及模型训练。</p>
+<h2 id="问题-17色斑密集及大量漏检问题">问题 1、7：色斑密集及大量漏检问题</h2>
+<p>当前问题表现是色斑密集时只能识别部分区域，大量小斑点无法识别，痘痘/色斑密集时识别数量明显不足。</p>
+<h3 id="当前核心问题">当前核心问题</h3>
+<p>对于密集色斑图片，目前无法明确，最终需要展示怎样的检测效果。 例如，是倾向于更加精细的识别效果；还是更偏向整体区域展示；或者以区域化方式进行识别。 不同方式对应的检测精度、检测框数量、展示效果、模型训练难度都会存在明显差异。</p>
+<p>目前的内容是，对于色斑密集图片，需由需求方明确确认<strong>最终期望的色斑识别效果</strong>。 例图：</p>
+<div class="image-placeholder">图片未发布：Pasted image 20260512193830.png</div>
+<div class="image-placeholder">图片未发布：Pasted image 20260512193850.png 建议直接在测试图片上标注，希望怎样框选、希望框到什么程度、是否需要每个点单独识别。 便于后续统一标注标准，统一训练方向，避免重复调整。</div>
+<h3 id="标注示例需求">标注示例需求</h3>
+<p>建议提供色斑标注示例图。 明确哪些需要框、哪些不需要框、密集区域如何处理、连续区域如何处理。</p>
+<h3 id="漏检问题处理方案">漏检问题处理方案</h3>
+<p>漏检问题本质仍然属于模型训练问题，需要继续增加数据训练。 因此数据要求是增加设备实际采集图片。 对于测试图片也是优先使用<strong>实际设备采集数据</strong>。不建议大量使用网上图片验证。 原因是网上图片与实际设备拍摄的图片光照不同、清晰度不同、成像风格不同，会导致训练与实际使用效果不一致。</p>
+<h3 id="开发周期-2">开发周期</h3>
+<p>模型训练及优化：1~2 周 包括数据整理、模型重新训练、漏检优化、密集色斑场景优化测试</p>
+<h2 id="问题-4痣漏检问题">问题 4：痣漏检问题</h2>
+<p>当前问题表现是痣无法识别、痣容易漏检</p>
+<h3 id="原因分析-2">原因分析</h3>
+<p>属于当前模型训练问题。 现阶段模型对病灶定位能力不足，分类能力不稳定，导致色斑和痣类识别效果较差。</p>
+<h3 id="优化方案-2">优化方案</h3>
+<p>采用“先单类定位，再分类”方案。 即第一阶段仅训练病灶定位。不区分斑，痣，痘。先保证“病灶能被检出”。 第二阶段，在已有定位能力基础上，再进行分类训练。</p>
+<h3 id="开发周期-3">开发周期</h3>
+<p>预计测试及实现时间：2 周 包括单类模型训练、分类模型测试、两阶段训练验证、效果对比测试。</p>
+<h1 id="二测试图片规范">二、测试图片规范</h1>
+<p>由于后续将增加<strong>五官识别</strong>功能，因此测试图片需尽量满足以下要求。</p>
+<h2 id="正脸照片">1. 正脸照片</h2>
+<p>避免大角度侧脸，五官遮挡，面部不完整。</p>
+<h2 id="图片清晰">2. 图片清晰</h2>
+<p>避免模糊，过曝，阴影过重。</p>
+<h2 id="尽量使用设备实际拍摄图片">3. 尽量使用设备实际拍摄图片</h2>
+<h1 id="三当前整体优化安排">三、当前整体优化安排</h1>
+<div class="line-block">任务 | 优化内容 | 预计时间 |</div>
+<div class="line-block">— | ———————- | —– |</div>
+<div class="line-block">1 | 增加检测前五官识别功能，过滤五官区域检测 | 1 周 |</div>
+<div class="line-block">2 | 明确色斑密集场景最终展示效果，并提供标注示例 | 需需求确认 |</div>
+<div class="line-block">3 | 增加设备实际采集数据，优化漏检问题 | 1~2 周 |</div>
+<div class="line-block">4 | 先单类定位，再分类训练模型 | 2 周 |</div>
+<div class="line-block">5 | 测试图片统一使用正脸照片 | 测试规范 |</div>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></div>
+<div><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></div>
+<div><a href="../articles/修改.html">检测与分割双模型协同方案</a></div>
+<div><a href="../articles/超市识别项目.html">超市识别项目：视频预处理、标注与 YOLO 训练</a></div>
+<div><a href="../articles/实验记录.html">人脸色斑检测实验记录</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/标注规范.html">人脸色斑检测标注规范</a></div>
+<div><a href="../articles/数据集.html">人脸色斑检测数据集整理笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

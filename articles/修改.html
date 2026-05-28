@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="把斑点分割和痘痣检测拆成两个模型，并通过统一切图、结果回拼和可视化叠加实现协同。">
+  <title>检测与分割双模型协同方案 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>检测与分割双模型协同方案</span></h1>
+  <div class="postDesc">posted @ 2026-05-22 swilderyude 分类: <a href="../categories.html#项目实践">项目实践</a></div>
+  <p class="postSummary">把斑点分割和痘痣检测拆成两个模型，并通过统一切图、结果回拼和可视化叠加实现协同。</p>
+  <div class="postTags"><span>检测</span> <span>分割</span> <span>Pipeline</span></div>
+  
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <ul>
+<li><p>将输入图分辨率 <strong>imgsz ≥ 1280</strong></p></li>
+<li><p>增加 <strong>P2 小目标检测头</strong></p></li>
+<li><p><strong>关掉或调弱 Mosaic</strong>，防止小目标被拉扁</p></li>
+<li><p>推理阶段可用 <strong>SAHI 切图</strong>（切片推理提高召回）</p></li>
+<li><p>数据增强：<strong>copy-paste</strong>、loss 换 <strong>Varifocal</strong> 或 <strong>Focal loss</strong></p></li>
+<li><p><strong>二阶段分类</strong>：先用 YOLO 定位 → crop 出目标 → 再用 ResNet/ViT 分类</p></li>
+<li><p>或增加 attribute 分类头（颜色、隆起等特征）</p></li>
+<li><p><strong>斑改成分割任务</strong>：</p>
+<ul>
+<li><p>YOLOv8-seg 或 U-Net / Mask2Former</p></li>
+<li><p>输出 mask 而不是 bbox，更贴合斑的形状</p></li>
+</ul></li>
+<li><p>下游可以直接计算面积，或者再做 patch 分类聚合</p></li>
+<li><p><strong>斑（spot）→ 分割模型</strong></p></li>
+<li><p><strong>痘/痣（acne/mole）→ 检测模型</strong> 这是一个非常典型的“多任务 pipeline”。</p></li>
+</ul>
+<blockquote>
+<p>两个模型怎么协同？</p>
+</blockquote>
+<blockquote>
+<p>能不能在同一张图上显示？</p>
+</blockquote>
+<blockquote>
+<p>后续改进该怎么做？</p>
+</blockquote>
+<p>建议：</p>
+<p>|任务|模型|</p>
+<p>|—|—|</p>
+<p>|spot（斑）|分割|</p>
+<p>|acne/mole（痘痣）|检测|</p>
+<p>原因：</p>
+<p>|类别|特征|最适合|</p>
+<p>|—|—|—|</p>
+<p>|斑|边界模糊、连续区域|分割|</p>
+<p>|痘|小目标、离散|检测|</p>
+<p>|痣|小目标、边界清晰|检测|</p>
+<p>两个模型能不能同时识别？ 能。 而且工业里非常常见。</p>
+<p>两个模型能不能显示在同一张图？ 完全可以。 这是最常见的实现方式。 例如： 原图：</p>
+<pre class="text"><code>输入图像
+   ↓
+检测模型（痘/痣）
+   ↓
+得到 bbox
+
+同时：
+
+输入图像
+   ↓
+分割模型（斑）
+   ↓
+得到 mask
+
+最后：
+bbox + mask
+叠加到同一张图</code></pre>
+<p>最终结果：</p>
+<ul>
+<li><p>痘痘：框</p></li>
+<li><p>痣：框</p></li>
+<li><p>斑：半透明区域 全部显示在一张图。 这是标准做法。</p></li>
+</ul>
+<p>怎么实现“同图显示”？ 本质就是：</p>
+<pre class="python"><code>原图 image
+    ↓
+检测模型 pred_det
+    ↓
+画框
+
+分割模型 pred_seg
+    ↓
+画mask
+
+最后 merge</code></pre>
+<p>OpenCV 就能实现。</p>
+<p>两个模型怎么跑？ 两个独立模型 Pipeline</p>
+<pre class="text"><code>输入图
+   ├── YOLOv8 检测痘/痣
+   └── U-Net/YOLOv8-seg 分割斑
+
+最后融合结果</code></pre>
+<p>优点 非常适合你现在。 因为：</p>
+<ul>
+<li><p>spot 特性和 acne/mole 完全不同</p></li>
+<li><p>强行一个模型会互相干扰 缺点 推理稍慢。 因为跑两个模型。 但通常可以接受。</p></li>
+</ul>
+<p>分割模型还需要切图吗？ 这是关键。 大概率还是需要。 因为： 1、问题本质还是小目标 即使是分割：</p>
+<ul>
+<li><p>痘</p></li>
+<li><p>小斑</p></li>
+<li><p>小色素点 仍然只有几个像素。 2、高清人脸图太大 所以： 分割一样经常需要：</p></li>
+<li><p>切图</p></li>
+<li><p>patch</p></li>
+<li><p>sliding window</p></li>
+</ul>
+<p>尤其医学影像里非常常见。</p>
+<p>那两个模型能共享切图吗？ 完全可以。 这是最佳方案。 推荐工程结构</p>
+<pre class="text"><code>原图
+   ↓
+统一切图
+   ↓
+patches
+
+patch
+   ├── 检测模型
+   └── 分割模型
+
+结果回拼
+   ↓
+最终融合显示</code></pre>
+<p>后续如果提升模块，怎么改？ 检测和分割分开迭代。 因为： 它们是两个完全不同的问题。</p>
+<p>检测侧优化 优化：</p>
+<ul>
+<li><p>P2</p></li>
+<li><p>Neck</p></li>
+<li><p>小目标 Head</p></li>
+<li><p>Focal Loss</p></li>
+<li><p>SAHI</p></li>
+<li><p>RT-DETR</p></li>
+</ul>
+<p>分割侧优化 优化：</p>
+<ul>
+<li><p>U-Net++</p></li>
+<li><p>Attention U-Net</p></li>
+<li><p>DeepLabV3+</p></li>
+<li><p>Mask2Former</p></li>
+</ul>
+<p>第一阶段 保持：</p>
+<ul>
+<li><p>YOLOv8 检测 acne/mole 新增：</p></li>
+<li><p>U-Net 分割 spot 最后：</p></li>
+<li><p>OpenCV 融合显示</p></li>
+</ul>
+<p>这是最稳的。 第二阶段</p>
+<p>检测侧：</p>
+<ul>
+<li><p>P2</p></li>
+<li><p>RT-DETR</p></li>
+<li><p>SAHI</p></li>
+</ul>
+<p>分割侧：</p>
+<ul>
+<li><p>Attention U-Net</p></li>
+<li><p>DeepLabV3+</p></li>
+<li><p>YOLOv8-seg</p></li>
+</ul>
+<p>第三阶段（论文） 做： 多任务联合网络 例如：</p>
+<pre class="text"><code>共享Backbone
+   ├── detection head
+   └── segmentation head</code></pre>
+<p>这就很像正式科研了。</p>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></div>
+<div><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></div>
+<div><a href="../articles/优化计划.html">人脸色斑检测优化计划</a></div>
+<div><a href="../articles/超市识别项目.html">超市识别项目：视频预处理、标注与 YOLO 训练</a></div>
+<div><a href="../articles/实验记录.html">人脸色斑检测实验记录</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/标注规范.html">人脸色斑检测标注规范</a></div>
+<div><a href="../articles/数据集.html">人脸色斑检测数据集整理笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

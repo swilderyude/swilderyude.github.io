@@ -1,0 +1,1417 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="整理 Python 语法、常用库、文件处理和编程基础，作为后续深度学习实践的底座。">
+  <title>Python 学习笔记 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>Python 学习笔记</span></h1>
+  <div class="postDesc">posted @ 2026-05-27 swilderyude 分类: <a href="../categories.html#ai-基础">AI 基础</a></div>
+  <p class="postSummary">整理 Python 语法、常用库、文件处理和编程基础，作为后续深度学习实践的底座。</p>
+  <div class="postTags"><span>Python</span> <span>编程基础</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#缩进">缩进</a></li>
+<li class="toc-level-2"><a href="#注释">注释</a></li>
+<li class="toc-level-2"><a href="#命名">命名</a></li>
+<li class="toc-level-2"><a href="#保留字">保留字</a></li>
+<li class="toc-level-2"><a href="#print">print</a></li>
+<li class="toc-level-2"><a href="#模块化">模块化</a></li>
+<li class="toc-level-2"><a href="#格式化字符串">格式化字符串</a></li>
+<li class="toc-level-3"><a href="#三引号">三引号</a></li>
+<li class="toc-level-3"><a href="#format方法">format方法</a></li>
+<li class="toc-level-3"><a href="#f-字符串">f-字符串</a></li>
+<li class="toc-level-2"><a href="#输入函数">输入函数</a></li>
+<li class="toc-level-2"><a href="#赋值语句">赋值语句</a></li>
+<li class="toc-level-2"><a href="#输出函数">输出函数</a></li>
+<li class="toc-level-2"><a href="#循环">循环</a></li>
+<li class="toc-level-3"><a href="#for循环">for循环</a></li>
+<li class="toc-level-3"><a href="#while循环">while循环</a></li>
+<li class="toc-level-1"><a href="#交互模式">交互模式</a></li>
+<li class="toc-level-1"><a href="#函数">函数</a></li>
+<li class="toc-level-2"><a href="#对库函数引用的方式">对库函数引用的方式</a></li>
+<li class="toc-level-3"><a href="#函数定义">函数定义</a></li>
+<li class="toc-level-2"><a href="#函数的调用和返回值">函数的调用和返回值</a></li>
+<li class="toc-level-2"><a href="#改变参数值的函数">改变参数值的函数</a></li>
+<li class="toc-level-2"><a href="#函数与程序-结构递归">函数与程序 结构/递归</a></li>
+<li class="toc-level-2"><a href="#dry">DRY</a></li>
+<li class="toc-level-2"><a href="#引入模块">引入模块</a></li>
+<li class="toc-level-2"><a href="#高阶函数">高阶函数</a></li>
+<li class="toc-level-3"><a href="#匿名函数">匿名函数</a></li>
+<li class="toc-level-1"><a href="#类型">类型</a></li>
+<li class="toc-level-2"><a href="#未知类型">未知类型</a></li>
+<li class="toc-level-2"><a href="#数字类型">数字类型</a></li>
+<li class="toc-level-2"><a href="#复数类型complex">复数类型complex（）</a></li>
+<li class="toc-level-2"><a href="#浮点数类型float">浮点数类型float（）</a></li>
+<li class="toc-level-2"><a href="#字符串类型">字符串类型</a></li>
+<li class="toc-level-3"><a href="#索引">索引</a></li>
+<li class="toc-level-3"><a href="#字符串操作方法">字符串操作方法：</a></li>
+<li class="toc-level-2"><a href="#布尔类型">布尔类型</a></li>
+<li class="toc-level-2"><a href="#空值类型none-type">空值类型None Type</a></li>
+<li class="toc-level-2"><a href="#元组类型">元组类型</a></li>
+<li class="toc-level-3"><a href="#特点">特点：</a></li>
+<li class="toc-level-2"><a href="#列表类型">列表类型</a></li>
+<li class="toc-level-2"><a href="#字典类型">字典类型</a></li>
+<li class="toc-level-2"><a href="#字典的操作">字典的操作</a></li>
+<li class="toc-level-2"><a href="#切片slice语法">切片(slice)语法</a></li>
+<li class="toc-level-2"><a href="#方法和函数">方法和函数</a></li>
+<li class="toc-level-1"><a href="#分支">分支</a></li>
+<li class="toc-level-2"><a href="#简单分支">简单分支</a></li>
+<li class="toc-level-2"><a href="#二分支语法结构">二分支语法结构</a></li>
+<li class="toc-level-2"><a href="#多分支决策">多分支决策</a></li>
+<li class="toc-level-1"><a href="#异常处理">异常处理</a></li>
+<li class="toc-level-1"><a href="#基本循环结构">基本循环结构</a></li>
+<li class="toc-level-2"><a href="#for循环-1">for循环</a></li>
+<li class="toc-level-2"><a href="#死循环和循环嵌套">死循环和循环嵌套</a></li>
+<li class="toc-level-2"><a href="#后测循环实现">后测循环实现</a></li>
+<li class="toc-level-3"><a href="#半路循环">半路循环</a></li>
+<li class="toc-level-3"><a href="#半路循环-哨兵">半路循环-哨兵</a></li>
+<li class="toc-level-1"><a href="#布尔表达式">布尔表达式</a></li>
+<li class="toc-level-1"><a href="#面向对象编程">面向对象编程</a></li>
+<li class="toc-level-2"><a href="#特性">特性</a></li>
+<li class="toc-level-3"><a href="#封装">封装</a></li>
+<li class="toc-level-3"><a href="#继承">继承</a></li>
+<li class="toc-level-3"><a href="#多态">多态</a></li>
+<li class="toc-level-2"><a href="#实例">实例</a></li>
+<li class="toc-level-1"><a href="#文件">文件</a></li>
+<li class="toc-level-2"><a href="#文件的基础">文件的基础</a></li>
+<li class="toc-level-3"><a href="#文件的基本处理">文件的基本处理</a></li>
+<li class="toc-level-1"><a href="#异常">异常</a></li>
+<li class="toc-level-2"><a href="#异常类型">异常类型</a></li>
+<li class="toc-level-2"><a href="#捕捉异常">捕捉异常</a></li>
+<li class="toc-level-2"><a href="#测试">测试</a></li>
+<li class="toc-level-3"><a href="#unittest">unittest</a></li>
+<li class="toc-level-1"><a href="#常用">常用</a></li>
+<li class="toc-level-2"><a href="#random">random</a></li>
+<li class="toc-level-1"><a href="#数据分析三大库">数据分析三大库</a></li>
+<li class="toc-level-2"><a href="#matplotlib">matplotlib</a></li>
+<li class="toc-level-3"><a href="#matplotlib三层结构">Matplotlib三层结构</a></li>
+<li class="toc-level-3"><a href="#折线图与基础绘图">折线图与基础绘图</a></li>
+<li class="toc-level-3"><a href="#常见图形绘制">常见图形绘制</a></li>
+<li class="toc-level-2"><a href="#numpy">Numpy</a></li>
+<li class="toc-level-3"><a href="#性质">性质</a></li>
+<li class="toc-level-1"><a href="#示例-1">示例 1</a></li>
+<li class="toc-level-1"><a href="#示例-2">示例 2</a></li>
+<li class="toc-level-3"><a href="#运算">运算</a></li>
+<li class="toc-level-3"><a href="#统计运算">统计运算</a></li>
+<li class="toc-level-3"><a href="#数组间运算">数组间运算</a></li>
+<li class="toc-level-2"><a href="#pandas">Pandas</a></li>
+<li class="toc-level-3"><a href="#引入">引入</a></li>
+<li class="toc-level-3"><a href="#dataframe">DataFrame</a></li>
+<li class="toc-level-3"><a href="#基本操作">基本操作</a></li>
+<li class="toc-level-1"><a href="#未看2.案例电影数据">未看2.案例电影数据</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <h2 id="缩进">缩进</h2>
+<p>1个缩进=4个空格</p>
+<h2 id="注释">注释</h2>
+<p>两种方法： 单行注释以<code>#</code>开头 多行注释以<code>'''</code>开头和结尾 快捷键：command+/</p>
+<h2 id="命名">命名</h2>
+<p>命名规则使用大小写字母，数字和下划线的组合，但首字母只能是大小写字母或下划线，不能使用空格。 中文等非字母符号也可以作为名字。 下划线命名法： 1.字母全部小写 2.不同单词用下划线分隔</p>
+<h2 id="保留字">保留字</h2>
+<p>33个关键字</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250723203803.png 保留字in是一个二元关系操作，它用来判断左侧内容是否在右侧内容的集合中。 保留字import用来引用外部库。 保留字def用于定义函数。def定义的函数未经调用不能执行，需要通过函数名调用。</div>
+<h2 id="print">print</h2>
+<p>print（）函数可以用来输出空行 def定义的函数未经调用不能执行，需要通过函数名调用。</p>
+<pre class="python"><code>print(&quot;Dad!!!&quot;)</code></pre>
+<p>字符串连接（+）</p>
+<pre class="python"><code>print(&quot;hello&quot;+&quot; world&quot;+&quot;!&quot;)</code></pre>
+<h2 id="模块化">模块化</h2>
+<pre class="python"><code># 只有直接运行这个文件时才执行
+if __name__ ** &quot;__main__&quot;:
+    cook()</code></pre>
+<h2 id="格式化字符串">格式化字符串</h2>
+<h3 id="三引号">三引号</h3>
+<p>Python会把新的一行当成内容的换行</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250725154636.png</div>
+<h3 id="format方法">format方法</h3>
+<p>根据位置放参</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250901200414.png 根据关键词放参</div>
+<div class="image-placeholder">图片未发布：Pasted image 20250901200654.png</div>
+<h3 id="f-字符串">f-字符串</h3>
+<p>变量会直接求值添加到字符串内。</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250901200827.png</div>
+<div class="image-placeholder">图片未发布：Pasted image 20250901200954.png</div>
+<blockquote>
+<p><code>:.2f</code>是指数字会保留两位小数。</p>
+</blockquote>
+<h2 id="输入函数">输入函数</h2>
+<p>Input（）函数从控制台获得用户输入。 使用方法：<变量>=Input(<提示性文字>) 获得的用户变量输入以<strong>字符串</strong>形式保存在<变量>中。 第一个字节的索引值为0或-L，最后一个字节的索引值为L-1或-1</p>
+<h2 id="赋值语句">赋值语句</h2>
+<p>同步赋值指同时给多个变量赋值，即先运算右侧N个表达式，然后同时将表达式结果赋值给左侧。 <code>&lt;变量1&gt;，……，&lt;变量n&gt;=&lt;表达式1&gt;,……&lt;表达式n&gt;</code></p>
+<pre class="python"><code>my_love=&quot;祁煜&quot;</code></pre>
+<h2 id="输出函数">输出函数</h2>
+<p>通过<code>%</code>选择要输出的变量</p>
+<h2 id="循环">循环</h2>
+<h3 id="for循环">for循环</h3>
+<pre class="python"><code>for 变量名 in 可迭代对象：
+    表达式</code></pre>
+<p>计数循环基本过程</p>
+<pre class="python"><code>for i in range（&lt;计数值&gt;)：
+    &lt;表达式组&gt;</code></pre>
+<p>range函数语法：<code>range（start，stop，step】</code> 结束值不在序列的范围内。</p>
+<h3 id="while循环">while循环</h3>
+<pre class="python"><code>while 条件：
+    行动</code></pre>
+<h1 id="交互模式">交互模式</h1>
+<p>输入python3 直接输入赋值好的变量名，即可的结果，无需print 退出：quit（）或control+D</p>
+<h1 id="函数">函数</h1>
+<h2 id="对库函数引用的方式">对库函数引用的方式</h2>
+<p>第一种方式在程序头部增加： <code>import &lt;库名&gt;</code></p>
+<pre class="python"><code>import math</code></pre>
+<p>引用库里的函数： <code>&lt;库名&gt;.&lt;函数名&gt;(参数)</code></p>
+<pre class="python"><code>math.sin(1)</code></pre>
+<p>第二种引用方式：</p>
+<pre class="python"><code>from&lt;库名&gt;import&lt;函数名&gt;
+from&lt;库名&gt;import*</code></pre>
+<p>可直接使用库中的函数：</p>
+<pre class="python"><code>&lt;函数名&gt;（参数）</code></pre>
+<h3 id="函数定义">函数定义</h3>
+<p>函数定义：使用def语句</p>
+<pre class="python"><code>def &lt;name&gt;(&lt;parameters&gt;):
+    &lt;body&gt;</code></pre>
+<p>形式参数：定义函数时，函数名后面圆括号中的变量。形参只在函数内部有效。 实际参数：调用函数时，函数名后面圆括号中的变量。 函数调用的一般形式：<code>&lt;name&gt;(&lt;parameters&gt;)</code> 函数接口：返回值和参数 函数传递信息主要途径 通过函数返回值的方式传递信息 通过参数传递信息</p>
+<h2 id="函数的调用和返回值">函数的调用和返回值</h2>
+<p>无返回值的return语句等价于return None None是表示没有任何东西的特殊类型</p>
+<h2 id="改变参数值的函数">改变参数值的函数</h2>
+<p>Python的参数是通过值来传递的。 如果变量是可变对象（列表或图形对象），返回到调用程序后，该对象会呈现被修改后的状态。</p>
+<h2 id="函数与程序-结构递归">函数与程序 结构/递归</h2>
+<p>递归：函数定义中使用函数自身的方法。 典例：阶乘，0的阶乘：定义为1</p>
+<pre class="python"><code>def fact（n）：
+     if  n**0：
+         return 1        
+    else：
+        return  n*fact（n-1）</code></pre>
+<p>字符串反转 Python列表有反转的内置方法。 方法1:字符串转化为字符列表，反转列表，列表转化为字符串 方法2:递归 构造递归函数，需要基例。基例不进行递归，否则递归就会无限循环进行。</p>
+<h2 id="dry">DRY</h2>
+<p>软件开发原则：Don’t Repeat Yourself. 函数</p>
+<h2 id="引入模块">引入模块</h2>
+<p>求中位数</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250901202434.png statistics–数学统计函数 引入见库函数引入</div>
+<h2 id="高阶函数">高阶函数</h2>
+<p>把函数作为参数的函数 作为参数的函数是直接用函数名传入，不能带（），带（）就是函数调用后返回的结果 可以把格式化函数也作为高阶函数的参数传入</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250908193423.png</div>
+<h3 id="匿名函数">匿名函数</h3>
+<p>Lambda</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250908193804.png</div>
+<pre class="python"><code>(lambda num1, num2: num1 + num2)(2, 3)</code></pre>
+<p>局限性： <code>:</code>后只能有一个语句/表达式</p>
+<h1 id="类型">类型</h1>
+<p>类型是编程语言对数据的一种划分。 Python语言的类型： 数字类型，字符串类型，元组类型，列表类型，文件类型，字典类型。</p>
+<h2 id="未知类型">未知类型</h2>
+<p>type（）函数确定对象类型</p>
+<h2 id="数字类型">数字类型</h2>
+<p>整数类型int（） 传参后可以将其变为整型 pow（x，y）函数：计算x^y 0x,0X开头表示16进制数 0b,0B开头表示2进制数 0o,0O开头表示8进制数</p>
+<h2 id="复数类型complex">复数类型complex（）</h2>
+<p>对于复数z,可用z.real获得实数部分，z.imag获得虚数部分。 不同数字类型之间可以进行混合运算。 不支持直接将复数转换为浮点数和整数。可通过z.real，z.imag分别转换。</p>
+<h2 id="浮点数类型float">浮点数类型float（）</h2>
+<p>Python语言中浮点数的数值范围存在限制，小数精度也存在限制，这种限制与不同计算机系统有关。 科学计数法： <code>&lt;a&gt;e&lt;b&gt;=a*10^b</code></p>
+<h2 id="字符串类型">字符串类型</h2>
+<p>字符串是用<code>“ ”</code>或<code>‘ ’</code>括起来的一个或多个字符。 str1= 字符串可以保存在变量中，也可以单独存在。 可以用type（）函数测试一个字符串的类型。 转义符：<code>\</code> len（）函数能返回一个字符串的长度。 完整的转义符才占一个长度 字符串之间可以通过<code>+</code>或<code>*</code>进行连接 大多数数据类型都可以通过str（）函数转换为字符串</p>
+<h3 id="索引">索引</h3>
+<p>字符串中的编号叫做“索引”。 字符串是一个字符序列：字符串最左端位置标记为0，依次增加。 单个索引辅助访问字符串中的特定位置。 <code>&lt;string&gt;[&lt;索引&gt;]</code> <code>&lt;string&gt;[&lt;start&gt;:&lt;end&gt;]</code> start和end都是整数型数值，不包括end位置。</p>
+<h3 id="字符串操作方法">字符串操作方法：</h3>
+<p><code>&lt;string&gt;.func()</code> 遍历字符串中每个字符 <code>for&lt;var&gt;in&lt;string&gt;:</code></p>
+<h2 id="布尔类型">布尔类型</h2>
+<p>True False</p>
+<h2 id="空值类型none-type">空值类型None Type</h2>
+<p>None 当不确定某个变量的值，就可以先定义为None</p>
+<h2 id="元组类型">元组类型</h2>
+<p>元组是包含多个元素的类型，元素之间用逗号分割。 <code>()</code> 元组外侧可以使用括号，也可以不使用。</p>
+<h3 id="特点">特点：</h3>
+<p>元组中元素可以是不同类型 元组中各元素存在先后关系，可以通过索引访问元组中元素。 元组定义后不能更改也不能删除。 可索引，可使用<code>+</code>或<code>*</code>进行运算。</p>
+<h2 id="列表类型">列表类型</h2>
+<p>用<code>[]</code>表示，增加元素使用append，<code>变量.append()</code> 删除使用remove 列表是可变的，在于使用方法后原列表发生变化 列表是有序的元素集合，可以存放不同类型的数据。 列表中元素可通过索引访问单个元素 内置函数max，min，sorted 字符串可以通过split（）函数，将字符串拆分成一个列表。</p>
+<h2 id="字典类型">字典类型</h2>
+<p>针对非序列集合而提供的一种数据类型 <键><值>对 空字典用<code>{}</code>表示。 字典是一个键值对的集合，以键为索引，同一个键信息对应一个值。 键（key）：值（value）</p>
+<h2 id="字典的操作">字典的操作</h2>
+<p>获取某个键的值，<code>字典名[键]</code>。通过任意键查找集合中值信息的过程叫映射。 键的类型必须是不可变的。 字典是可变的，<code>字典名[键]=值</code>，就是更新和添加操作。 判断是否存在，<code>键 in 字典名</code>，返回bool值。 删除，<code>del 字典名[键]</code>。 个数，<code>len(字典名)</code>。 字典名.keys()，所有键。 字典名.values()，所有值。 字典名.items()，所有键值对。 字典的遍历</p>
+<pre class="python"><code>for key in dictionaryName：
+​       print（key+“：“+str（dictionaryName[key]））</code></pre>
+<p>字典的标准操作符 <code>-，&lt;,&gt;,&lt;=,&gt;=,**,!=,and,or,not</code> 字典不支持拼接操作符和重复操作符</p>
+<h2 id="切片slice语法">切片(slice)语法</h2>
+<p>用于从序列（如列表、元组、字符串）中提取元素。 语法：</p>
+<pre class="python"><code>sequence[start:stop:step]</code></pre>
+<p>例子：</p>
+<pre class="python"><code>my_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+# 从索引2开始，每2个取一个
+print(my_list[2::2])  # [2, 4, 6, 8]
+
+&quot;&quot;&quot;当步长为负数时：
+切片会从后向前取元素;
+默认的start变为最后一个元素;
+默认的stop变为第一个元素的前一个位置&quot;&quot;&quot;
+
+# 反转列表
+print(my_list[::-1])  # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+text = &quot;Python&quot;
+print(text[5:2:-1])    # &quot;noh&quot; - 从索引5到索引2反向取
+
+text = &quot;HelloWorld&quot;
+print(text[::2])  # &quot;Hlool&quot; - 每隔一个字符取一个</code></pre>
+<h2 id="方法和函数">方法和函数</h2>
+<div class="image-placeholder">图片未发布：Pasted image 20250803172007.png</div>
+<h1 id="分支">分支</h1>
+<h2 id="简单分支">简单分支</h2>
+<p>if语句格式</p>
+<pre class="python"><code>if&lt;condition&gt;:
+    &lt;body&gt;</code></pre>
+<p><code>&lt;body&gt;</code>是一个或多个语句序列 简单条件基本形式<code>&lt;expr&gt;&lt;relop&gt;&lt;expr&gt;</code> <code>&lt;relop&gt;</code>是关系操作符<code>&lt;,&lt;=,**,&gt;=,&gt;,!=</code> 除数字外，字符或字符串也可以按照字典顺序用于条件比较 eval是Python的一个内置函数,这个函数的作用是,返回传入字符串的表达式的结果</p>
+<h2 id="二分支语法结构">二分支语法结构</h2>
+<pre class="python"><code>if&lt;condition&gt;:
+    &lt;statements&gt;
+else:
+    &lt;statements&gt;</code></pre>
+<h2 id="多分支决策">多分支决策</h2>
+<p>把一个复合语句放到另一个语句的结构之中称为嵌套。 python使用if-elif-else描述多分支决策。</p>
+<pre class="python"><code>if&lt;condition1&gt;:
+    &lt;case1  statements&gt;
+elif&lt;condition2&gt;:
+    &lt;case2  statements&gt;
+elif&lt;condition3&gt;:
+    &lt;case3  statements&gt;
+……
+else：
+    &lt;default  statements&gt;</code></pre>
+<h1 id="异常处理">异常处理</h1>
+<p>python使用try……except……，可使程序不因运行错误而崩溃。</p>
+<pre class="python"><code>try：
+
+​      &lt;body&gt;
+
+except &lt;ErrorType1&gt;:
+
+​      &lt;handler1&gt;
+
+except &lt;ErrorType2&gt;:
+
+​      &lt;handler2&gt;
+
+except:
+
+​      &lt;handler0&gt;</code></pre>
+<p>python的异常处理语句还可以使用else和finally关键字。</p>
+<pre class="python"><code>try：
+
+​      &lt;body&gt;
+
+except &lt;ErrorType1&gt;:
+
+​      &lt;handler1&gt;
+
+except &lt;ErrorType2&gt;:
+
+​      &lt;handler2&gt;
+
+except:
+
+​      &lt;handler0&gt;
+
+else：
+
+​      &lt;process_else&gt;
+
+finally:
+
+​     &lt;process_fiinally&gt;</code></pre>
+<p>非数值类型NameError，无效的表达式SyntaxError</p>
+<blockquote>
+<p>求三者最大值</p>
+</blockquote>
+<p>策略一：通盘比较 将每一个值和其他所有值比较以确定最大值 策略二：决策树 决策树方法可以避免冗余比较</p>
+<pre class="python"><code>if    x1&gt;=x2:
+
+  ​       if     x1&gt;=x3
+
+  ​              max=x1
+
+  ​      else:
+
+  ​              max=x3
+
+  else:保留最大值
+
+  ​        if       x2&gt;=x3:
+
+  ​                  max=x2
+
+  ​        else   max=x3</code></pre>
+<p>策略三：顺序处理 逐个扫描每个值，保留最大值。</p>
+<pre class="python"><code>  max=x1
+
+  if   x2&gt;max:
+
+  ​          max=x2
+
+  If   x3&gt;max:
+
+  ​          max=x3</code></pre>
+<p>策略四：Python python终极解决方案</p>
+<pre class="python"><code> def    main():
+
+​                    x1,x2,x3=eval(input(&quot;please enter three values: &quot;))
+
+​                    print(&quot;The  largest  value is&quot;,max(x1,x2,x3))
+
+​          main()</code></pre>
+<h1 id="基本循环结构">基本循环结构</h1>
+<h2 id="for循环-1">for循环</h2>
+<p>for语句循环遍历整个序列的值。</p>
+<pre class="python"><code>  for &lt;var&gt; in &lt;sequence&gt;
+
+  ​               &lt;body&gt;
+</code></pre>
+<p>循环变量var遍历了队列中的每一个值，循环的语句体为每个值执行一次。</p>
+<h2 id="死循环和循环嵌套">死循环和循环嵌套</h2>
+<p>C语言中死循环While true或While 1是单片机编程的普遍用法，死循环一直运行，等待中断程序发生然后去处理中断程序。</p>
+<h2 id="后测循环实现">后测循环实现</h2>
+<p>Python没有后测循环语句，但可以通过while间接实现。 设定一初值，让循环至少执行一次，相当于后测循环。 break语句实现后测循环。</p>
+<h3 id="半路循环">半路循环</h3>
+<pre class="python"><code>While True：
+
+​           number=eval（input（“Enter a positive number：“））
+
+​           if x&gt;=0:break
+
+​           print（“The number you entered was not positive“）</code></pre>
+<h3 id="半路循环-哨兵">半路循环-哨兵</h3>
+<pre class="python"><code>While true：
+
+​           Get  next  date item
+
+​           if the item is the sentinel：break
+
+​           process the item</code></pre>
+<h1 id="布尔表达式">布尔表达式</h1>
+<p>逻辑运算 布尔操作符：not，and，or（顺序高阶） 德摩根定律，not放入表达式后，and和or运算符之间发生变化。 not（a and b）** not a or not b not（a or b）** not a and not b</p>
+<h1 id="面向对象编程">面向对象编程</h1>
+<p>OOP Object-Oriented Programming 类是对象的模版，对象是类的实例 对象的属性和方法</p>
+<blockquote>
+<p>图片未发布：Pasted image 20250901204823.png <code>init</code>构造函数，规定</p>
+</blockquote>
+<div class="image-placeholder">图片未发布：Pasted image 20250901204850.png</div>
+<div class="image-placeholder">图片未发布：Pasted image 20250901210329.png</div>
+<h2 id="特性">特性</h2>
+<h3 id="封装">封装</h3>
+<p>写类的人将内部实现细节隐藏，使用类的人只通过外部接口（方法）访问和使用。</p>
+<h3 id="继承">继承</h3>
+<p>父子类</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250901211908.png</div>
+<h3 id="多态">多态</h3>
+<p>子类方法不同，在不同字类里分别定义，但父类可直接执行方法，对象会自己表现不同。</p>
+<h2 id="实例">实例</h2>
+<div class="image-placeholder">图片未发布：Pasted image 20250901211400.png</div>
+<div class="image-placeholder">图片未发布：Pasted image 20250901211448.png</div>
+<h1 id="文件">文件</h1>
+<p>储存在外部介质上的数据或信息集合。 有序的数据序列。 绝对路径：/home/data 相对路径： <code>.</code>当前所在的目录 <code>..</code>上一层的父目录 <code>../..</code>更上一次 <code>./data</code>下一层子目录 <code>./</code>可以省略，在同一目录下可以直接使用文件名</p>
+<h2 id="文件的基础">文件的基础</h2>
+<p>Python中字符串类型未编码 编码encode（） 解码decode（） Unicode，UTF-8编码，GBK编码（《汉字内码扩展规范》，双字节编码） 文件数据 文本文件（以ASCII码方式存储的文件。） 二进制文件（照片，音乐，视频，计算机程序等）</p>
+<h3 id="文件的基本处理">文件的基本处理</h3>
+<h4 id="打开文件">打开文件</h4>
+<p>建立磁盘上的文件与程序中的对象相关联 通过相关的文件对象获得</p>
+<pre class="python"><code>open（）
+open(&quot;路径&quot;,&quot;模式&quot;,encoding=&quot;编码方式&quot;)
+open(&quot;./data.txt&quot;,&quot;r&quot;,encoding=&quot;utf-8&quot;)</code></pre>
+<p>模式参数不写默认是读取模式</p>
+<h4 id="文件操作">文件操作</h4>
+<p><code>r</code>读取模式(只读) <code>w</code>写入模式(只写)</p>
+<h5 id="读文件">读文件</h5>
+<h6 id="read方法">read方法</h6>
+<pre class="python"><code>f = open(&quot;./data.txt&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;)
+print(f.read()) # 会读全部的文件内容，并打印
+print(f.read()) # 会读空字符串，并打印</code></pre>
+<p>第一次read会记录到读到哪个位置，第二次read后面没有内容了就会返回空 read不要读很大内存的文件</p>
+<pre class="python"><code>print（f.read（10））# 会读第1-10个字节的文件内容
+print（f.read（10））# 会读第11-20个字节的文件内容</code></pre>
+<p>给read传参数，一次读多少字节</p>
+<h6 id="readline方法">readline方法</h6>
+<p>根据换行符确定行结尾，换行符也会被读进内容。</p>
+<pre class="python"><code>f = open（&quot;./data.txt&quot;，&quot;r&quot;，encoding=&quot;utf-8&quot;）
+print（f.readline（））# 会读一行文件内容，并打印
+print（f.readline（））# 会读一行文件内容，并打印</code></pre>
+<p>如何确定调用次数/行数？ 读到结尾会返回空字符串。 一般用while循环实现</p>
+<pre class="python"><code>f = open（&quot;./data.txt&quot;.&quot;r&quot;，encoding=&quot;utf-8&quot;）
+line = f.readline() # 读第一行
+while line ！=&quot;&quot;： # 判断当前行是否为空
+    print(line) # 不为空则打印当前行
+    line = f.readline() # 读取下一行</code></pre>
+<h6 id="readlines方法">readlines方法</h6>
+<pre class="python"><code>f = open(&quot;./data.txt&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;)
+# readlines会读全部文件内容，并把每行作为列表元素返回
+print(f.readlines())</code></pre>
+<p>一般和for循环结合</p>
+<pre class="python"><code>f = open(&quot;./data.txt&quot;, &quot;r&quot;, encoding=&quot;utf-8&quot;)
+lines = f.readlines() # 把每行内容储存到列表里
+for line in lines: # 遍历每行内容
+    print(line) # 打印当前行</code></pre>
+<h5 id="写文件">写文件</h5>
+<p><code>w</code>写入，如果文件已经存在，就会把原本的文件内容清空。</p>
+<pre class="python"><code>with open(&quot;./data.txt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+    f.write(&quot;Hello!\n&quot;)
+    f.write(&quot;Yo000\n&quot;)</code></pre>
+<p><code>a</code>附加模式，不会清空原文件</p>
+<pre class="python"><code>with open(&quot;./data.txt&quot;, &quot;a&quot;, encoding=&quot;utf-8&quot;) as f:
+    f.write(&quot;Hello!\n&quot;)
+    f.write(&quot;Yo000\n&quot;)</code></pre>
+<h5 id="同时读写">同时读写</h5>
+<p><code>r+</code></p>
+<pre class="python"><code>with open(&quot;./data.txt&quot;,&quot;r+&quot;,encoding=&quot;utf-8&quot;) as f:
+    print(f. read())
+    f.write(&quot;hello!&quot;)</code></pre>
+<h4 id="关闭文件">关闭文件</h4>
+<pre class="python"><code>f.close（）# 关闭文件，释放资源</code></pre>
+<p>with关键字</p>
+<pre class="python"><code>with open(&quot;./data.txt&quot;) as f:
+    print（f.read（））# 对文件的操作</code></pre>
+<p>文件会自动关闭。</p>
+<h1 id="异常">异常</h1>
+<h2 id="异常类型">异常类型</h2>
+<ol type="1">
+<li><p>长度之外的值对列表取索引，会产生indexError（索引错误）</p></li>
+<li><p>用数字除以0时，会产生ZeroDivisionError（除零错误）</p></li>
+<li><p>打开的文件不存在时，会产生FileNotFoundError（找不到文件错误）</p></li>
+<li><p>让两个字符串做乘法，会产生TypeError（类型错误）</p></li>
+</ol>
+<h2 id="捕捉异常">捕捉异常</h2>
+<p>用<code>try</code>,<code>except</code>语句捕捉异常</p>
+<pre class="python"><code>try:
+    user_weight = float（input（&quot;请输入您的体重（单位：kg）：&quot;））
+    user_height = float（input（&quot;请输入您的身高（单位：m）：&quot;））
+    user_BMI = user_weight / user_height ** 2
+except ValueError:
+    print（&quot;输入不为合理数字，请重新运行程序，并输入正确的数字。“）
+except ZeroDivisionError:
+    print（“身高不能为零，请重新运行程序，并输入正确的数字。“）
+except:
+    print（&quot;发生了未知错误，请重新运行程序。&quot;）
+else:
+    print（&quot;您的BMI值为：&quot; + str（user_BMI））# 没有错误时会运行
+finally:
+    print（&quot;程序结束运行。&quot;） # 无论发生错误与否都会运行</code></pre>
+<h2 id="测试">测试</h2>
+<p><code>assert</code>断言 <code>AssertionError</code>断言错误，程序直接中止</p>
+<h3 id="unittest">unittest</h3>
+<p>python单元测试库，单元测试是对软件中的最小可测试单元进行验证 一般把测试代码放在独立文件里 unittest会自动搜索test_开头的方法，而且只把test_开头的当成测试用例 引入：</p>
+<pre class="python"><code>from 文件名 import 函数名</code></pre>
+<pre class="python"><code>from 文件名 import 类名</code></pre>
+<p>例子：</p>
+<pre class="python"><code>import unittest
+from my_calculator import my_adder
+class TestMyAdder(unittest.TestCase): # TestMyAdder是unittest.TestCase的子类
+    def test_positive_with_positive(self):
+        self.assertEqual(my_adder (5, 3), 8)
+    def test_negative_with_positive(self):
+        self.assertEqual(my_adder (-5, 3), -2)</code></pre>
+<p><code>python -m unittest</code>这个库就会自动搜寻所有继承了unittest库里TestCase类的子类,运行它们所有以test_开头的方法,然后展示测试结果，共运行了几个测试。每个点都代表一个测试通过，没有通过是F</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250908181506.png</div>
+<div class="image-placeholder">图片未发布：Pasted image 20250908181829.png</div>
+<h4 id="测试方法">测试方法</h4>
+<div class="image-placeholder">图片未发布：Pasted image 20250908182256.png assertTrue可以代替这些所有方法</div>
+<pre class="python"><code>assertTrue(2 not in [1, 3 - 1])
+assertNotin(2, [1, 3 - 1])</code></pre>
+<p>测试类</p>
+<div class="image-placeholder">图片未发布：Pasted image 20250908190439.png 利用TestCase类里的setUp方法</div>
+<div class="image-placeholder">图片未发布：Pasted image 20250908190749.png</div>
+<h1 id="常用">常用</h1>
+<h2 id="random">random</h2>
+<pre class="python"><code>random.randint(a, b)</code></pre>
+<p>返回一个在 <code>[a, b]</code> 区间内的随机整数 <code>N</code>，即 <code>a &lt;= N &lt;= b</code>。 <code>randrange(a, b)</code> 生成 <code>[a, b)</code> 区间的数，不包含 <code>b</code>。 <code>random.randrange(b)</code> 从 0 开始 [0, b) <code>random.random()</code> 返回一个随机浮点数 [0.0, 1.0) <code>random.uniform(a, b)</code> 返回一个随机浮点数 [a, b] 或 [a, b)</p>
+<h1 id="数据分析三大库">数据分析三大库</h1>
+<h2 id="matplotlib">matplotlib</h2>
+<p>数据可视化图表</p>
+<p>matplotlib默认不支持中文 查看Mac支持的字体： <code>fc-list</code> 查看支持的字体 <code>fc-list :lang=zh</code> 查看支持的中文</p>
+<h3 id="matplotlib三层结构">Matplotlib三层结构</h3>
+<h4 id="容器层">容器层</h4>
+<p>容器层主要由Canvas、Figure、Axes组成。 Canvas是位于最底层的系统层，在绘图的过程中充当画板的角色，即放置画布（Figure）的工具。 Figure是Canvas上方的第一层，也是需要用户来操作的应用层的第一层，在绘图的过程中充当画布的角色。 Axes是应用层的第二层，在绘图的过程中相当于画布上的绘图区的角色。</p>
+<ul>
+<li><p>Figure：指整个图形（可以通过plt.figure（设置画布的大小和分辨率等）</p></li>
+<li><p>Axes（坐标系）：数据的绘图区域</p></li>
+<li><p>Axis（坐标轴）：坐标系中的一条轴，包含大小限制、刻度和刻度标签</p></li>
+</ul>
+<p>特点为：</p>
+<ul>
+<li><p>一个figure（图像）可以包含多个axes（坐标系/绘图区），但是一个axes只能属于一个figure。</p></li>
+<li><p>一个axes（坐标系/绘图区）可以包含多个axis（坐标轴），包含两个即为2d坐标系，3个即为3d坐标系</p></li>
+</ul>
+<h4 id="辅助显示层">辅助显示层</h4>
+<p>辅助显示层为Axes（绘图区）内的除了根据数据绘制出的图像以外的内容，主要包括Axes外观（facecolor）、边框线（spines）、坐标轴（axis）、坐标轴名称（axis label）、坐标轴刻度（tick）、坐标轴刻度标签（tick label）、网格线（grid）、图例（egend）、标题（title）等内容。 该层的设置可使图像显示更加直观更加容易被用户理解，但又不会对图像产生实质的影响。</p>
+<h4 id="图像层">图像层</h4>
+<p>图像层指Axes内通过plot、scatter、bar、histogram、pie等函数根据数据绘制出的图像。</p>
+<h3 id="折线图与基础绘图">折线图与基础绘图</h3>
+<p><strong>matplotlib.pyplot模块</strong> matplotlib.pytplot包含了一系列类似于matlab的画图函数。它的函数作用于当前图形（figure）的当前坐标系(axes).</p>
+<pre class="python"><code>import matplotlib.pyplot as plt</code></pre>
+<p>例子</p>
+<p><code>python title:"example" import matplotlib.pyplot as plt # 1. 创建画布 plt.figure(figsize=(20,8), dpi=100) # 2.绘制图像 x = [1,2,3] y = [4,5,6] plt.plot(x, y) #3.显示图像 plt. show()</code> <strong>画布属性</strong> 查看参数</p>
+<pre class="python"><code>help(plt.figure)
+# figsize:大小，dpi:像素</code></pre>
+<p><strong>图片保存</strong></p>
+<pre class="python"><code>plt.savefig(path)
+plt.savefig(&quot;test.png&quot;)
+# 放在展示前保存
+# show会释放内存资源</code></pre>
+<p><strong>添加自定义x,y刻度</strong> <code>plt.xticks(x, **kwargs)</code> x：要显示的刻度值 <code>plt.yticks(y, **kwargs)</code> y：要显示的刻度值</p>
+<pre class="python"><code># 增加以下两行代码
+# 构造x轴刻度标签
+x_ticks_label = [&quot;11点{}分&quot;.format(i) for i in x] # 相当于拼接
+# 构造y轴刻度
+y_ticks = range(40)
+# 修改X，y轴坐标的刻度显示
+# 第一个参数必须是数字，否则进行值替换
+plt.xticks(x[::5], x_ticks_label[::5]) # 必须最开始传递的是数字
+plt.yticks(y_ticks[::5])</code></pre>
+<p><strong>中文显示问题解决</strong> 下载中文字体（黑体，看准系统版本） 安装字体 linux下：拷贝字体到 <code>usr/share/fonts</code> 下：</p>
+<pre class="bash"><code>sudo cp ~/SimHei.ttf /usr/share/fonts/SimHei.ttf</code></pre>
+<p>windows和mac下：双击安装 删除~/.matplotib中的缓存文件</p>
+<pre class="bash"><code>cd ~/.matplotlib
+rm -r *</code></pre>
+<p>修改配置文件matplotlibrc</p>
+<pre class="bash"><code>vi ~/.matplotlib/matplotlibrc</code></pre>
+<p>将文件内容修改为：</p>
+<pre class="bash"><code>font. family: sans-serif
+font.sans-serif: SimHei
+axes. unicode_minus: False</code></pre>
+<p><strong>添加网格显示</strong></p>
+<pre class="python"><code>plt.grid(True, linestyle=&#39;--&#39;, alpha=0.5)
+# 虚实线，透明度</code></pre>
+<p><strong>添加描述信息</strong> 添加x轴、y轴描述信息及标题</p>
+<pre class="python"><code>plt.xlabel（&quot;时间&quot;）
+plt.ylabel（&quot;温度&quot;）
+plt.title（&quot;温度变化图示&quot;）</code></pre>
+<p><strong>再添加曲线</strong> 多次plot实现</p>
+<pre class="python"><code># 增加北京的温度数据
+y_beijing = [random.uniform(1, 3) for i in x]
+#绘制折线图
+plt.plot(x, y_shanghai, label=&quot;上海&quot;)
+# 使用多次plot可以画多个折线
+plt.plot (x, y_beijing, color=&#39;r&#39;, linestyle=&#39;-&#39;, label=&quot;北京&quot;)
+# 显示图例
+plt.legend(loc=&quot;best&quot;) # 自动选择最优位置（默认值）</code></pre>
+<p>我们仔细观察，用到了两个新的地方，一个是对于不同的折线展示效果，一个是添加图例。 <strong>图形风格</strong></p>
+<div class="line-block">颜色字符 | 风格字符 |</div>
+<p>|—–|—–|</p>
+<div class="line-block">r 红色 | - 实线 |</div>
+<div class="line-block">g 绿色 | - - 虚线 |</div>
+<div class="line-block">b 蓝色 | -. 点划线 |</div>
+<div class="line-block">w 白色 | : 点虚线 |</div>
+<div class="line-block">c 青色 | ’’ 留空、空格 |</div>
+<div class="line-block">m 洋红 |</div>
+<div class="line-block">y 黄色 |</div>
+<div class="line-block">k 黑色 |</div>
+<p><strong>显示图例</strong></p>
+<div class="line-block">字符串 | 数字代号 | 位置 |</div>
+<div class="line-block">:— | :— | :— |</div>
+<div class="line-block"><code>"best"</code> | <code>0</code> | 自动选择最优位置（默认值） |</div>
+<div class="line-block"><code>"upper right"</code> | <code>1</code> | 右上角 |</div>
+<div class="line-block"><code>"upper left"</code> | <code>2</code> | 左上角 |</div>
+<div class="line-block"><code>"lower left"</code> | <code>3</code> | 左下角 |</div>
+<div class="line-block"><code>"lower right"</code> | <code>4</code> | 右下角 |</div>
+<div class="line-block"><code>"right"</code> | <code>5</code> | 右侧中间 |</div>
+<div class="line-block"><code>"center left"</code> | <code>6</code> | 左侧中间 |</div>
+<div class="line-block"><code>"center right"</code> | <code>7</code> | 右侧中间 |</div>
+<div class="line-block"><code>"lower center"</code> | <code>8</code> | 底部中间 |</div>
+<div class="line-block"><code>"upper center"</code> | <code>9</code> | 顶部中间 |</div>
+<div class="line-block"><code>"center"</code> | <code>10</code> | 正中心 |</div>
+<p><strong>多个坐标系显示-plt.subplots（面向对象的画图方法）</strong> <code>matplotlib.pyplot.subplots（nrows=1, ncols=1， **fig_kw）</code> 创建一个带有多个axes（坐标系/绘图区）的图</p>
+<pre class="txt"><code>Parameters:
+nrows, ncols: int, optional, default: 1, Number of rows/columns of the subplot grid.
+**fig_kw : All additional keyword arguments are passed to the figure() call.
+Returns:
+f1g ：图对象
+ax :
+设置标题等方法不同：
+set_xticks
+set_yticks
+set_xlabel
+set_ylabel</code></pre>
+<p>注意：plt.函数名()相当于面向过程的画图方法，axes.set_方法名()相当于面向对象的画图方法。</p>
+<p><code>python title:"example" # 多个axes # 0.构造数据 x = range(60) y_shanghai = [random.uniform(15, 18) for i in x] y_beijing = [random.uniform(1, 14) for i in x] # 1. 创建画布 # plt.figure(fick-ze=(20, 8)) fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(20, 8), dpi=100) # 2. 图像绘制 # plt.plot(x, y_shanghai, label="上海") # plt.plot(x, y_beijing, label="北京", linestyle="-_", color="r") axes[0].plot (x, y_shanghai, label="上海") axes[1].plot (x, y_beijing, label="北京", linestyle="--", color="r") # 2.1 添加X，y轴刻度 x_ticks_label = ["11点{}分".format(i) for i in x] y_ticks = range(40) # plt.xticks(x[: :5], x_ticks_label[::5]) # plt.yticks(y_ticks[::5]) axes[0].set_xticks(x[::5]) axes[0].set_yticks(y_ticks[::5]) axes[0].set_xticklabels(x_ticks_label[: :5]) axes[1].set_xticks(x[::5]) axes[1].set_yticks(y_ticks[::5]) axes[1].set_xticklabels(x_ticks_label[: :5]) # 2.2 添加网格显示 # plt.grid(True, linestyle="--", alpha=0.5) axes[0].grid(True, linestyle="--", alpha=0.5) axes[1].grid(True, linestyle="--", alpha=0.5) # 2.3 添加×，y轴描述和标题 # plt.xlabel(”时间”） # plt.ylabel(”温度”） # plt.title("中午11点--12点温度变化图”，fontsize=25） axes[0].set_xlabeL("时间") axes[0].set_ylabel("温度") axes[0].set_title("上海中午11点--12点温度变化图"，fontsize=25) axes[1].set_xlabel("时间") axes[1].set_ylabel("温度") axes[1].set_title("北京中午11点--12点温度变化图"，fontsize=25) # 2.4 显示图例 # plt.legend(loc=0) axes[0].legend(loc=0) axes[1].legend(loc=0) # 3.显示 plt.show()</code></p>
+<h3 id="常见图形绘制">常见图形绘制</h3>
+<p>折线图</p>
+<pre class="python"><code>plt.plot(x,y)</code></pre>
+<p>散点图</p>
+<pre class="python"><code>plt.scatter(x,y)</code></pre>
+<p>柱状图</p>
+<pre class="python"><code>plt.bar(x, width, align=&#39;center&#39;, **kwargs)
+# x，柱宽，柱位置，颜色</code></pre>
+<p>直方图</p>
+<pre class="python"><code>matplotlib.pyplot.hist(x, bins=None)
+# 组距</code></pre>
+<p>饼图</p>
+<pre class="python"><code>plt.pie(x,labels=,autopct=,colors)
+# X：数量，自动算百分比
+# labels：每部分名称
+# autopct：占比显示指定%1.2f%%
+# colors：每部分颜色</code></pre>
+<h2 id="numpy">Numpy</h2>
+<p>Numpy （Numerical Python）是一个开源的Python科学计算库，用于快速处理任意维度的数组。 Numpy支持常见的数组和矩阵操作。对于同样的数值计算任务，使用Numpy比直接使用Python要简洁的 多。 Numpy使用ndarray对象来处理多维数组，该对象是一个快速而灵活的大数据容器。 <strong>ndarray</strong> NumPy提供了一个N维数组类型ndarray，它描述了相同类型的“items”的集合。 运算速率更快。 列表</p>
+<pre class="python"><code>import numpy as np
+# 创建ndarray
+score = np.array([[80, 89, 86, 67, 79],
+[78,97,89,67,81],
+[90,94,78,67,74],
+[91,91,90,67,69],
+[76,87,75,67,86],
+[70,79,84,67,84],
+[94,92,93, 67,64],
+[86, 85,83,67,80]])
+
+score</code></pre>
+<p>机器学习的最大特点就是大量的数据运算，那么如果没有一个快速的解决方案，那可能现在python也在机 器学习领域达不到好的效果。 Numpy专门针对ndarray的操作和运算进行了设计，所以数组的存储效率和输入输出性能远优于Python中 的嵌套列表，数组越大，Numpy的优势就越明显。 <strong>思考：ndarray为什么可以这么快？</strong></p>
+<ol type="1">
+<li>内存块风格</li>
+</ol>
+<div class="image-placeholder">图片未发布：Pasted image 20260317171851.png 从图中我们可以看出ndarray在存储数据的时候，数据与数据的地址都是连续的，这样就给使得批量操作数 组元素时速度更快。 这是因为ndarray中的所有元素的类型都是相同的，而Python列表中的元素类型是任意的，所以ndarray在 存储元素时内存可以连续，而python原生list就只能通过寻址方式找到下一个元素，这虽然也导致了在通用 性能方面Numpy的ndarray不及Python原生list，但在科学计算中，Numpy的ndarray就可以省掉很多循环 语句，代码使用方面比Python原生list简单的多。</div>
+<ol start="2" type="1">
+<li><p>ndarray支持并行化运算（向量化运算）</p></li>
+<li><p>效率远高于纯Python代码 Numpy底层使用C语言编写，内部解除了GIL（全局解释器锁），其对数组的操作速度不受Python解释器的 限制，所以，其效率远高于纯Python代码。</p></li>
+</ol>
+<h3 id="性质">性质</h3>
+<h4 id="属性">属性</h4>
+<div class="line-block">属性名字 | 属性解释 |</div>
+<div class="line-block">:— | :— |</div>
+<div class="line-block"><code>ndarray.shape</code> | 数组维度的元组 |</div>
+<div class="line-block"><code>ndarray.ndim</code> | 数组维数 |</div>
+<div class="line-block"><code>ndarray.size</code> | 数组中的元素数量 |</div>
+<div class="line-block"><code>ndarray.itemsize</code> | 一个数组元素的长度（字节） |</div>
+<div class="line-block"><code>ndarray.dtype</code> | 数组元素的类型 |</div>
+<h4 id="形状">形状</h4>
+<p>首先创建一些数组。</p>
+<pre class="python"><code># 创建不同形状的数组
+&gt;&gt;&gt; a = np.array(`1.2,31,14,5,6`)
+&gt;&gt;&gt; b = np.array([1,2,3,4])
+&gt;&gt;&gt; с = np.array([[[1,2,3], [4,5,6]], [[1,2,3], [4,5,6]]])</code></pre>
+<p>分别打印出形状</p>
+<pre class="python"><code>&gt;&gt;&gt; a.shape
+&gt;&gt;&gt; b.shape
+&gt;&gt;&gt; c.shape
+(2,3) # 二维数组
+(4, ) # 一维数组
+(2,2,3) # 三维数组</code></pre>
+<h4 id="类型-1">类型</h4>
+<pre class="python"><code>&gt;&gt;&gt; type(score.dtype)
+&lt;type &#39;numpy.dtype&#39;&gt;</code></pre>
+<p>dtype是numpy.dtype类型，先看看对于数组来说都有哪些类型</p>
+<div class="line-block">名称 | 描述 | 简写 |</div>
+<div class="line-block">:— | :— | :— |</div>
+<div class="line-block"><code>np.bool</code> | 用一个字节存储的布尔类型 (True 或 False) | <code>'b'</code> |</div>
+<div class="line-block"><code>np.int8</code> | 一个字节大小，-128 至 127 | <code>'i'</code> |</div>
+<div class="line-block"><code>np.int16</code> | 整数，-32768 至 32767 | <code>'i2'</code> |</div>
+<div class="line-block"><code>np.int32</code> | 整数，<span class="math inline"> − 2<sup>31</sup></span> 至 <span class="math inline">2<sup>31</sup> − 1</span> | <code>'i4'</code> |</div>
+<div class="line-block"><code>np.int64</code> | 整数，<span class="math inline"> − 2<sup>63</sup></span> 至 <span class="math inline">2<sup>63</sup> − 1</span> | <code>'i8'</code> |</div>
+<div class="line-block"><code>np.uint8</code> | 无符号整数，0 至 255 | <code>'u'</code> |</div>
+<div class="line-block"><code>np.uint16</code> | 无符号整数，0 至 65535 | <code>'u2'</code> |</div>
+<div class="line-block"><code>np.uint32</code> | 无符号整数，0 至 <span class="math inline">2<sup>32</sup> − 1</span> | <code>'u4'</code> |</div>
+<div class="line-block"><code>np.uint64</code> | 无符号整数，0 至 <span class="math inline">2<sup>64</sup> − 1</span> | <code>'u8'</code> |</div>
+<div class="line-block"><code>np.float16</code> | 半精度浮点数：16位，正负号1位，指数5位，精度10位 | <code>'f2'</code> |</div>
+<div class="line-block"><code>np.float32</code> | 单精度浮点数：32位，正负号1位，指数8位，精度23位 | <code>'f4'</code> |</div>
+<div class="line-block"><code>np.float64</code> | 双精度浮点数：64位，正负号1位，指数11位，精度52位 | <code>'f8'</code> |</div>
+<div class="line-block"><code>np.complex64</code> | 复数，分别用两个32位浮点数表示实部和虚部 | <code>'c8'</code> |</div>
+<div class="line-block"><code>np.complex128</code> | 复数，分别用两个64位浮点数表示实部和虚部 | <code>'c16'</code> |</div>
+<div class="line-block"><code>np.object_</code> | python对象 | <code>'O'</code> |</div>
+<div class="line-block"><code>np.string_</code> | 字符串 | <code>'S'</code> |</div>
+<div class="line-block"><code>np.unicode_</code> | unicode类型 | <code>'U'</code> |</div>
+<p>```python title:“example” import numpy as np</p>
+<h1 id="示例-1">示例 1</h1>
+<p>a = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.float32) print(a.dtype) # 输出: dtype(‘float32’)</p>
+<h1 id="示例-2">示例 2</h1>
+<p>arr = np.array([‘python’, ‘tensorflow’, ‘scikit-learn’, ‘numpy’], dtype=np.string_) print(arr) # 输出: array([b’python’, b’tensorflow’, b’scikit-learn’, b’numpy’], dtype=‘|S12’)</p>
+<pre><code>对于输出解释：
+b 前缀代表Bytes（字节）
+S (String)：代表这是一个字节字符串类型
+12 (长度)：NumPy 会自动扫描数组中所有的字符串，找到最长的一个。为了保证数组中每个元素占用的内存空间一致，NumPy 把所有元素的长度都定为 12。
+
+    - 较短的字符串（如 &#39;numpy&#39;）在内部存储时会在后面补空字节，但在显示时仍保持原样。
+
+| (字节序)：这个符号代表字节序（Endianness）。对于字符串类型来说，字节序是不适用的（因为它是单字节序列），所以用 | 表示“不适用”或“忽略”。
+
+### 基本操作
+
+#### 生成数组的方法
+
+##### 生成0和1的数组
+
+*   `np.ones(shape[, dtype, order])`
+
+*   `np.ones_like(a[, dtype, order, subok])`
+
+*   `np.zeros(shape[, dtype, order])`
+
+*   `np.zeros_like(a[, dtype, order, subok])`
+a是按照已有的数组进行生成。
+
+```python
+&gt;&gt;&gt; zero = np.zeros([3, 4])
+array([[ 0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.]])
+&gt;&gt;&gt; one = np.ones(zero)</code></pre>
+<p>这是图片内容的 Markdown 格式：</p>
+<h5 id="从现有数组生成">从现有数组生成</h5>
+<p>生成方式</p>
+<ul>
+<li><p><code>np.array(object[, dtype, copy, order, subok, ndmin])</code></p></li>
+<li><p><code>np.asarray(a[, dtype, order])</code></p></li>
+</ul>
+<pre class="python"><code># 列表形式
+a = np.array([[1,2,3],[4,5,6]])
+
+# 从现有的数组当中创建
+a1 = np.array(a)
+
+# 相当于索引的形式，并没有真正的创建一个新的
+a2 = np.asarray(a)</code></pre>
+<p><strong>np.array</strong> (深拷贝) 它会创建一个全新的对象，并将原数组的数据完整地复制一份到新内存中。 区别：如果你修改了原始数组 a，a1 不会发生任何变化。它们是独立的。 <strong>np.asarray</strong> (浅拷贝/引用) 如果输入已经是一个 NumPy 数组，它不会创建新副本，而是直接指向原数组的内存地址（相当于起了一个别名）。 区别：如果你修改了原始数组 a，a2 也会随之改变。 这是图片内容的 Markdown 格式：</p>
+<h5 id="生成固定范围的数组">生成固定范围的数组</h5>
+<ul>
+<li><code>np.linspace (start, stop, num, endpoint)</code> 生成等间隔的序列</li>
+</ul>
+<pre class="txt"><code>- start：序列的起始值
+- stop：序列的终止值
+- num：要生成的等间隔样例数量，即多少组。默认为 50
+- endpoint：序列中是否包含 stop 值，默认为 True</code></pre>
+<pre class="python"><code># 生成等间隔的数组
+np.linspace(0, 100, 11)</code></pre>
+<p>返回结果： <code>array([  0.,  10.,  20.,  30.,  40.,  50.,  60.,  70.,  80.,  90., 100.])</code></p>
+<ul>
+<li><p>其它的还有</p>
+<ul>
+<li><p><code>numpy.arange(start, stop, step, dtype)</code></p></li>
+<li><p><code>numpy.logspace(start, stop, num)</code></p></li>
+</ul></li>
+</ul>
+<pre class="python"><code>np.arange(10, 50, 2)</code></pre>
+<p>返回结果： <code>array([10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48])</code></p>
+<pre class="python"><code># 生成 10^x
+np.logspace(0, 2, 3)</code></pre>
+<p>返回结果： <code>array([  1.,  10., 100.])</code></p>
+<p><code>np.logspace</code> 的作用是生成一个对数等比数列。 在代码 <code>np.logspace(0, 2, 3)</code> 中：</p>
+<ul>
+<li><p>第一个参数 <code>0</code>：起始指数（start）。</p></li>
+<li><p>第二个参数 <code>2</code>：终止指数（stop）。</p></li>
+<li><p>第三个参数 <code>3</code>：生成样本的数量（num）。</p></li>
+<li><p>默认参数 <code>base=10</code>：底数（图片中没写，但默认就是 10）。 这是图片内容的 Markdown 格式：</p></li>
+</ul>
+<h5 id="生成随机数组">生成随机数组</h5>
+<ul>
+<li><p><code>np.random</code> 模块 <strong>均匀分布</strong></p></li>
+<li><p><code>np.random.rand(d0, d1, ..., dn)</code> 返回 <span class="math inline">[0.0, 1.0)</span> 内的一组均匀分布的数。</p></li>
+<li><p><code>np.random.uniform(low=0.0, high=1.0, size=None)</code> 功能：从一个均匀分布 <span class="math inline">[<em>l</em><em>o</em><em>w</em>, <em>h</em><em>i</em><em>g</em><em>h</em>)</span> 中随机采样，注意定义域是左闭右开，即包含 <span class="math inline"><em>l</em><em>o</em><em>w</em></span>，不包含 <span class="math inline"><em>h</em><em>i</em><em>g</em><em>h</em></span>。 参数介绍：</p>
+<ul>
+<li><p>low：采样下界，float 类型，默认值为 0；</p></li>
+<li><p>high：采样上界，float 类型，默认值为 1；</p></li>
+<li><p>size：输出样本数目，为 int 或元组 (tuple) 类型。例如，<span class="math inline"><em>s</em><em>i</em><em>z</em><em>e</em> = (<em>m</em>, <em>n</em>, <em>k</em>)</span>，则输出 <span class="math inline"><em>m</em> × <em>n</em> × <em>k</em></span> 个样本，缺省时输出 1 个值。 返回值：<code>ndarray</code> 类型，其形状和参数 <code>size</code> 中描述一致。</p></li>
+</ul></li>
+<li><p><code>np.random.randint(low, high=None, size=None, dtype='l')</code> 从一个均匀分布中随机采样，生成一个<strong>整数</strong>或 N 维整数数组。 取数范围：若 <code>high</code> 不为 <code>None</code> 时，取 <span class="math inline">[<em>l</em><em>o</em><em>w</em>, <em>h</em><em>i</em><em>g</em><em>h</em>)</span> 之间随机整数，否则取值 <span class="math inline">[0, <em>l</em><em>o</em><em>w</em>)</span> 之间随机整数。</p></li>
+</ul>
+<p><strong>正态分布<span class="math inline"><em>N</em>(<em>μ</em>, <em>σ</em>)</span></strong> 正态分布特点 <span class="math inline"><em>μ</em></span> 决定了其位置，其标准差 <span class="math inline"><em>σ</em></span> 决定了分布的幅度。当 <span class="math inline"><em>μ</em> = 0, <em>σ</em> = 1</span> 时的正态分布是标准正态分布。 <span class="math display">$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$</span></p>
+<ul>
+<li><p>方差 是在概率论和统计方差衡量一组数据时离散程度的度量 <span class="math display">$$s^2 = \frac{(x_1 - M)^2 + (x_2 - M)^2 + (x_3 - M)^2 + \cdots + (x_n - M)^2}{n}$$</span> 其中 M 为平均值，n 为数据总个数，S 为标准差，<span class="math inline"><em>S</em><sup>2</sup></span> 可以理解一个整体为方差 <span class="math display">$$\sigma = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2}$$</span></p></li>
+<li><p>标准差与方差的意义 可以理解成数据的一个离散程度的衡量</p></li>
+</ul>
+<p>正态分布创建方式</p>
+<ul>
+<li><p><code>np.random.randn(d0, d1, ..., dn)</code> 功能：从标准正态分布中返回一个或多个样本值</p></li>
+<li><p><code>np.random.normal(loc=0.0, scale=1.0, size=None)</code></p>
+<ul>
+<li><p>loc: float 此概率分布的均值（对应着整个分布的中心centre）</p></li>
+<li><p>scale: float 此概率分布的标准差（对应于分布的宽度，scale越大越矮胖，scale越小，越瘦高）</p></li>
+<li><p>size: int or tuple of ints 输出的shape，默认为None，只输出一个值</p></li>
+</ul></li>
+<li><p><code>np.random.standard_normal(size=None)</code> 返回指定形状的标准正态分布的数组。</p></li>
+</ul>
+<pre class="python"><code>x2 = np.random.normal(1.75, 1, 100000000)</code></pre>
+<p>返回结果：</p>
+<pre class="python"><code>array([2.90646763, 1.46737886, 2.21799024, ..., 1.56047411, 1.87969135,
+       0.9028096 ])</code></pre>
+<h4 id="数组索引切片">数组索引，切片</h4>
+<p>案例：随机生成 8 只股票 2 周的交易日涨幅数据 8 只股票，两周（10天）的涨跌幅数据，如何获取？</p>
+<ul>
+<li><p>两周的交易日数量为：<span class="math inline">2 × 5 = 10</span></p></li>
+<li><p>随机生成涨跌幅在某个正态分布内，比如均值 0，方差 1</p></li>
+</ul>
+<p>股票涨跌幅数据的创建</p>
+<pre class="python"><code># 创建符合正态分布的 8 只股票 10 天的涨跌幅数据
+stock_change = np.random.normal(0, 1, (8, 10))</code></pre>
+<p><strong>索引、切片</strong></p>
+<pre class="python"><code># 前两天
+stock_change[0:8,0:2]</code></pre>
+<h4 id="形状修改">形状修改</h4>
+<p>让刚才的股票行、日期列反过来，变成日期行，股票列</p>
+<ul>
+<li><code>ndarray.reshape(shape[, order])</code> Returns an array containing the same data with a new shape.</li>
+</ul>
+<pre class="python"><code># 在转换形状的时候，一定要注意数组的元素匹配
+stock_change.reshape([10, 8])
+stock_change.reshape([-1, 20])  # 数组的形状被修改为：(4, 20), -1: 表示通过待计算</code></pre>
+<ul>
+<li><code>ndarray.resize(new_shape[, refcheck])</code> Change shape and size of array in-place.</li>
+</ul>
+<pre class="python"><code>stock_change.resize([10, 8])</code></pre>
+<p><code>reshape</code> vs <code>resize</code>：</p>
+<pre><code>*   `reshape`：产生一个**新**的数组，原数组 `stock_change` 的形状其实没有变。
+
+*   `resize`：直接在**原数组**上修改形状（in-place），没有返回值。</code></pre>
+<ul>
+<li><p><code>ndarray.T</code> 数组的转置</p>
+<ul>
+<li>将数组的行、列进行互换</li>
+</ul></li>
+</ul>
+<pre class="python"><code>stock_change.shape
+# (8, 10)
+
+stock_change.T.shape
+# (10, 8)</code></pre>
+<h4 id="类型修改">类型修改</h4>
+<ul>
+<li><code>ndarray.astype(type)</code></li>
+</ul>
+<pre class="python"><code>stock_change.astype(np.int32)</code></pre>
+<ul>
+<li><p><code>ndarray.tostring([order])</code> 或者 <code>ndarray.tobytes([order])</code> Construct Python bytes containing the raw data bytes in the array.</p>
+<ul>
+<li>转换成 bytes</li>
+</ul></li>
+</ul>
+<pre class="python"><code>arr = np.array([[[1, 2, 3], [4, 5, 6]], [[12, 3, 34], [5, 6, 7]]])
+arr.tostring()</code></pre>
+<ol type="1">
+<li><p><code>astype</code>：这是最常用的类型转换方法（例如将浮点数转为整数）。注意它会返回一个<strong>新数组</strong>，不会修改原数组。</p></li>
+<li><p><code>tostring/tobytes</code>：将数组转换为二进制字节流。这在将数据写入文件或通过网络传输时很有用。注意：<code>tostring</code> 在较新版本的 NumPy 中已弃用，建议改用 <code>tobytes</code>。</p></li>
+</ol>
+<h4 id="数组的去重">数组的去重</h4>
+<ul>
+<li><code>np.unique</code></li>
+</ul>
+<pre class="python"><code>temp = np.array([[1, 2, 3, 4], [3, 4, 5, 6]])
+
+# 运行去重函数
+&gt;&gt;&gt; np.unique(temp)
+array([1, 2, 3, 4, 5, 6])</code></pre>
+<ol type="1">
+<li><p>功能：<code>np.unique()</code> 的作用是找出数组中所有唯一的值，并剔除重复项。</p></li>
+<li><p>自动展平：注意看例子中原数组 <code>temp</code> 是一个 2x4 的二维数组，但 <code>np.unique</code> 的返回结果变成了一个一维数组。这是因为在默认情况下，该函数会将多维数组先“压扁”（flatten）再进行去重。</p></li>
+<li><p>自动排序：去重后的结果会按照从小到大的顺序自动排列。</p></li>
+</ol>
+<h3 id="运算">运算</h3>
+<h4 id="逻辑运算">逻辑运算</h4>
+<pre class="python"><code># 重新生成 8 只股票 10 个交易日的涨跌幅数据
+&gt;&gt;&gt; stock_change = np.random.normal(0, 1, (8, 10))
+
+# 截取前 5 只股票的前 5 天数据（方便观察结果）
+&gt;&gt;&gt; stock_change = stock_change[0:5, 0:5]
+
+# 逻辑判断：如果涨跌幅大于 0.5 就标记为 True，否则为 False
+&gt;&gt;&gt; stock_change &gt; 0.5
+array([[ True, False, False,  True, False],
+       [ True,  True, False, False, False],
+       [ True, False,  True, False,  True],
+       [False,  True, False, False, False],
+       [False, False, False,  True,  True]])
+
+# BOOL 赋值：将满足条件的（&gt; 0.5 的）位置统一设置为指定的值 1 —— 这种方式叫“布尔索引”
+&gt;&gt;&gt; stock_change[stock_change &gt; 0.5] = 1
+
+# 打印赋值后的结果
+&gt;&gt;&gt; stock_change
+array([[ 1.        , -0.72404879, -1.2045773 ,  1.        ,  0.3869043 ],
+       [ 1.        ,  1.        ,  0.20815446, -1.67860823,  0.06612823],
+       [ 1.        ,  0.42753488,  1.        , -0.24375089,  1.        ],
+       [-0.971945  ,  1.        , -0.95444661, -0.2602084 , -0.48736497],
+       [-0.32183056, -0.92544956, -0.42126604,  1.        ,  1.        ]])</code></pre>
+<p>广播机制的逻辑比较 (<code>stock_change &gt; 0.5</code>)： NumPy 允许你直接用数组和单个数字做比较。它会对数组中的每一个元素进行检查，返回一个形状完全相同、但内容全是 <code>True</code> 或 <code>False</code> 的布尔型数组。 这是图片内容的 Markdown 格式以及详细的代码解释：</p>
+<h4 id="通用判断函数">通用判断函数</h4>
+<ul>
+<li><strong><code>np.all()</code></strong></li>
+</ul>
+<pre class="python"><code># 判断 stock_change[0:2, 0:5] 是否全是上涨的
+&gt;&gt;&gt; np.all(stock_change[0:2, 0:5] &gt; 0)
+False</code></pre>
+<ul>
+<li><strong><code>np.any()</code></strong></li>
+</ul>
+<pre class="python"><code># 判断前 5 只股票这段期间是否有上涨的
+&gt;&gt;&gt; np.any(stock_change[0:5, :] &gt; 0)
+True</code></pre>
+<h4 id="np.where三元运算符">np.where（三元运算符）</h4>
+<p>通过使用 <code>np.where</code> 能够进行更加复杂的运算。</p>
+<ul>
+<li><strong><code>np.where()</code></strong></li>
+</ul>
+<pre class="python"><code># 判断前四个股票前四天的涨跌幅 大于0的置为1，否则为0
+temp = stock_change[:4, :4]
+np.where(temp &gt; 0, 1, 0)</code></pre>
+<ul>
+<li><strong>复合逻辑需要结合 <code>np.logical_and</code> 和 <code>np.logical_or</code> 使用</strong></li>
+</ul>
+<pre class="python"><code># 判断前四个股票前四天的涨跌幅 大于0.5并且小于1的，换为1，否则为0
+np.where(np.logical_and(temp &gt; 0.5, temp &lt; 1), 1, 0)
+
+# 判断前四个股票前四天的涨跌幅 大于0.5或者小于-0.5的，换为1，否则为0
+np.where(np.logical_or(temp &gt; 0.5, temp &lt; -0.5), 1, 0)</code></pre>
+<h3 id="统计运算">统计运算</h3>
+<h4 id="统计指标">统计指标</h4>
+<ul>
+<li><p><strong><code>min(a[, axis, out, keepdims])</code></strong></p>
+<ul>
+<li>Return the minimum of an array or minimum along an axis. (返回数组的最小值或沿轴的最小值)</li>
+</ul></li>
+<li><p><strong><code>max(a[, axis, out, keepdims])</code></strong></p>
+<ul>
+<li>Return the maximum of an array or maximum along an axis. (返回数组的最大值或沿轴的最大值)</li>
+</ul></li>
+<li><p><strong><code>median(a[, axis, out, overwrite_input, keepdims])</code></strong></p>
+<ul>
+<li>Compute the median along the specified axis. (计算沿指定轴的中位数)</li>
+</ul></li>
+<li><p><strong><code>mean(a[, axis, dtype, out, keepdims])</code></strong></p>
+<ul>
+<li>Compute the arithmetic mean along the specified axis. (计算沿指定轴的算术平均值)</li>
+</ul></li>
+<li><p><strong><code>std(a[, axis, dtype, out, ddof, keepdims])</code></strong></p>
+<ul>
+<li>Compute the standard deviation along the specified axis. (计算沿指定轴的标准差)</li>
+</ul></li>
+<li><p><strong><code>var(a[, axis, dtype, out, ddof, keepdims])</code></strong></p>
+<ul>
+<li>Compute the variance along the specified axis. (计算沿指定轴的方差)</li>
+</ul></li>
+</ul>
+<p><strong>案例：股票涨跌幅统计运算</strong> 进行统计的时候，<strong>axis</strong> 轴的取值并不一定，NumPy 中不同的 API 轴的值都不一样。在这里，<strong>axis 0 代表列</strong>，<strong>axis 1 代表行</strong>去进行统计。</p>
+<pre class="python"><code># 接下来对于这 4 只股票的 4 天数据，进行一些统计运算
+# 指定行 (axis=1) 去统计，即计算每一只股票在这一段时间内的指标
+
+print(&quot;前四只股票前四天的最大涨幅 {}&quot;.format(np.max(temp, axis=1)))
+
+# 使用 min, std, mean
+print(&quot;前四只股票前四天的最大跌幅 {}&quot;.format(np.min(temp, axis=1)))
+print(&quot;前四只股票前四天的波动程度 {}&quot;.format(np.std(temp, axis=1)))
+print(&quot;前四只股票前四天的平均涨跌幅 {}&quot;.format(np.mean(temp, axis=1)))</code></pre>
+<p>如果需要统计出<strong>哪一只股票</strong>在某个交易日的涨幅最大或者最小？</p>
+<ul>
+<li><p><code>np.argmax(temp, axis=)</code></p></li>
+<li><p><code>np.argmin(temp, axis=)</code></p></li>
+</ul>
+<pre class="python"><code># 获取股票指定哪一天的涨幅最大
+print(&quot;前四只股票前四天内涨幅最大 {}&quot;.format(np.argmax(temp, axis=1)))
+
+print(&quot;前四天一天内涨幅最大的股票 {}&quot;.format(np.argmax(temp, axis=0)))</code></pre>
+<ul>
+<li><p><code>np.max()</code>：返回的是具体的数值。</p></li>
+<li><p><code>np.argmax()</code>：返回的是最大值所在的索引（位置）。</p></li>
+</ul>
+<h3 id="数组间运算">数组间运算</h3>
+<h4 id="数组与数的运算">数组与数的运算</h4>
+<pre class="python"><code>arr = np.array([[1, 2, 3, 2, 1, 4], [5, 6, 1, 2, 3, 1]])
+arr + 1
+arr / 2
+
+# 可以对比python列表的运算，看出区别
+a = [1, 2, 3, 4, 5]
+a * 3</code></pre>
+<h4 id="数组与数组的运算">数组与数组的运算</h4>
+<pre class="python"><code>arr1 = np.array([[1, 2, 3, 2, 1, 4], [5, 6, 1, 2, 3, 1]])
+arr2 = np.array([[1, 2, 3, 4], [3, 4, 5, 6]])</code></pre>
+<p><strong>NumPy 数组 vs Python 列表</strong></p>
+<ul>
+<li><p>Python 列表 (<code>a * 3</code>)：它不会把列表里的数字乘以 3，而是把整个列表复制并拼接 3 遍。结果会变成 <code>[1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5]</code>。</p></li>
+<li><p>NumPy 数组：执行的是数学意义上的向量/矩阵运算。</p></li>
+</ul>
+<h4 id="广播机制">广播机制</h4>
+<p>执行 broadcast 的前提在于，两个 ndarray 执行的是 element-wise 的运算，Broadcast 机制的功能是为了方便不同形状的 ndarray（numpy 库的核心数据结构）进行数学运算。 当操作两个数组时，numpy 会逐个比较它们的 shape（构成的元组 tuple），只有在下述情况下，两个数组才能够进行数组与数组的运算：</p>
+<ul>
+<li><p>维度相等</p></li>
+<li><p>shape（其中相对应的一个地方为 1）</p></li>
+</ul>
+<p>例如：</p>
+<pre class="text"><code>Image  (3d array): 256 x 256 x 3
+Scale  (1d array):             3
+Result (3d array): 256 x 256 x 3
+
+A      (4d array):  9 x 1 x 7 x 1
+B      (3d array):      8 x 1 x 5
+Result (4d array):  9 x 8 x 7 x 5
+
+A      (2d array):  5 x 4
+B      (1d array):      1
+Result (2d array):  5 x 4
+
+A      (3d array): 15 x 3 x 5
+B      (1d array): 15 x 1 x 1
+Result (3d array): 15 x 3 x 5</code></pre>
+<p>当两个数组的大小对不上时，NumPy 会尝试把那些只有 <strong>1</strong> 的维度“拉伸”开，直到和另一个数组的大小一致。</p>
+<p><strong>判定的口诀：</strong> 从后往前看每一个维度（从右往左）：</p>
+<ol type="1">
+<li><p><strong>如果两个数相等</strong>，没问题。</p></li>
+<li><p><strong>如果其中一个是 1</strong>，也没问题，它会把自己复制很多份来匹配另一个。</p></li>
+<li><p><strong>如果两个数不等且都不为 1</strong>，对不起，报错！ 案例分析（以例子 2 为例）：</p></li>
+</ol>
+<ul>
+<li><p>A 是 <code>9 x 1 x 7 x 1</code></p></li>
+<li><p>B 是 <code>8 x 1 x 5</code> （位数不够的前面补 1，变成 <code>1 x 8 x 1 x 5</code>）</p></li>
+</ul>
+<h4 id="矩阵运算">矩阵运算</h4>
+<h5 id="矩阵乘法api">矩阵乘法api:</h5>
+<ul>
+<li><p><strong><code>np.matmul</code></strong></p></li>
+<li><p><strong><code>np.dot</code></strong></p></li>
+</ul>
+<pre class="python"><code>&gt;&gt;&gt; a = np.array([[80, 86],
+                  [82, 80],
+                  [85, 78],
+                  [90, 90],
+                  [86, 82],
+                  [82, 90],
+                  [78, 80],
+                  [92, 94]])
+
+&gt;&gt;&gt; b = np.array([[0.7], [0.3]])
+
+&gt;&gt;&gt; np.matmul(a, b)
+array([[81.8],
+       [81.4],
+       [82.9],
+       [90. ],
+       [84.8],
+       [84.4],
+       [78.6],
+       [92.6]])
+&gt;&gt;&gt; np.dot(a, b)
+array([[81.8],
+       [81.4],
+       [82.9],
+       [90. ],
+       [84.8],
+       [84.4],
+       [78.6],
+       [92.6]])</code></pre>
+<p>矩阵乘法不是对应位置相乘，而是“行乘列”**。 <code>np.matmul</code> 与 <code>np.dot</code> 的区别</p>
+<ul>
+<li><p><strong><code>np.matmul</code></strong>：专门用于矩阵乘法。它不支持标量（单个数字）乘法。在处理高维矩阵（3维及以上）时，它的行为更符合线性代数的逻辑。</p></li>
+<li><p><strong><code>np.dot</code></strong>：更通用。如果是一个数乘数组，它也可以。但在处理两个矩阵相乘时，结果通常与 <code>matmul</code> 一致。</p></li>
+</ul>
+<h2 id="pandas">Pandas</h2>
+<p>数据处理、读取文件方便、封装了Matplotlib、Numpy的画图和计算</p>
+<h3 id="引入">引入</h3>
+<pre class="python"><code># 导入pandas
+import pandas as pd</code></pre>
+<p>在 numpy 当中创建的股票涨跌幅数据形式</p>
+<pre class="python"><code># 创建一个符合正态分布的 10 个股票 5 天的涨跌幅数据
+stock_change = np.random.normal(0, 1, (10, 5))
+
+# 返回结果：
+array([[-0.06544031, -1.30931491, -1.45451514,  0.57973008,  1.48602405],
+       [-1.73216741, -0.83413717,  0.45861517, -0.80391793, -0.46878575],
+       [ 0.21805567,  0.19901371,  0.7134683 ,  0.5484263 ,  0.38623412],
+       [-0.42207879, -0.33702398,  0.42328531, -1.23079202,  1.32843773],
+       [-1.72530711,  0.07591832, -1.91708358, -0.16535818,  1.07645091],
+       [-0.81576845, -0.28675278,  1.20441981,  0.73365951, -0.06214496],
+       [-0.98820861, -1.01815231, -0.95417342, -0.81538991,  0.50268175],
+       [-0.10034128,  0.61196204, -0.06850331,  0.74738433,  0.143011  ],
+       [ 1.00026175,  0.34241958, -2.2529711 ,  0.93921064,  1.14080312],
+       [ 2.52064693,  1.55384756,  1.72252984,  0.61270132,  0.60888092]])</code></pre>
+<p>Numpy无索引 <strong>NumPy 负责底层的高效数学运算，而 Pandas 负责高层的业务逻辑和数据管理。</strong></p>
+<h4 id="pandas-的数据结构">Pandas 的数据结构</h4>
+<pre class="python"><code># 使用 Pandas 中的数据结构
+stock_day_rise = pd.DataFrame(stock_change)</code></pre>
+<p>给股票涨跌幅数据增加行列索引，显示效果更佳 效果： （展示了一个带有日期作为列标题、股票编号作为行索引的表格化数据结构）</p>
+<h5 id="增加行索引">增加行索引</h5>
+<pre class="python"><code># 构造行索引序列
+stock_code = [&#39;股票&#39; + str(i) for i in range(stock_day_rise.shape[0])]
+
+# 添加行索引
+data = pd.DataFrame(stock_change, index=stock_code)</code></pre>
+<ul>
+<li><p><code>stock_day_rise.shape[0]</code>：假设 <code>stock_day_rise</code> 是一个已有的数组或矩阵。<code>.shape</code> 返回一个元组 <code>(行数, 列数)</code>。<code>shape[0]</code> 也就是获取数据的行数（即有多少支股票）。</p></li>
+<li><p><code>['股票' + str(i) for i in range(...)]</code>：一个 Python 的列表推导式。它循环遍历行数，生成形如 <code>['股票0', '股票1', '股票2'...]</code> 的列表。</p></li>
+<li><p><code>pd.DataFrame(stock_change, index=stock_code)</code>：使用基础数据 <code>stock_change</code> 创建 DataFrame，并通过 <code>index=</code> 参数将刚才生成的列表设定为每一行的标签。</p></li>
+</ul>
+<h5 id="增加列索引">增加列索引</h5>
+<p>股票的日期是一个时间的序列，要实现从前往后的时间还要考虑每月的总天数等。 使用pd.date_range()：用于生成一组连续的时间序列</p>
+<pre class="python"><code>date_range(start=None, end=None, periods=None, freq=&#39;B&#39;)
+
+    start:开始时间
+
+    end:结束时间
+
+    periods:时间天数
+
+    freq:递进单位，默认1天，&#39;B&#39;默认略过周末</code></pre>
+<p>Pandas 专门用于处理时间序列的强大工具：<code>pd.date_range()</code>。 一个自动生成日期序列的函数，核心参数如下：</p>
+<ul>
+<li><p><strong>start</strong>: 序列的起始日期（如 ‘2017-01-01’）。</p></li>
+<li><p><strong>end</strong>: 序列的结束日期（通常 start, end, periods 给出两个即可推算第三个）。</p></li>
+<li><p><strong>periods</strong>: 想要生成的日期总数（天数/期数）。</p></li>
+<li><p><strong>freq</strong>: 频率（递进单位）。默认是 ‘D’ (Calendar Day，日历日)。<code>'B'</code> (Business Day，工作日)，这个参数非常实用，它会自动跳过周六和周日，完美契合股票交易日的特性。</p></li>
+</ul>
+<pre class="python"><code># 生成一个时间的序列，略过周末非交易日
+date = pd.date_range(&#39;2017-01-01&#39;, periods=stock_day_rise.shape[1], freq=&#39;B&#39;)
+
+# index代表行索引，columns代表列索引
+data = pd.DataFrame(stock_change, index=stock_code, columns=date)</code></pre>
+<ul>
+<li><p><code>stock_day_rise.shape[1]</code>：获取<strong>数据的列数</strong>，这代表这批数据总共有多少个交易日的数据。</p></li>
+<li><p><code>date = pd.date_range('2017-01-01', periods=stock_day_rise.shape[1], freq='B')</code>：从 2017年1月1日开始，生成指定数量（即数据的列数）的工作日序列，自动跳过周末。</p></li>
+<li><p><code>data = pd.DataFrame(stock_change, index=stock_code, columns=date)</code>：最终步骤。将原始数据 <code>stock_change</code> 包装成 DataFrame，同时使用 <code>index=</code> 赋予行名（股票代码），使用 <code>columns=</code> 赋予列名（交易日期）。</p></li>
+</ul>
+<h3 id="dataframe">DataFrame</h3>
+<h4 id="dataframe结构">DataFrame结构</h4>
+<p>DataFrame对象既有行索引，又有列索引。</p>
+<ul>
+<li><p>行索引，表明不同行，横向索引，叫index，0轴，axis=0</p></li>
+<li><p>列索引，表名不同列，纵向索引，叫columns，1轴，axis=1</p></li>
+</ul>
+<h4 id="datatframe的属性">DatatFrame的属性</h4>
+<ul>
+<li><strong>shape</strong></li>
+</ul>
+<pre class="python"><code>data.shape
+# 结果
+(10, 5)</code></pre>
+<ul>
+<li><strong>index</strong> DataFrame的行索引列表</li>
+</ul>
+<pre class="python"><code>data.index
+
+Index([&#39;股票0&#39;, &#39;股票1&#39;, &#39;股票2&#39;, &#39;股票3&#39;, &#39;股票4&#39;, &#39;股票5&#39;, &#39;股票6&#39;, &#39;股票7&#39;, &#39;股票8&#39;, &#39;股票9&#39;])</code></pre>
+<ul>
+<li><strong>columns</strong> DataFrame的列索引列表</li>
+</ul>
+<pre class="python"><code>data.columns
+
+DatetimeIndex([&#39;2017-01-02&#39;, &#39;2017-01-03&#39;, &#39;2017-01-04&#39;, &#39;2017-01-05&#39;,
+               &#39;2017-01-06&#39;],
+              dtype=&#39;datetime64[ns]&#39;, freq=&#39;B&#39;)</code></pre>
+<ul>
+<li><strong>values</strong> 直接获取其中array的值</li>
+</ul>
+<pre class="python"><code>data.values</code></pre>
+<ul>
+<li><strong>T</strong> 转置</li>
+</ul>
+<pre class="python"><code>data.T</code></pre>
+<ul>
+<li><strong>head(5)</strong>: 显示前5行内容 如果不补充参数，默认5行。填入参数N则显示前N行</li>
+</ul>
+<pre class="python"><code>data.head(5)</code></pre>
+<ul>
+<li><strong>tail(5)</strong>: 显示后5行内容 如果不补充参数，默认5行。填入参数N则显示后N行</li>
+</ul>
+<pre class="python"><code>data.tail(5)</code></pre>
+<h4 id="datatframe索引的设置">DatatFrame索引的设置</h4>
+<p><strong>修改行列索引值</strong></p>
+<pre class="python"><code>stock_code = [&quot;股票_&quot; + str(i) for i in range(stock_day_rise.shape[0])]
+
+# 必须整体全部修改
+data.index = stock_code</code></pre>
+<p>注意：以下修改方式是错误的</p>
+<pre class="python"><code># 错误修改方式
+data.index[3] = &#39;股票_3&#39;</code></pre>
+<p><strong>重设索引</strong></p>
+<ul>
+<li><p>reset_index(drop=False)</p>
+<ul>
+<li><p>设置新的下标索引</p></li>
+<li><p>drop:默认为False，不删除原来索引，如果为True,删除原来的索引值</p></li>
+</ul></li>
+</ul>
+<pre class="python"><code># 重置索引,drop=False
+data.reset_index()</code></pre>
+<p><strong>以某列值设置为新的索引</strong></p>
+<ul>
+<li><p>set_index(keys, drop=True)</p>
+<ul>
+<li><p>keys : 列索引名成或者列索引名称的列表</p></li>
+<li><p>drop : boolean, default True.当做新的索引，删除原来的列</p></li>
+</ul></li>
+<li><p>设置新索引案例 1、创建</p></li>
+</ul>
+<pre class="python"><code>df = pd.DataFrame({&#39;month&#39;: [1, 4, 7, 10],
+                   &#39;year&#39;: [2012, 2014, 2013, 2014],
+                   &#39;sale&#39;: [55, 40, 84, 31]})</code></pre>
+<pre class="text"><code>   month  sale  year
+0  1      55    2012
+1  4      40    2014
+2  7      84    2013
+3  10     31    2014</code></pre>
+<p>2、以月份设置新的索引</p>
+<pre class="python"><code>df.set_index(&#39;month&#39;)
+
+       sale  year
+month            
+1      55    2012
+4      40    2014
+7      84    2013
+10     31    2014</code></pre>
+<p>3、设置多个索引，以年和月份</p>
+<pre class="python"><code>df.set_index([&#39;year&#39;, &#39;month&#39;])
+
+            sale
+year  month     
+2012  1     55
+2014  4     40
+2013  7     84
+2014  10    31</code></pre>
+<blockquote>
+<p>注：DataFrame变成了一个具有MultiIndex的DataFrame。</p>
+</blockquote>
+<p>Multilndex与Panel</p>
+<h3 id="基本操作">基本操作</h3>
+<p>为了更好的理解基本操作，先读取一个真实的股票数据。关于文件操作，后面在介绍，这里只先用一下API</p>
+<pre class="python"><code># 读取文件
+data = pd.read_csv(&quot;./data/stock_day.csv&quot;)
+
+# 删除一些列，让数据更简单些，再去做后面的操作
+data = data.drop([&quot;ma5&quot;,&quot;ma10&quot;,&quot;ma20&quot;,&quot;v_ma5&quot;,&quot;v_ma10&quot;,&quot;v_ma20&quot;], axis=1)</code></pre>
+<h4 id="索引操作">索引操作</h4>
+<p>Numpy当中使用索引选取序列和切片选择，pandas也支持类似的操作，也可以直接使用列名、行名称，甚至组合使用。</p>
+<h5 id="直接使用行列索引先列后行">直接使用行列索引(先列后行)</h5>
+<p>获取’2018-02-27’这天的’close’的结果</p>
+<pre class="python"><code># 直接使用行列索引名字的方式（先列后行）
+data[&#39;open&#39;][&#39;2018-02-27&#39;]
+23.53
+
+# 不支持的操作
+# 错误
+data[&#39;2018-02-27&#39;][&#39;open&#39;]
+# 错误
+data[:1, :2]</code></pre>
+<h5 id="结合loc或者iloc使用索引">结合loc或者iloc使用索引</h5>
+<p>先行后列 获取从’2018-02-27’:‘2018-02-22’, ’open’的结果</p>
+<pre class="python"><code># 使用loc:只能指定行列索引的名字
+data.loc[&#39;2018-02-27&#39;:&#39;2018-02-22&#39;, &#39;open&#39;]</code></pre>
+<pre class="text"><code>2018-02-27    23.53
+2018-02-26    22.80
+2018-02-23    22.88
+Name: open, dtype: float64</code></pre>
+<pre class="python"><code># 使用iloc可以通过索引的下标去获取
+# 获取前100天数据的&#39;open&#39;列的结果
+data.iloc[0:100, 0:2].head()</code></pre>
+<pre class="text"><code>              open    high    close     low
+2018-02-27   23.53   25.88    24.16   23.53
+2018-02-26   22.80   23.78    23.53   22.80
+2018-02-23   22.88   23.37    22.82   22.71</code></pre>
+<h4 id="赋值操作">赋值操作</h4>
+<p>对DataFrame当中的close列进行重新赋值为1</p>
+<pre class="python"><code># 直接修改原来的值
+data[&#39;close&#39;] = 1
+
+# 或者
+data.close = 1</code></pre>
+<h4 id="排序">排序</h4>
+<p>排序有两种形式，一种对于索引进行排序，一种对于内容进行排序</p>
+<ul>
+<li><p>使用df.sort_values(by=, ascending=)</p>
+<ul>
+<li><p>单个键或者多个键进行排序,默认升序</p></li>
+<li><p>ascending=False:降序</p></li>
+<li><p>ascending=True:升序</p></li>
+</ul></li>
+</ul>
+<h1 id="未看2.案例电影数据">未看2.案例电影数据</h1>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></div>
+<div><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/统计学习方法.html">统计学习方法笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

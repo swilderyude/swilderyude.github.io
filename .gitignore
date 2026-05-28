@@ -1,26 +1,8 @@
-# 依赖文件
-node_modules/
-
-# 编译生成的文件
-_site/
 .DS_Store
-
-# 编辑器文件
-.vscode/
+._*
+__pycache__/
+*.pyc
+.venv/
+node_modules/
 .idea/
-*.swp
-*.swo
-
-# 环境变量文件
-.env
-
-# 测试文件
-coverage/
-
-# 日志文件
-logs/
-*.log
-
-# 临时文件
-tmp/
-temp/
+.vscode/

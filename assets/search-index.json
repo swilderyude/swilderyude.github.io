@@ -1,0 +1,317 @@
+[
+  {
+    "title": "人脸色斑检测项目：从数据处理到 SDK 封装",
+    "url": "articles/人脸色斑检测项目.html",
+    "date": "2026-05-28",
+    "category": "项目实践",
+    "summary": "围绕人脸色斑检测任务，整理数据匿名化、数据集结构、YOLO 训练、结果融合与 SDK 对接的完整工程记录。",
+    "tags": [
+      "YOLO",
+      "小目标检测",
+      "医学图像",
+      "工程化"
+    ]
+  },
+  {
+    "title": "科研入门路线：论文、代码与组合创新",
+    "url": "articles/科研大队长.html",
+    "date": "2026-05-28",
+    "category": "科研方法",
+    "summary": "从选题、读论文、精读代码、实验设置到论文结构，整理一套面向研究生早期阶段的科研工作流。",
+    "tags": [
+      "科研",
+      "论文写作",
+      "读代码"
+    ]
+  },
+  {
+    "title": "人脸色斑检测训练结果",
+    "url": "articles/训练结果.html",
+    "date": "2026-05-28",
+    "category": "项目实践",
+    "summary": "汇总模型训练过程中的主要结果、指标变化和阶段性判断。",
+    "tags": [
+      "训练",
+      "指标"
+    ]
+  },
+  {
+    "title": "PyTorch 入门笔记：Dataset 与 Dataloader",
+    "url": "articles/pytorch.html",
+    "date": "2026-05-28",
+    "category": "AI 基础",
+    "summary": "记录 PyTorch 环境配置、自定义 Dataset、Dataloader 和图像数据读取的基础实践。",
+    "tags": [
+      "PyTorch",
+      "Dataset",
+      "深度学习"
+    ]
+  },
+  {
+    "title": "动手学深度学习笔记",
+    "url": "articles/动手学深度学习.html",
+    "date": "2026-05-28",
+    "category": "AI 基础",
+    "summary": "记录深度学习基础、模型训练和实验实践中的关键知识点。",
+    "tags": [
+      "深度学习",
+      "动手实践"
+    ]
+  },
+  {
+    "title": "Obsidian DataLoom 使用笔记",
+    "url": "articles/loom.html",
+    "date": "2026-05-28",
+    "category": "工具与环境",
+    "summary": "整理 DataLoom 表格、字段类型、过滤排序、Source 自动生成行和导出功能。",
+    "tags": [
+      "Obsidian",
+      "DataLoom",
+      "知识管理"
+    ]
+  },
+  {
+    "title": "斑点检测 SDK 封装记录",
+    "url": "articles/sdk运行.html",
+    "date": "2026-05-27",
+    "category": "项目实践",
+    "summary": "将已有 Python 推理流程封装为 C ABI SDK 的设计笔记，包含头文件、runner、Demo 和交付检查思路。",
+    "tags": [
+      "SDK",
+      "C++",
+      "Python",
+      "工程交付"
+    ]
+  },
+  {
+    "title": "Python 学习笔记",
+    "url": "articles/python学习.html",
+    "date": "2026-05-27",
+    "category": "AI 基础",
+    "summary": "整理 Python 语法、常用库、文件处理和编程基础，作为后续深度学习实践的底座。",
+    "tags": [
+      "Python",
+      "编程基础"
+    ]
+  },
+  {
+    "title": "检测与分割双模型协同方案",
+    "url": "articles/修改.html",
+    "date": "2026-05-22",
+    "category": "项目实践",
+    "summary": "把斑点分割和痘痣检测拆成两个模型，并通过统一切图、结果回拼和可视化叠加实现协同。",
+    "tags": [
+      "检测",
+      "分割",
+      "Pipeline"
+    ]
+  },
+  {
+    "title": "Linux 命令笔记",
+    "url": "articles/linux命令.html",
+    "date": "2026-05-21",
+    "category": "工具与环境",
+    "summary": "整理研究和开发中常用的 Linux 命令与终端工作流。",
+    "tags": [
+      "Linux",
+      "命令行"
+    ]
+  },
+  {
+    "title": "人脸色斑检测优化计划",
+    "url": "articles/优化计划.html",
+    "date": "2026-05-12",
+    "category": "项目实践",
+    "summary": "围绕小目标检测、分割模型、切图推理、损失函数和多任务管线整理后续优化方向。",
+    "tags": [
+      "优化",
+      "小目标",
+      "分割"
+    ]
+  },
+  {
+    "title": "远程服务器使用笔记",
+    "url": "articles/远程服务器.html",
+    "date": "2026-05-12",
+    "category": "工具与环境",
+    "summary": "整理 SSH、远程训练、环境管理和服务器使用流程。",
+    "tags": [
+      "服务器",
+      "SSH",
+      "环境配置"
+    ]
+  },
+  {
+    "title": "Circulant Attention 精读笔记",
+    "url": "articles/circulant-attention.html",
+    "date": "2026-04-28",
+    "category": "文献精读",
+    "summary": "围绕 Vision Transformer 中的 Circulant Attention 机制，整理论文结构、核心方法和实现理解。",
+    "tags": [
+      "Transformer",
+      "Attention",
+      "论文精读"
+    ]
+  },
+  {
+    "title": "X-AnyLabeling 标注工具使用记录",
+    "url": "articles/x-anylabeling.html",
+    "date": "2026-04-22",
+    "category": "工具与环境",
+    "summary": "记录自动标注工具的安装、模型配置和常见问题处理。",
+    "tags": [
+      "X-AnyLabeling",
+      "标注工具"
+    ]
+  },
+  {
+    "title": "超市识别项目：视频预处理、标注与 YOLO 训练",
+    "url": "articles/超市识别项目.html",
+    "date": "2026-04-16",
+    "category": "项目实践",
+    "summary": "记录自助收银/人工柜台场景下的视频处理、数据标注、YOLO 训练、目标追踪和状态机理解过程。",
+    "tags": [
+      "项目",
+      "YOLO",
+      "目标追踪",
+      "状态机"
+    ]
+  },
+  {
+    "title": "人脸色斑检测实验记录",
+    "url": "articles/实验记录.html",
+    "date": "2026-04-13",
+    "category": "项目实践",
+    "summary": "记录训练、验证、指标观察和实验复盘，为后续调参与模型改进提供依据。",
+    "tags": [
+      "实验",
+      "结果分析"
+    ]
+  },
+  {
+    "title": "YOLO 理论笔记：从 YOLOv1 到 YOLOv8",
+    "url": "articles/yolo理论.html",
+    "date": "2026-04-08",
+    "category": "计算机视觉",
+    "summary": "梳理目标检测基本任务、YOLO 的网格预测、Anchor、NMS、损失函数和多尺度训练等核心概念。",
+    "tags": [
+      "YOLO",
+      "目标检测",
+      "计算机视觉"
+    ]
+  },
+  {
+    "title": "MobileNet 精读笔记",
+    "url": "articles/mobilenet.html",
+    "date": "2026-04-01",
+    "category": "文献精读",
+    "summary": "整理轻量化网络 MobileNet 系列的核心结构、深度可分离卷积和移动端部署思想。",
+    "tags": [
+      "MobileNet",
+      "轻量化网络"
+    ]
+  },
+  {
+    "title": "人脸色斑检测标注规范",
+    "url": "articles/标注规范.html",
+    "date": "2026-03-17",
+    "category": "项目实践",
+    "summary": "记录色斑、痘痣等类别的标注边界、质量控制和一致性要求。",
+    "tags": [
+      "标注",
+      "规范",
+      "数据质量"
+    ]
+  },
+  {
+    "title": "Git 使用笔记",
+    "url": "articles/git.html",
+    "date": "2026-03-15",
+    "category": "工具与环境",
+    "summary": "整理 Git 常用命令、分支、提交和协作流程。",
+    "tags": [
+      "Git",
+      "版本控制"
+    ]
+  },
+  {
+    "title": "统计学习方法笔记",
+    "url": "articles/统计学习方法.html",
+    "date": "2026-03-10",
+    "category": "AI 基础",
+    "summary": "整理统计学习中的基本概念、模型、损失函数、优化和泛化问题。",
+    "tags": [
+      "机器学习",
+      "统计学习"
+    ]
+  },
+  {
+    "title": "人脸色斑检测数据集整理笔记",
+    "url": "articles/数据集.html",
+    "date": "2026-03-09",
+    "category": "项目实践",
+    "summary": "整理数据集结构、标注格式、训练/验证划分和数据管理中的注意事项。",
+    "tags": [
+      "数据集",
+      "标注",
+      "YOLO"
+    ]
+  },
+  {
+    "title": "OpenCV 学习笔记",
+    "url": "articles/open-cv.html",
+    "date": "2026-02-25",
+    "category": "计算机视觉",
+    "summary": "记录 OpenCV 的图像读取、处理、显示和常见视觉任务实践。",
+    "tags": [
+      "OpenCV",
+      "图像处理"
+    ]
+  },
+  {
+    "title": "人脸皮肤色斑检测算法综合报告",
+    "url": "articles/人脸皮肤色斑检测算法综合报告.html",
+    "date": "2026-01-05",
+    "category": "文献精读",
+    "summary": "对色斑检测与分割领域的两阶段检测、YOLO 小目标、多模态融合、临床诊断逻辑和轻量化部署进行综述。",
+    "tags": [
+      "综述",
+      "色斑检测",
+      "多模态",
+      "轻量化"
+    ]
+  },
+  {
+    "title": "LaTeX 写作笔记",
+    "url": "articles/latex.html",
+    "date": "2025-12-03",
+    "category": "工具与环境",
+    "summary": "整理 LaTeX 环境、公式、排版和论文写作常用技巧。",
+    "tags": [
+      "LaTeX",
+      "论文写作"
+    ]
+  },
+  {
+    "title": "知识蒸馏精读笔记",
+    "url": "articles/知识蒸馏.html",
+    "date": "2025-11-12",
+    "category": "文献精读",
+    "summary": "整理教师网络、学生网络、软标签、温度系数和蒸馏损失等知识蒸馏基础概念。",
+    "tags": [
+      "知识蒸馏",
+      "模型压缩"
+    ]
+  },
+  {
+    "title": "计算机视觉基础笔记",
+    "url": "articles/计算机视觉.html",
+    "date": "2025-10-30",
+    "category": "计算机视觉",
+    "summary": "整理图像处理、分类、检测、分割等计算机视觉基础概念。",
+    "tags": [
+      "计算机视觉",
+      "图像处理"
+    ]
+  }
+]

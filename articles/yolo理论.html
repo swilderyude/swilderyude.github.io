@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="梳理目标检测基本任务、YOLO 的网格预测、Anchor、NMS、损失函数和多尺度训练等核心概念。">
+  <title>YOLO 理论笔记：从 YOLOv1 到 YOLOv8 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>YOLO 理论笔记：从 YOLOv1 到 YOLOv8</span></h1>
+  <div class="postDesc">posted @ 2026-04-08 swilderyude 分类: <a href="../categories.html#计算机视觉">计算机视觉</a></div>
+  <p class="postSummary">梳理目标检测基本任务、YOLO 的网格预测、Anchor、NMS、损失函数和多尺度训练等核心概念。</p>
+  <div class="postTags"><span>YOLO</span> <span>目标检测</span> <span>计算机视觉</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#yolo-简史">YOLO 简史</a></li>
+<li class="toc-level-1"><a href="#目标检测的演变">目标检测的演变</a></li>
+<li class="toc-level-1"><a href="#目标检测综述">目标检测综述</a></li>
+<li class="toc-level-1"><a href="#yolov1">yolov1</a></li>
+<li class="toc-level-2"><a href="#作者介绍">作者介绍</a></li>
+<li class="toc-level-2"><a href="#目标检测算法">目标检测算法</a></li>
+<li class="toc-level-3"><a href="#预测阶段前向推断">预测阶段（前向推断）</a></li>
+<li class="toc-level-3"><a href="#训练阶段反向传播">训练阶段（反向传播）</a></li>
+<li class="toc-level-2"><a href="#cvpr2016报告">CVPR2016报告</a></li>
+<li class="toc-level-1"><a href="#yolov2">yolov2</a></li>
+<li class="toc-level-2"><a href="#better更准确">Better（更准确）</a></li>
+<li class="toc-level-3"><a href="#batch-normalization-bn层">Batch Normalization BN层</a></li>
+<li class="toc-level-3"><a href="#high-resolution-classifer高分辨率分类器">High Resolution Classifer(高分辨率分类器)</a></li>
+<li class="toc-level-3"><a href="#anchor">Anchor</a></li>
+<li class="toc-level-3"><a href="#yolov2损失函数">YOLOV2损失函数</a></li>
+<li class="toc-level-3"><a href="#fine-grained-features信粒度特征">Fine-Grained Features信粒度特征</a></li>
+<li class="toc-level-3"><a href="#multi-scale-training">Multi-scale training</a></li>
+<li class="toc-level-2"><a href="#faster更快">Faster（更快）</a></li>
+<li class="toc-level-2"><a href="#stronger类别更多">Stronger（类别更多）</a></li>
+<li class="toc-level-3"><a href="#分类">分类</a></li>
+<li class="toc-level-1"><a href="#yolov8">yolov8</a></li>
+<li class="toc-level-1"><a href="#指标">指标</a></li>
+<li class="toc-level-2"><a href="#map">mAP</a></li>
+<li class="toc-level-2"><a href="#ap">AP</a></li>
+<li class="toc-level-2"><a href="#fps">FPS</a></li>
+<li class="toc-level-3"><a href="#f1-score">F1-score</a></li>
+<li class="toc-level-3"><a href="#best-f1">Best F1</a></li>
+<li class="toc-level-1"><a href="#环境配置">环境配置</a></li>
+<li class="toc-level-1"><a href="#训练">训练</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>基础： 深度学习，机器学习，计算机视觉 b站：https://appjaflfup94042.h5.xiaoeknow.com/p/course/text/i_610155dbe4b0bf642fff3021?from_multi_course=1&amp;pro_id=p_60fff9dee4b0a27d0e367e6b&amp;type=2</p>
+<h1 id="yolo-简史"><a href="https://docs.ultralytics.com/zh/#yolo-a-brief-history">YOLO 简史</a></h1>
+<p><a href="https://arxiv.org/abs/1506.02640">YOLO</a>（You Only Look Once）是一种流行的<a href="https://www.ultralytics.com/glossary/object-detection">物体检测</a>和<a href="https://www.ultralytics.com/glossary/image-segmentation">图像分割</a>模型，由华盛顿大学的 Joseph Redmon 和 Ali Farhadi 开发。YOLO 于 2015 年推出，因其高速和高精度而广受欢迎。</p>
+<ul>
+<li><p><a href="https://arxiv.org/abs/1612.08242">YOLOv2</a>于2016年发布，通过引入批量归一化、锚框和维度聚类，改进了原始模型。</p></li>
+<li><p>2018年推出的<a href="https://arxiv.org/abs/1804.02767">YOLOv3</a>，通过使用更高效的主干网络、多个锚点和空间金字塔池化，进一步提高了模型的性能。</p></li>
+<li><p><a href="https://arxiv.org/abs/2004.10934">YOLOv4</a>于 2020 年发布，引入了诸如 Mosaic <a href="https://www.ultralytics.com/glossary/data-augmentation">数据增强</a>、一种新的无锚框检测头以及一种新的 <a href="https://www.ultralytics.com/glossary/loss-function">损失函数</a>等创新。</p></li>
+<li><p><a href="https://github.com/ultralytics/yolov5">YOLOv5</a> 进一步提高了模型的性能，并添加了新功能，例如超参数优化、集成实验跟踪和自动导出为流行的导出格式。</p></li>
+<li><p><a href="https://github.com/meituan/YOLOv6">YOLOv6</a> 于 2022 年由 <a href="https://www.meituan.com/">美团</a> 开源，并已应用于该公司的许多自动送货机器人中。</p></li>
+<li><p><a href="https://github.com/WongKinYiu/yolov7">YOLOv7</a>增加了额外的任务，例如在COCO关键点数据集上进行姿势估计。</p></li>
+<li><p>Ultralytics 于 2023 年发布的 <a href="https://github.com/ultralytics/ultralytics">YOLOv8</a> 引入了新功能和改进，以增强性能、灵活性和效率，并支持全方位的视觉 AI 任务。</p></li>
+<li><p><a href="https://docs.ultralytics.com/zh/models/yolov9/">YOLOv9</a> 引入了创新方法，如可编程梯度信息 (PGI) 和通用高效层聚合网络 (GELAN)。</p></li>
+<li><p><a href="https://docs.ultralytics.com/zh/models/yolov10/">YOLOv10</a> 由<a href="https://www.tsinghua.edu.cn/en/">清华大学</a>的研究人员使用 <a href="https://www.ultralytics.com/">Ultralytics</a> <a href="https://pypi.org/project/ultralytics/">Python 包</a> 创建，通过引入消除非最大值抑制 (NMS) 要求的端到端头，提供了实时<a href="https://docs.ultralytics.com/zh/tasks/detect/">物体检测</a>方面的进展。</p></li>
+<li><p><strong><a href="https://docs.ultralytics.com/zh/models/yolo11/">YOLO11</a>🚀：</strong> Ultralytics 最新的YOLO 模型可在多项任务中提供最先进的 (SOTA) 性能，包括<a href="https://docs.ultralytics.com/zh/tasks/detect/">物体检测</a>、<a href="https://docs.ultralytics.com/zh/tasks/segment/">分割</a>、<a href="https://docs.ultralytics.com/zh/tasks/pose/">姿势估计</a> 、<a href="https://docs.ultralytics.com/zh/modes/track/">跟踪</a>和<a href="https://docs.ultralytics.com/zh/tasks/classify/">分类</a>，充分利用了各种人工智能应用和领域的能力。</p></li>
+<li><p><strong><a href="https://docs.ultralytics.com/zh/models/yolo26/">YOLO26</a>⚠️ 即将推出</strong>：Ultralytics 的下一代YOLO 模型针对边缘部署进行了优化，具有端到端无 NMS 推断功能。</p></li>
+</ul>
+<h1 id="目标检测的演变">目标检测的演变</h1>
+<p><img src="../assets/media/pasted-image-20260113151503-9b0f9355f3.webp" alt="Pasted image 20260113151503.png" /> 多年来，对象检测技术已经发生了显著的演变，从传统的计算机视觉技术发展到先进的深度学习模型。<a href="https://www.ultralytics.com/blog/the-evolution-of-object-detection-and-ultralytics-yolo-models">YOLO 模型系列</a>一直处于这一发展的前沿，不断突破实时对象检测的可能性。</p>
+<blockquote>
+<p>YOLO 的独特方法将对象检测视为一个单一的回归问题，通过一次评估直接从完整图像中预测<a href="https://www.ultralytics.com/glossary/bounding-box">边界框</a>和类别概率。这种革命性的方法使 YOLO 模型比以前的两阶段检测器快得多，同时保持了高精度。</p>
+</blockquote>
+<p>随着每个新版本的发布，YOLO 都引入了架构改进和创新技术，从而提高了各种指标的性能。YOLO11 通过结合计算机视觉研究中的最新进展，延续了这一传统，为实际应用提供了更好的速度-精度权衡。</p>
+<h1 id="目标检测综述">目标检测综述</h1>
+<p>基础：计算机视觉 分类，检测，分割 <img src="../assets/media/pasted-image-20251025144637-e7b79d882f.webp" alt="Pasted image 20251025144637.png" /> <img src="../assets/media/pasted-image-20251025144800-00af0f962a.webp" alt="Pasted image 20251025144800.png" /> 分类，检测，语义分割，实例分割 <img src="../assets/media/pasted-image-20251025144957-4d33d380df.webp" alt="Pasted image 20251025144957.png" /> <a href="https://arxiv.org/abs/1905.05055">Object Detection in 20 Years: A Survey</a> 两阶段：先从图像中提取候选框，再逐一对候选框分类和甄别，调整坐标，最后得出结果。 单阶段：不提取候选框，直接输出结果。统一的端到端。</p>
+<ul>
+<li><p><strong>两阶段检测器（Two-Stage Detector）</strong>：首先生成 <strong>候选区域（Region Proposals）</strong>，然后对这些候选区域分别做分类和边界框回归。</p></li>
+<li><p><strong>单阶段检测器（One-Stage Detector）</strong>：直接在整张图上一次性回归预测目标类别和边界框，不生成独立的候选区域阶段。 yolov1 <img src="../assets/media/pasted-image-20251025153009-d25fd3b409.webp" alt="Pasted image 20251025153009.png" /></p></li>
+</ul>
+<h1 id="yolov1">yolov1</h1>
+<p>yolo:you only loook once <a href="https://arxiv.org/abs/1506.02640">论文</a></p>
+<h2 id="作者介绍">作者介绍</h2>
+<p><a href="https://pjreddie.com/darknet/yolov1/">Joseph Redom</a> v1-3 会议：与DPM和R-CNN对比 <a href="https://www.youtube.com/watch?v=NM6lrxy0bxs&amp;list=PLrrmP4uhN47Y-hWs7DVfCmLwUACRigYyT">CVPR2016大会汇报视频</a></p>
+<h2 id="目标检测算法">目标检测算法</h2>
+<p>分开理解训练阶段和预测阶段</p>
+<h3 id="预测阶段前向推断">预测阶段（前向推断）</h3>
+<p>深度卷积神经网络 基准yolo模型与小yolo模型 <img src="../assets/media/pasted-image-20251026125934-d714de37df.webp" alt="Pasted image 20251026125934.png" /> <img src="../assets/media/pasted-image-20251026140850-393803748f.webp" alt="Pasted image 20251026140850.png" /> 输入是一个448X448X3的图像，先把彩色图片缩放成一张448X448的正方形图片，3表示的是三通道RGB，然后先过若干个卷积层，过池化层，过1X1卷积层，过3X3卷积层，一直到最后变成一个7X7X1024维的一个feature map，把这个7X7X1024维的数据拉平，喂到一个4096个神经元的全连接层中，输出4096维的向量，再把这个4096维的向量喂到1470个神经元的全连接层中，输出1470维的向量，就相当于1470个数字，然后把这1470个数字reshape成7X7X30的feature map 的黑箱子。输入448X448X3通道的彩色图像，输出7X7X30维的张量，即三维的矩阵。这7X7X30维的张量（Tensor）中包含了所有预测框的坐标，置信度和类别结果。 只需要解析这个7X7X30维的张量就可以获得最终目标演示的结果了。所以它是一个单阶段模型，一步到位，统一的架构。 为什么是7X7X30维的张量？ <img src="../assets/media/pasted-image-20251026144621-2598ce65f4.webp" alt="Pasted image 20251026144621.png" /> grid cell（网格单元） 在yolov1中S=7 bounding box（边界框） 在yolov1中B=2 先把图片分成7X7的网格，每个grid cell生成两个预测框，这两个预测框的中心点都落在所在的grid cell里，预测框包含4个定位坐标，即中心点的坐标，框的宽高。以及包含是不是一个object的置信度，在图上置信度就用框线的粗细来表示。 每个grid cell还能够生成所有类别的条件概率。 把每一个bounding box的置信度乘以这个类别的条件概率，就能够获得每一个bounding box的各类别的概率。 一个是bounding box的信息，一个是该grid cell的类别信息就可以获得最后的预测结果。 <img src="../assets/media/pasted-image-20251026170003-896761e853.webp" alt="Pasted image 20251026170003.png" /> 对于7X7X30维的张量中的30怎么来的？ 它包含两个预测框，每个预测框有五个参数，两个框就是十个参数，在Pascal VOC中包含20个类别。 每一个grid cell只能有一个代表类别，进而每一个grid cell只能预测出一个物体. <img src="../assets/media/pasted-image-20251027113230-7962ae1aac.webp" alt="Pasted image 20251027113230.png" /> 把中间这个图进行一系列的后处理，比如把低置信度的过滤掉，然后在进行非极大值抑制去除掉重复的预测框，然后就获得了最终的目标检测预测结果。</p>
+<h4 id="预测阶段-后处理">预测阶段 后处理</h4>
+<p>置信度过滤 非极大值抑制 <a href="https://docs.google.com/presentation/d/1aeRvtKG21KHdD5lg6Hgyhx5rPq_ZOsGjG5rJ1HP7BbA/pub?start=false&amp;/d/1aeRvtKG21KHdD5lg6Hgyhx5rPq_ZOsGjG5rJ1HP7BbA/pub%EF%BC%9Fstart=false&amp;loop=false&amp;delayms=3000&amp;slide=id.p">ppt讲解</a> <img src="../assets/media/pasted-image-20251027113230-7962ae1aac.webp" alt="Pasted image 20251027113230.png" /> yolo后处理是把纷繁复杂的预测框，进行筛选过滤，把重复的预测框只保留一个，最终获得目标检测的结果。包含把低置信度的过滤掉，以及把重复的预测框去掉，只保留一个，这个过程就称为NMS非极大值抑制。 <img src="../assets/media/pasted-image-20251027114343-6c5bf9de1a.webp" alt="Pasted image 20251027114343.png" /> 主要看7X7X30维的张量是怎么变成最后目标检测的结果。 30维中是两个框的参数（4个点位置，1个置信度），和20个类别概率。 <img src="../assets/media/pasted-image-20251203094409-cbcade62b1.webp" alt="Pasted image 20251203094409.png" /> 两个预测框的置信度分别相乘20个类，得到两个20维的全概率。 <img src="../assets/media/pasted-image-20251203103110-b724d4150a.webp" alt="Pasted image 20251203103110.png" /> 后处理 每个类别把小于阈值的抹为0，再按照概率高低排序，再对排序后的概率进行非极大值抑制（NMS） <img src="../assets/media/pasted-image-20251203104710-17a1fc3753.webp" alt="Pasted image 20251203104710.png" /> 非极大值抑制（NMS） IoU = Intersection over Union（交并比） IoU=预测框 ∩ 真实框 的面积​/预测框 ∪ 真实框 的面积 先把概率最高的拿出来，之后每一个都跟最高的进行比较，如果它俩的IoU大于某个阈值，即重复识别了一个物品，就把低概率的过滤掉。 IoU比较小，预测框仍然保留。 第二高的概率再进行对比，重复以上操作。 每一个类别都如此操作，获得最终的目标检测的结果。</p>
+<h3 id="训练阶段反向传播">训练阶段（反向传播）</h3>
+<p>目标检测是一个典型的监督学习问题。算法是让结果拟合标注框，使得损失函数最小化。 IoU较大的bounding box负责拟合grid truth。如果不符合，两个bounding box都排除，置信度降低。 <img src="../assets/media/pasted-image-20251203132820-215d65296a.webp" alt="Pasted image 20251203132820.png" /> 构造残差平方和的回归问题的损失函数。 回国问题是预测出连续的值，把值和标注值进行比较，越接近越好。 有上标的是标注值，不带上标的是预测值。 负责检测物体bbox与不负责检测物体bbox。 标签值是指bbox和grid truth的IoU。 如果一个bbox负责检测物体则所属的grid cell也负责检测物体。 S^2 ：49 B：2</p>
+<h2 id="cvpr2016报告">CVPR2016报告</h2>
+<p>CVPR是视觉和模式识别的顶尖会议。 当年两个著名模型，一是yolo，二是ResNet。 以前的模型：DPM v5、R-CNN、Fast R-CNN、Faster R-CNN TPS超过30是实时的目标检测算法。 yolo预测小物体较差。</p>
+<h1 id="yolov2">yolov2</h1>
+<p>YOLOV1算法的缺点： 1.定位性能较差 2.RECALL比较差 3.检测小目标和密集目标性能比较差 4.虽然速度快，但是map准确度比较低 yolov2</p>
+<h2 id="better更准确">Better（更准确）</h2>
+<p>• Batch Normalization BN层 批量归一化 • High Resolution Classifier 高分辨率分类器 • Anchor 锚点 • Dimension Cluster 维度聚类 • Direct location prediction 直接位置预测 • Fine-Grained Features 精细特征 • Multi-Scale Training 多尺度训练</p>
+<h3 id="batch-normalization-bn层">Batch Normalization BN层</h3>
+<p><img src="../assets/media/pasted-image-20260113201202-83fe2266b4.webp" alt="Pasted image 20260113201202.png" /> BN层一般在线性层之后，激活函数之前。BN层优点。 1.BN层是把神经元的输出减去均值除以标准差，变成以0为均值，标准差为1得分布。 <img src="../assets/media/pasted-image-20260113161115-c0bd89668f.webp" alt="Pasted image 20260113161115.png" /></p>
+<p>强行把神经元输出集合在0附近原因是：一些激活函数比如sigmod激活函数或者双曲正切激活函数在0附近是非饱和区，如果输出太大或者太小，会陷入激活函数的饱和区，意味着梯度消失，会难以训练。 <img src="../assets/media/pasted-image-20260113161256-8fe67bf499.webp" alt="Pasted image 20260113161256.png" /></p>
+<p><img src="../assets/media/pasted-image-20260113162808-7bf1b8d45e.webp" alt="Pasted image 20260113162808.png" /> <img src="../assets/media/pasted-image-20260113164107-c6d181543e.webp" alt="Pasted image 20260113164107.png" /> 归一化</p>
+<p><img src="../assets/media/pasted-image-20260113163959-262108319e.webp" alt="Pasted image 20260113163959.png" /> <img src="../assets/media/pasted-image-20260113165718-d1502b6bcd.webp" alt="Pasted image 20260113165718.png" /> <img src="../assets/media/pasted-image-20260113200744-d39b83d134.webp" alt="Pasted image 20260113200744.png" /> 经过BN之后，原本很分散的数据都集中到了0得附近，对于双曲正切函数来说在0附近有较大得梯度。 <img src="../assets/media/pasted-image-20260113200833-815a980e5d.webp" alt="Pasted image 20260113200833.png" /> <img src="../assets/media/pasted-image-20260113200910-b9fe3c20e8.webp" alt="Pasted image 20260113200910.png" /> 经过BN层之后，双峰的图像数据在中间也有较好的体现，可以更好地保留原始数据。</p>
+<p>BN与Dropout为什么不能一起用？ 一起用效率会降低。</p>
+<h3 id="high-resolution-classifer高分辨率分类器">High Resolution Classifer(高分辨率分类器)</h3>
+<p>网络不需要从小的分辨率的模型开始去训练，而是直接转型成大分辨率来训练。</p>
+<h3 id="anchor">Anchor</h3>
+<p>这个是相对YOLOV1得Bondingbox来改进的，YOLOV1中得候选框是可以野蛮生长的，没有界限，而Anchor是预先被设定好了大小，同样是谁与ground trunth得IOU大谁就负责进行预测目标。 yolov1 <img src="../assets/media/pasted-image-20260113205028-51c8c17919.webp" alt="Pasted image 20260113205028.png" /> yolov2 <img src="../assets/media/pasted-image-20260113205301-82a04d3d1a.webp" alt="Pasted image 20260113205301.png" /> 在yolov2中把图片分为13X13个grid cell，每一个grid cell预测5个anchor，事先指定五种长宽大小尺度不同的先验框，每一个anchor对应一个预测框，这个预测框只需要去预测输出相对于它所在的anchor的偏移量。 <img src="../assets/media/pasted-image-20260113220048-e567ef67fa.webp" alt="Pasted image 20260113220048.png" /> 每一个grand cell都能预测5个Anchor，同样是根据中心点落在哪一个框，然后与白框进行交并比运算，那个大就选哪一个。 这个anchor对应的预测框只需要输出相比于所在anchor的偏移量。 <img src="../assets/media/pasted-image-20260113222327-fefe5b82ae.webp" alt="Pasted image 20260113222327.png" /> 小技巧：把模型输出的feature map弄成奇数长宽，而不是偶数长宽 因为奇数长宽有一个中心的grid cell，偶数是四个grid cell去抢占中心。 <img src="../assets/media/pasted-image-20260113230351-05fa62c241.webp" alt="Pasted image 20260113230351.png" /> 在yolov1中类别归grid cell预测，两个预测框，每个预测框有五个数，还有20个类别，一共30个数。在yolov2中每个grid cell有五个anchor，每一个anchor有25个数，即25X5=125个数。 <img src="../assets/media/pasted-image-20260114131717-35a060702e.webp" alt="Pasted image 20260114131717.png" /> <img src="../assets/media/pasted-image-20260114133555-d4a603e3d5.webp" alt="Pasted image 20260114133555.png" /> 为什么是5个anchor？ <img src="../assets/media/pasted-image-20260114140944-c6c116dd99.webp" alt="Pasted image 20260114140944.png" /> K-means聚类五个anchor效果比手动选anchor要9个的效果好。 即使是相较anchor的偏移量，预测框也可能是全图乱窜，所以加一个限制模型 <img src="../assets/media/pasted-image-20260114143015-62127585a9.webp" alt="Pasted image 20260114143015.png" /> 其中tx和ty是可以从负无穷到正无穷任意一个数，但是在sigmod函数中，不管你多大，都把数值回归到【0-1】之间，所以把预测框的中心点都限制在grandcell 内，而对于宽和高不做过多限制。 <img src="../assets/media/pasted-image-20260114145900-a5b30e64ac.webp" alt="Pasted image 20260114145900.png" /></p>
+<p>最终的b是预测框。最下面的是置信度。</p>
+<h3 id="yolov2损失函数">YOLOV2损失函数</h3>
+<figure>
+<img src="../assets/media/pasted-image-20260114151502-e5fa2822ed.webp" alt="Pasted image 20260114151502.png" /><figcaption aria-hidden="true">Pasted image 20260114151502.png</figcaption>
+</figure>
+<p>蓝框的内容代表遍历完所有的13X13的Anchor预测框。 一个grid truth仅分配给一个anchor，仅选最大的IOU作为预测框，不属于IOU&lt;0.6也不属于IOU最大的anchor被忽略，即忽略这些anchor的损失。 根据代码推出。</p>
+<h3 id="fine-grained-features信粒度特征">Fine-Grained Features信粒度特征</h3>
+<p><img src="../assets/media/pasted-image-20260114154210-3b9c3e5547.webp" alt="Pasted image 20260114154210.png" /> 把浅层的网络Feather Map一路拆分成四个部分，另外一路进行下采样卷积池化，后来把之前的四个部分拼接成一个长的向量，与池化后的拼接在一起，就包含了浅层信粒度特征和高层语义的特征，这样就有利于检测小物体。 <img src="../assets/media/pasted-image-20260114160225-15610219f9.webp" alt="Pasted image 20260114160225.png" /> 由4X4X3的feature map结构变成了2X2，feature map的长宽缩减为原来的一半，但通道数扩展为四倍。这一层被称为PassThrough层。 <img src="../assets/media/pasted-image-20260114162950-98e435fa85.webp" alt="Pasted image 20260114162950.png" /> 论文和源码不一样。</p>
+<h3 id="multi-scale-training">Multi-scale training</h3>
+<p>同一个模型每十步就会重现选取一个输入图像的大小，模型训练的期间，把不同大小的图像输入到模型里，模型必须能覆盖所有尺度大小输入的图像。 模型权重和结构都没有变化，依赖于全局平均池化层，会把输出的feature map的每一个通道求平均，来替代全连接层。 <img src="../assets/media/pasted-image-20260114173112-ecc1273e23.webp" alt="Pasted image 20260114173112.png" /> 这个能使输入不同尺度的图像都能够训练。 <img src="../assets/media/pasted-image-20260114183035-12f0160048.webp" alt="Pasted image 20260114183035.png" /> 一般FPS大于30我们就认为实时检测。</p>
+<h2 id="faster更快">Faster（更快）</h2>
+<p><img src="../assets/media/pasted-image-20260114205245-3fb68631a9.webp" alt="Pasted image 20260114205245.png" /> 换了骨干网络。 <img src="../assets/media/pasted-image-20260114213256-69da382e27.webp" alt="Pasted image 20260114213256.png" /> 先降维再升维 <img src="../assets/media/pasted-image-20260115140024-8c7eec3a16.webp" alt="Pasted image 20260115140024.png" /></p>
+<h2 id="stronger类别更多">Stronger（类别更多）</h2>
+<h3 id="分类">分类</h3>
+<p><img src="../assets/media/pasted-image-20260115143433-78af38da94.webp" alt="Pasted image 20260115143433.png" /> 想把这两种数据集结合起来。一个只有检测标签，一个只有分类标签。 soft max假设所有类别是互斥的。但比如有熊还有美洲黑熊，二者并不是强行为互斥关系。不能把检测数据集和分类数据集作为扁平结构。这种扁平结构是不符合的。 <img src="../assets/media/pasted-image-20260115153340-20ad0e6113.webp" alt="Pasted image 20260115153340.png" /></p>
+<p>在这上面进行了修改，改为树状结构。层次清晰。 <img src="../assets/media/pasted-image-20260115154822-c94fbf6283.webp" alt="Pasted image 20260115154822.png" /> 同一层进行softmax，解决分层结构的分类问题。 <img src="../assets/media/pasted-image-20260115155048-d9538f3685.webp" alt="Pasted image 20260115155048.png" /> 把COCO数据集和ImageNet数据集整合如下所示 <img src="../assets/media/pasted-image-20260115160557-fdd78aec5c.webp" alt="Pasted image 20260115160557.png" /> 既学习检测，也学习分类 <img src="../assets/media/pasted-image-20260115161118-ad689c1e3c.webp" alt="Pasted image 20260115161118.png" /></p>
+<h1 id="yolov8">yolov8</h1>
+<p>代码内含热图等可以丰富论文内容。下游任务。doc/en/guides 实例分割+跟踪、过线统计、滑动窗口预测（大图小目标）、区域内元素统计</p>
+<h1 id="指标">指标</h1>
+<h2 id="map">mAP</h2>
+<p>mean Average Precision（平均精度均值） 模型在“所有类别 + 不同置信度阈值下”的综合检测性能 表示在特定 IoU 阈值下，各类别 AP 的平均值。</p>
+<p>|符号|含义|</p>
+<p>|—|—|</p>
+<p>|<strong>AP</strong>|单个类别的平均精度|</p>
+<p>|<strong>mAP</strong>|所有类别 AP 的平均值（mean）|</p>
+<h2 id="ap">AP</h2>
+<p>（Precision–Recall 即PR曲线） Precision–Recall 曲线下面积（PR 曲线的面积） 面积越大表明性能越好</p>
+<p>以 <strong>mAP@0.5</strong> 为例 1️⃣设定 IoU 阈值 = 0.5<br />
+2️⃣ 统计 TP/FP/FN<br />
+3️⃣ 计算每个类别的 PR 曲线<br />
+4️⃣ 计算每个类别的 AP（曲线下面积）<br />
+5️⃣ 所有类别 AP 取平均 → mAP</p>
+<h2 id="fps">FPS</h2>
+<p>frames per second 每秒帧数 在YOLO系列论文（以及目标检测领域）中，<strong>Best F1</strong> 是指在不同的<strong>置信度阈值（Confidence Threshold）</strong>下，模型所能达到的<strong>最大 F1-score</strong>。</p>
+<p>为了更透彻地理解这个指标，我们可以从以下几个维度拆解：</p>
+<h3 id="f1-score">F1-score</h3>
+<p>F1-score 是统计学中衡量二分类模型精确度的一种指标，它是 <strong>精确率（Precision）</strong> 和 <strong>召回率（Recall）</strong> 的调和平均数。</p>
+<ul>
+<li><p><strong>精确率 (Precision)</strong>：模型预测为“正”的样本中，真正为“正”的比例。（查准率：预测出的框里，有多少是准的？）</p></li>
+<li><p><strong>召回率 (Recall)</strong>：所有真正的“正”样本中，被模型正确预测出来的比例。（查全率：所有的目标里，找出了多少？） <strong>公式为：</strong> <span class="math display">$$F1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}$$</span> <strong>为什么要用 F1？</strong> 因为 Precision 和 Recall 往往是“鱼和熊掌不可兼得”：</p></li>
+<li><p>如果阈值设得很高，Precision 会高，但会漏掉很多目标（Recall 低）。</p></li>
+<li><p>如果阈值设得很低，Recall 会高，但会产生很多误检（Precision 低）。 F1-score 综合了这两者，只有当两者都较高时，F1 才会高。</p></li>
+</ul>
+<h3 id="best-f1">Best F1</h3>
+<p>在 YOLO 训练或评估时，模型会输出成千上万个预测框，每个框都有一个<strong>置信度分数（Confidence Score）</strong>。</p>
+<ul>
+<li><p>如果我们把阈值设为 0.1，会得到一组 Precision/Recall 和一个 F1。</p></li>
+<li><p>如果我们把阈值设为 0.5，又会得到另一组值。</p></li>
+<li><p>如果我们把阈值从 0 变到 1（步长比如 0.01），就会得到一条 <strong>F1-Confidence Curve（F1-置信度曲线）</strong>。 <strong>Best F1 就是这条曲线上的最高点。</strong> 它代表了：<strong>在当前模型下，通过选择一个“最优的置信度阈值”，模型能达到的最佳平衡性能。</strong> Best F1 通常意味着：</p></li>
+</ul>
+<ol type="1">
+<li><p><strong>性能上限的参考</strong>：它告诉开发者，这个模型在最理想的阈值设置下，综合表现有多好。</p></li>
+<li><p><strong>指导生产环境部署</strong>：Best F1 对应的那个置信度阈值（比如 0.45），通常就是你在实际部署模型（推理）时，最建议设置的 <code>conf_thres</code> 参数。</p></li>
+<li><p><strong>不同于 mAP</strong>：</p>
+<ul>
+<li><p><strong>mAP (mean Average Precision)</strong> 衡量的是模型在所有阈值下的平均表现，是评价模型<strong>训练质量</strong>的综合指标。</p></li>
+<li><p><strong>Best F1</strong> 则更贴近<strong>实际使用</strong>，它反映了模型在某个特定点上的最佳工作状态。 <strong>Best F1 是模型在“不乱报”和“不漏报”之间找到的最完美平衡点。</strong> 在 YOLO 结果图中，你会看到一张 F1 曲线图，横轴是置信度，纵轴是 F1 值，曲线的顶点就是 Best F1。</p></li>
+</ul></li>
+</ol>
+<h1 id="环境配置">环境配置</h1>
+<p>以yolov8为例 <strong>Anaconda</strong></p>
+<pre class="shell"><code>conda env list  # 查看已有环境
+conda create -n 环境名 python=版本 # 创建环境
+conda activate 环境名 # 激活环境
+conda deactivate # 退出环境</code></pre>
+<p><strong>cuda</strong> CUDA是一个让软件能够利用NVIDIA显卡（GPU）进行大规模并行计算的平台和编程模型。 本人Mac m1芯片不能下载，推荐MPS。</p>
+<pre class="shell"><code># 安装PyTorch（支持M1芯片的版本）
+pip3 install torch torchvision torchaudio
+# 安装Ultralytics YOLOv8
+pip install ultralytics
+# 上述会报错，我前期的虚拟环境下载了tensorflow，有依赖冲突
+# 提示tensorflow2.16.2 requires numpy&lt;2.0.0,&gt;=1.23.5
+# 改用conda安装（conda能更好处理依赖）
+conda install -c conda-forge ultralytics
+# 后面过程有报错
+pip install ultralytics==8.3.0</code></pre>
+<p>在代码中使用MPS</p>
+<pre class="python"><code>from ultralytics import YOLO
+
+# 加载模型
+model = YOLO(&#39;yolov8n.pt&#39;)  # 使用nano版本
+
+# 训练时指定 device=&#39;mps&#39;
+results = model.train(data=&#39;coco8.yaml&#39;, epochs=100, device=&#39;mps&#39;)
+
+# 或者进行预测时指定 device=&#39;mps&#39;
+results = model(&#39;path/to/image.jpg&#39;, device=&#39;mps&#39;)</code></pre>
+<p>创建测试脚本验证MPS是否正常工作：</p>
+<pre class="python"><code># test_mps.py
+import torch
+import ultralytics
+
+print(&quot;PyTorch版本:&quot;, torch.__version__)
+print(&quot;Ultralytics版本:&quot;, ultralytics.__version__)
+print(&quot;MPS可用:&quot;, torch.backends.mps.is_available())
+print(&quot;CUDA可用:&quot;, torch.cuda.is_available())
+
+if torch.backends.mps.is_available():
+    # 测试MPS设备
+    device = torch.device(&quot;mps&quot;)
+    x = torch.randn(3, 640, 640).to(device)
+    print(&quot;✅ MPS设备测试成功&quot;)
+else:
+    print(&quot;❌ MPS不可用&quot;)</code></pre>
+<h1 id="训练">训练</h1>
+<div class="image-placeholder">图片未发布：Pasted image 20260402161012.png</div>
+<ol type="1">
+<li><p><strong><code>train.py</code> (训练)</strong> 用于加载数据集、配置模型参数，并开始漫长的训练过程。</p></li>
+<li><p><strong><code>val.py</code> (验证)</strong> 专门在验证集上跑一遍，计算出精准的 mAP、Precision、Recall 等指标。 训练完后，用来客观评价 <code>best.pt</code> 的性能。</p></li>
+<li><p><strong><code>detect.py</code> (推理/预测)</strong> 把训练好的模型应用在全新的图片或视频上，并画出框。 向客户展示效果时用。通常对应官方的 <code>predict</code> 功能。</p></li>
+<li><p><strong><code>track.py</code> (追踪)</strong> 用于视频流，给每个检测到的目标分配一个 ID，并在画面中追踪它的轨迹。</p></li>
+<li><p><strong><code>get_COCO_metrice.py</code> (COCO 指标计算)</strong> 计算标准的 COCO 格式指标。 YOLO 默认的指标和标准的 COCO 指标略有不同。如果你要发表学术论文，通常需要跑这个脚本来获得业界公认的详细得分（如 AP@.75, AP Small/Medium/Large 等）。</p></li>
+<li><p><strong><code>get_FPS.py</code> (帧率测试)</strong> 测试模型在当前硬件（比如 A10 显卡）上的处理速度。 医生使用时要求实时响应。这个脚本告诉你 1 秒钟能处理多少张图。</p></li>
+<li><p><strong><code>main_profile.py</code> (模型性能分析)</strong> 测量模型的计算量（FLOPs）和参数量（Params）。</p></li>
+<li><p><strong><code>heatmap.py</code> (热力图)</strong> 生成 Grad-CAM 图像，显示模型在看哪里。</p></li>
+<li><p><strong><code>plot_result.py</code> (绘图工具)</strong> 自定义绘制训练曲线、损失函数图。</p></li>
+</ol>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/open-cv.html">OpenCV 学习笔记</a></div>
+<div><a href="../articles/计算机视觉.html">计算机视觉基础笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1806 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="整理 LaTeX 环境、公式、排版和论文写作常用技巧。">
+  <title>LaTeX 写作笔记 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>LaTeX 写作笔记</span></h1>
+  <div class="postDesc">posted @ 2025-12-03 swilderyude 分类: <a href="../categories.html#工具与环境">工具与环境</a></div>
+  <p class="postSummary">整理 LaTeX 环境、公式、排版和论文写作常用技巧。</p>
+  <div class="postTags"><span>LaTeX</span> <span>论文写作</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#使用-latex">使用 LATEX</a></li>
+<li class="toc-level-2"><a href="#命令和代码结构">命令和代码结构</a></li>
+<li class="toc-level-3"><a href="#命令和环境">命令和环境</a></li>
+<li class="toc-level-3"><a href="#latex-源代码结构">LATEX 源代码结构</a></li>
+<li class="toc-level-1"><a href="#latex-宏包和文档类">LATEX 宏包和文档类</a></li>
+<li class="toc-level-2"><a href="#文档类">文档类</a></li>
+<li class="toc-level-2"><a href="#宏包">宏包</a></li>
+<li class="toc-level-2"><a href="#文件的组织方式">文件的组织方式</a></li>
+<li class="toc-level-1"><a href="#用-latex-排版文字">用 LATEX 排版文字</a></li>
+<li class="toc-level-2"><a href="#排版中文">排版中文</a></li>
+<li class="toc-level-2"><a href="#latex-中的字符">LATEX 中的字符</a></li>
+<li class="toc-level-3"><a href="#空格分段换行断页断词">空格、分段、换行、断页、断词</a></li>
+<li class="toc-level-3"><a href="#连字">连字</a></li>
+<li class="toc-level-3"><a href="#标点符号">标点符号</a></li>
+<li class="toc-level-1"><a href="#文档元素">文档元素</a></li>
+<li class="toc-level-2"><a href="#章节和目录">章节和目录</a></li>
+<li class="toc-level-2"><a href="#标题页">标题页</a></li>
+<li class="toc-level-1"><a href="#格式">格式</a></li>
+<li class="toc-level-2"><a href="#居中取消缩进行距">居中、取消缩进、行距</a></li>
+<li class="toc-level-2"><a href="#字号与字体">字号与字体</a></li>
+<li class="toc-level-2"><a href="#下划线颜色">下划线、颜色</a></li>
+<li class="toc-level-2"><a href="#纸张边距">纸张、边距</a></li>
+<li class="toc-level-2"><a href="#分页分栏">分页、分栏</a></li>
+<li class="toc-level-2"><a href="#摘要摘录脚注边注">摘要、摘录、脚注、边注</a></li>
+<li class="toc-level-2"><a href="#box">box</a></li>
+<li class="toc-level-2"><a href="#自定义命令">自定义命令</a></li>
+<li class="toc-level-2"><a href="#图片">图片</a></li>
+<li class="toc-level-3"><a href="#插入图片">插入图片</a></li>
+<li class="toc-level-3"><a href="#浮动体与图片排版">浮动体与图片排版</a></li>
+<li class="toc-level-3"><a href="#图片引用">图片引用</a></li>
+<li class="toc-level-2"><a href="#文档设置背景图片">文档设置背景图片</a></li>
+<li class="toc-level-2"><a href="#cutwin文字环绕排版">cutwin文字环绕排版</a></li>
+<li class="toc-level-2"><a href="#有序列表无序列表">有序列表、无序列表</a></li>
+<li class="toc-level-2"><a href="#空格与填充">空格与填充</a></li>
+<li class="toc-level-2"><a href="#表格">表格</a></li>
+<li class="toc-level-3"><a href="#简单表格tabular">简单表格tabular</a></li>
+<li class="toc-level-3"><a href="#表格浮动表格引用">表格浮动、表格引用</a></li>
+<li class="toc-level-3"><a href="#表格样式">表格样式</a></li>
+<li class="toc-level-3"><a href="#三线表">三线表</a></li>
+<li class="toc-level-3"><a href="#自动变宽表格tabularx">自动变宽表格tabularx</a></li>
+<li class="toc-level-3"><a href="#新式表格tabularray">新式表格tabularray</a></li>
+<li class="toc-level-3"><a href="#补充">补充</a></li>
+<li class="toc-level-2"><a href="#公式">公式</a></li>
+<li class="toc-level-3"><a href="#数学模式与公式引用">数学模式与公式引用</a></li>
+<li class="toc-level-3"><a href="#分式与根式">分式与根式</a></li>
+<li class="toc-level-3"><a href="#上下标">上下标</a></li>
+<li class="toc-level-3"><a href="#上下线">上下线</a></li>
+<li class="toc-level-3"><a href="#求和与公式样式调整">求和与公式样式调整</a></li>
+<li class="toc-level-3"><a href="#极限与积分">极限与积分</a></li>
+<li class="toc-level-3"><a href="#矩阵">矩阵</a></li>
+<li class="toc-level-3"><a href="#多行公式">多行公式</a></li>
+<li class="toc-level-3"><a href="#分支公式">分支公式</a></li>
+<li class="toc-level-3"><a href="#定理环境与cleveref引用">定理环境与cleveref引用</a></li>
+<li class="toc-level-2"><a href="#章节标题与目录">章节标题与目录</a></li>
+<li class="toc-level-2"><a href="#文档结构-前言正文附录后记">文档结构-前言正文附录后记</a></li>
+<li class="toc-level-2"><a href="#文档拆分">文档拆分</a></li>
+<li class="toc-level-2"><a href="#页眉页脚">页眉页脚</a></li>
+<li class="toc-level-2"><a href="#参考文献">参考文献</a></li>
+<li class="toc-level-2"><a href="#索引">索引</a></li>
+<li class="toc-level-2"><a href="#tikz绘图">TikZ绘图</a></li>
+<li class="toc-level-3"><a href="#直线坐标">直线、坐标</a></li>
+<li class="toc-level-3"><a href="#基本图形绘制">基本图形绘制</a></li>
+<li class="toc-level-3"><a href="#线条样式">线条样式</a></li>
+<li class="toc-level-3"><a href="#scope环境样式复用">scope环境、样式复用</a></li>
+<li class="toc-level-3"><a href="#形变">形变</a></li>
+<li class="toc-level-3"><a href="#绘制与填充">绘制与填充</a></li>
+<li class="toc-level-3"><a href="#文字结点">文字结点</a></li>
+<li class="toc-level-3"><a href="#循环绘制坐标轴">循环、绘制坐标轴</a></li>
+<li class="toc-level-3"><a href="#绘制函数图象">绘制函数图象</a></li>
+<li class="toc-level-2"><a href="#beamer幻灯片">beamer幻灯片</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <h2 id="使用-latex">使用 LATEX</h2>
+<pre class="latex"><code>\documentclass{article}
+
+\begin{document}
+
+``Hello world!&#39;&#39; from \LaTeX.
+
+\end{document}</code></pre>
+<pre class="latex"><code>\documentclass{ctexart}
+
+\begin{document}
+
+“你好，世界！”来自 \LaTeX{} 的问候。
+
+\end{document}</code></pre>
+<p>如果使用命令行方式进行编译，则需打开 Windows 命令提示符或者 <code>*nix</code> 的终端，在源代码所在的目录下输入： <code>xelatex 文件名（helloworld）</code></p>
+<h2 id="命令和代码结构">命令和代码结构</h2>
+<h3 id="命令和环境">命令和环境</h3>
+<p>LATEX 中命令以反斜线  开头。</p>
+<ol type="1">
+<li><p>反斜线和后面的一串字母，如 。它们以任意非字母符号（空格、数字、标点等）为界限。</p></li>
+<li><p>反斜线和后面的单个非字母符号，如 <code>\$</code>。 即输入特殊字符： <code>\</code>:<code>textbackslash</code> %:<code>\%</code> {}:<code>\{\}</code></p></li>
+</ol>
+<blockquote>
+<p>要注意 LATEX 命令是对大小写敏感的。<code>\LaTeX</code></p>
+</blockquote>
+<blockquote>
+<p>字母形式的 LATEX 命令忽略其后的所有连续空格。如果要人为引入空格，需要在命令后面加一对花括号<code>{}</code>阻止其忽略空格。</p>
+</blockquote>
+<p>LATEX 的参数分为可选参数和必选参数。可选参数以方括号<code>[ ]</code>包裹；必选参数以花括号<code>{ }</code>包裹。有些命令带一个星号 <code>*</code>，可以粗略地把星号看作一种特殊的可选参数。 有些命令（如 </p>
+<p>LATEX 中包括环境，用以令一些效果在局部生效，或是生成特殊的文档元素。LATEX 环境的用法为一对命令<code>\begin</code> 和 <code>\end</code>.</p>
+<pre class="latex"><code>\begin{⟨environment name⟩}[⟨optional arguments⟩]{⟨mandatory arguments⟩}
+
+…
+
+\end{⟨environment name⟩}</code></pre>
+<p>LATEX 环境需要一个或多个必选/可选参数或完全不需要参数。部分环境允许嵌套使用。</p>
+<h3 id="latex-源代码结构">LATEX 源代码结构</h3>
+LATEX 源代码以一个 <code>\documentclass</code> 命令作为开头，它指定了文档使用的文档类。document 环境当中的内容是文档正文。 在 \documentclass 和 \begin{document} 之间的位置称为导言区。在导言区中常会使用
+<p>命令调用宏包，还会进行文档的全局设置。</p>
+<pre class="latex"><code>\documentclass{...} % ... 为某文档类
+
+% 导言区
+
+\begin{document}
+
+% 正文内容
+
+\end{document}
+
+% 此后内容会被忽略</code></pre>
+<h1 id="latex-宏包和文档类">LATEX 宏包和文档类</h1>
+<h2 id="文档类">文档类</h2>
+<p>文档类规定了 LATEX 源代码所要生成的文档的性质。LATEX 源代码的开头须用\documentclass 指定文档类：</p>
+<pre class="latex"><code>\documentclass[⟨options⟩]{⟨class-name⟩}</code></pre>
+<p>其中 ⟨class-name⟩ 为文档类的名称，如 LATEX 提供的 article、report、book，支持中文排版的 ctexart、ctexrep、ctexbook. 或者有其它功能的一些文档类，如 moderncv、beamer 等。 LATEX 提供的基础文档类见表 1.1，其中前三个习惯上称为“标准文档类”。 <code>表 1.1: LATEX 提供的基础文档类</code></p>
+<p>|文档类|介绍|</p>
+<p>|—|—|</p>
+<p>|article|文章格式的文档类，广泛用于科技论文、报告、说明文档等。|</p>
+<p>|report|长篇报告格式的文档类，具有章节结构，用于综述、长篇论文、简单的书籍等。|</p>
+<p>|book|书籍文档类，包含章节结构和前言、正文、后记等结构。|</p>
+<p>|proc|基于 article 文档类的一个简单的学术文档模板。|</p>
+<p>|slides|幻灯格式的文档类，使用无衬线字体。|</p>
+<p>|minimal|一个极其精简的文档类，只设定了纸张大小和基本字号，用作代码测试的最小工作示例（Minimal Working Example）| 可选参数 ⟨options⟩ 为文档类指定选项，以全局地规定一些排版的参数，如字号、纸张大小、单双面等等。比如调用 article 文档类排版文章，指定纸张为 A4 大小，基本字号为 11pt，双面排版.</p>
+<pre class="latex"><code>\documentclass[11pt,twoside,a4paper]{article}</code></pre>
+<h2 id="宏包">宏包</h2>
+<p>依赖一些扩展来增强或补充 LATEX 的功能，称为宏包。</p>
+<pre class="latex"><code>\usepackage[⟨options⟩]{⟨package-name⟩}</code></pre>
+<p>可以一次性调用多个宏包，在 ⟨package-name⟩ 中用逗号隔开。这种用法一般不要指定选项.</p>
+<pre class="latex"><code>% 一次性调用三个排版表格常用的宏包
+
+\usepackage{tabularx, makecell, multirow}</code></pre>
+<p>在使用宏包和文档类之前，一定要首先确认它们是否安装在你的计算机中，否则 package 等命令会报错误。 宏包定义了许多命令和环境，或者修改了 LATEX 已有的命令和环境。它们的用法说明记在相应宏包和文档类的帮助文档。在终端下输入命令可查阅相应文档： <code>texdoc ⟨pkg-name⟩</code> 其中 ⟨pkg-name⟩ 是宏包或者文档类的名称。</p>
+<h2 id="文件的组织方式">文件的组织方式</h2>
+当编写长篇文档时，将源文件分割成若干个文件，例如将每章内容单独写在一个文件中，会大大简化修改和校对的工作。 LATEX 提供了命令
+<p>用来在源代码里插入文件.</p>
+<pre class="latex"><code>\include{⟨filename⟩}</code></pre>
+<p>⟨filename⟩ 为文件名（不带 .tex 扩展名)，如果和要编译的主文件不在一个目录中，则要加上相对或绝对路径，例如：</p>
+<pre class="latex"><code>\include{chapters/file} % 相对路径
+
+\include{/home/Bob/file} % *nix（包含 Linux、macOS）绝对路径</code></pre>
+值得注意的是
+<p>在读入 ⟨filename⟩ 之前会另起一页。有的时候并不需要这样，而是用 命令，它纯粹是把文件里的内容插入：</p>
+<pre class="latex"><code>\input{⟨filename⟩}</code></pre>
+<p>当导言区内容较多时，常常将其单独放置在一个 .tex 文件中，再用 命令插入。复杂的图、表、代码等也会用类似的手段处理。</p>
+LATEX 还提供了一个 命令来组织文件，用于导言区，指定只载入某些文件。 导言区使用了 后，正文中不在其列表范围的
+<p>命令不会起效：</p>
+<pre class="latex"><code>\includeonly{⟨filename1⟩,⟨filename2⟩,…}</code></pre>
+使用
+<p>和 命令载入的文件名最好不要加空格和特殊字符，也尽量避免使用中文名，否则很可能会出错。</p>
+<p>一个实用的工具宏包是syntonly。加载这个宏包后，在导言区使用 命令，可令 LATEX 编译后不生成 DVI 或者 PDF 文档，只排查错误，编译速度会快不少：</p>
+<pre class="latex"><code>\usepackage{syntonly}
+
+\syntaxonly</code></pre>
+<p>如果想生成文档，则用 % 注释掉 命令即可。</p>
+<h1 id="用-latex-排版文字">用 LATEX 排版文字</h1>
+<h2 id="排版中文">排版中文</h2>
+<p>ctex 宏包. 第一种。</p>
+<pre class="latex"><code>\documentclass{ctexart}
+% [scheme=chinese] chinese：中文格式，plain：英文格式
+\begin{document}
+
+在\LaTeX{}中排版中文。
+
+汉字和English单词混排，通常不需要在中英文之间添加额外的空格。
+
+当然，为了代码的可读性，加上汉字和 English 之间的空格也无妨。
+
+汉字换行时不会引入多余的空格。
+
+\end{document}</code></pre>
+<p>第二种。</p>
+<pre class="latex"><code>\usepackage{ctex}</code></pre>
+<p>属性选项[]另一种格式</p>
+<pre class="latex"><code>\ctexset{
+    autoindent = 3em,
+    % today = small|big|old， small阿拉伯数字，big中文，old英文
+    abstractname = ｛本文概要｝,
+    bibname = {文\quad献},
+    chapter = {
+        name = ｛第,回｝,
+        number = \arabic{chapter}
+    }</code></pre>
+<h2 id="latex-中的字符">LATEX 中的字符</h2>
+<pre class="latex"><code>％ 标题 作者 日期
+\title{\LaTex 从入门到放弃｝
+\author{王今天｝
+\date{\today}
+
+\begin{document}
+\maketitle</code></pre>
+<p>多个作者（\and)</p>
+<pre class="latex"><code>\author{王今天 \and 王明天 \and 王后天｝</code></pre>
+<p>添加附加信息() 附加信息在正文后有<code>*</code>,内容在脚注。</p>
+<pre class="latex"><code>\author{王今天 \and 王明天\thanks{Email:0000@aa.com} \and 王后天｝</code></pre>
+<h3 id="空格分段换行断页断词">空格、分段、换行、断页、断词</h3>
+<p>换行。 <code>\\</code>、<code>\newline</code> 分段。 1.空一行。多个空行被视为一个空行。2.<code>\par</code> 空格。 LATEX 源代码中，空格键和 Tab 键输入的空白字符视为“空格”。连续的若干个空白字符视为一个空格。一行开头的空格忽略不计。 1.<code>\hspace{1em}</code>(水平空格)、<code>\vspace{}</code>(垂直空格) 2.行末的换行符视为一个空格. &gt;1em即代表一个汉字的宽度，1pt即1磅，cm，in即英寸，ex英文环境下是x字符的高度。</p>
+<p>断页。</p>
+<pre class="latex"><code>\newpage
+\clearpage</code></pre>
+<p>微调断行或断页</p>
+<pre class="latex"><code>\linebreak [(n)]
+\nolinebreak [(n)]
+\pagebreak[(n)]
+\nopagebreak [(n)]</code></pre>
+<p>断词。 <code>\-</code></p>
+<h3 id="连字">连字</h3>
+<p>西文排版中经常会出现连字.</p>
+<pre class="latex"><code>dif{}f{}icult</code></pre>
+<h3 id="标点符号">标点符号</h3>
+<p>中文的标点符号使用中文输入法输入即可. 西文标点符号时，有不少地方需要留意。 <strong>引号</strong> LATEX 中单引号 ‘ 和 ’ 分别用 ` 和 ’ 输入；双引号 “ 和 ” 分别用 `` 和 ’’ 输入.</p>
+<p><strong>连字号和破折号</strong> 连字号 <code>-</code>用来组成复合词；短破折号<code>--</code> 用来连接数字表示范围；长破折号<code>---</code>用来连接单词，语义上类似中文的破折号。 <strong>省略号</strong> <code>\ldots = \dots</code></p>
+<h1 id="文档元素">文档元素</h1>
+<h2 id="章节和目录">章节和目录</h2>
+<p>章节标题。</p>
+<pre class="latex"><code>\chapter{(title)}
+\section{(title)}
+\subsectionf(title)}
+\subsubsection{(title)}
+\paragraph{(title)} 
+\subparagraph{(title)}</code></pre>
+<p>其中\chapter 只在 report 和 book 文档类有定义。这些命令生成章节标题，并能够自动编号。</p>
+<p>目录。</p>
+<pre class="latex"><code>\tableofcontents</code></pre>
+<p>这个命令会生成单独的一章（report/book）或一节（article），标题默认“Contents”</p>
+<h2 id="标题页">标题页</h2>
+<pre class="latex"><code>\title{(title)}
+\author{author)}
+\date{date)}</code></pre>
+其中前两个命令是必须的（不用\title 会报错；不用\author 会警告），
+<p>令可选。</p>
+<pre class="latex"><code>\today</code></pre>
+<p>自动生成当前日期。</p>
+<pre class="latex"><code>\thanks{Email:dkdkdk@kdkd.com}</code></pre>
+<p>在 \title、\thanks 命令生成标题页的脚注，用。</p>
+在信息给定后，就可以使用
+<p>命令生成一个简单的标题页了。</p>
+<h1 id="格式">格式</h1>
+<h2 id="居中取消缩进行距">居中、取消缩进、行距</h2>
+<p>居中。</p>
+<pre class="latex"><code>\begin{center}
+\end{center}</code></pre>
+<p>靠左。</p>
+<pre class="latex"><code>\begin{flushleft}
+\end{flushleft}</code></pre>
+<p>取消缩进。</p>
+<pre class="latex"><code>\noindent</code></pre>
+<p>或在导言区写。</p>
+<pre class="latex"><code>\parindent = 0pt
+
+\setlength{\parindent}{0pt}</code></pre>
+<p>行距。 latex基础行距 =1.2 * 字号 word基础行距 =1.3 * 字号 要在latex实现word的行距。需* 1.3/1.2。</p>
+<pre class="latex"><code>% 导言区
+\linespread{数字}
+% 在局部修改
+\linespread{数字}\selectfont
+% 选区修改
+{\linespread{数字}\selectfont
+\par}</code></pre>
+<p>更简单的。</p>
+<pre class="latex"><code>\usepackage{setspace}
+\singlespacing % 单倍行距
+\onehalfspacing % 1.5倍行距
+\doublespacing % 双倍行距
+% 这里的行距是字号
+\setstretch{数字}
+% 这里是基础行距的倍数
+% 局部
+\begin{spacing}{2}
+\end{spacing}
+% 这里是基础行距的倍数</code></pre>
+<h2 id="字号与字体">字号与字体</h2>
+<p>在文档类内。</p>
+<pre class="latex"><code>\documentclass[11pt]{ctexart}
+% 字号只能写10、11、12</code></pre>
+<p>字体相对尺寸。</p>
+<div class="image-placeholder">图片未发布：Pasted image 20251009160811.png</div>
+<pre class="latex"><code>\huge
+
+\begin{huge}
+\end{huge}
+
+{\huge
+}</code></pre>
+<p>直接设置。</p>
+<pre class="latex"><code>\fontsize{18pt}{18pt}\selectfont
+% 前为字号，后为行距</code></pre>
+<p>中文字号。</p>
+<div class="image-placeholder">图片未发布：Pasted image 20251009163308.png</div>
+<pre class="latex"><code>\zihao{5}</code></pre>
+<p>字体。 中文：</p>
+<pre class="latex"><code>\heiti % 黑体
+\songti 
+\yahei
+\fangsong
+\kaishu
+\lishu
+\youyuan</code></pre>
+<p>英文：</p>
+<pre class="latex"><code>\bfseries % 加粗
+\itshape % 斜体
+\rmfamily % 罗马字（衬线）
+\sffamily % 非衬线
+\ttfamily % 等宽字体</code></pre>
+<p>用宏包。</p>
+<pre class="latex"><code>\usepackage{fontspec}
+
+\setmainfont{consolas} % {}内写字体，main：主字体，全局
+\setsansfont{consolas} % 无衬线字体
+\setmonofont{...} % 等宽字体
+
+\fontspec{consolas} % 仅作用于其后</code></pre>
+<pre class="latex"><code>\usepackage{xeCJK} % 中日韩的文字，导入中文宏包会自动导入
+\setCJKmainfont{华文行楷｝
+｛\CJKfontspec{华文行楷}}
+
+\newCJKfontfamily{\xk}{华文行楷}
+\xk</code></pre>
+<h2 id="下划线颜色">下划线、颜色</h2>
+<p>下划线</p>
+<pre class="latex"><code>\usepackage[normale]{ulem}
+\uline{} % 单下划线
+\uuline{} % 双下划线
+\uwave{} % 波浪线
+\dotuline{} % 点式下划线
+
+\sout{} % 删除线
+\xout{} % 斜杠删除线</code></pre>
+<p>以上中文模式下不会自动换行，会超出纸的范围。 以下命令自动换行，但下划线会加在每个字下面，不包括标点符号</p>
+<pre class="latex"><code>\usepackage {CJKfntef}
+\CJKunderline{} % 单下划线
+\CJKunderdblline{} % 双下划线
+\CJKunderwave{} % 波浪线
+\CJKunderdot{} % 点式下划线，不同的是每一个字下面有一个点，而不是点构成线
+
+\CJKsout{} % 删除线
+\CJKxout{} % 斜杠删除线</code></pre>
+<p>颜色。</p>
+<pre class="latex"><code>\usepackage{xcolor}
+
+% 字体颜色
+\color{颜色名｝
+\color[rgb]{r,g,b｝% rgb也可以用16
+\textcolor{颜色}{内容｝
+\textcolor[rgb]{r,g,b}{内容｝
+% 背景色，box不能自动换行
+\colorbox{颜色}{内容｝
+\colorbox[rgb]{r,g,b}{内容｝
+\fcolorbox{边框色}{背景色}{内容｝
+\fcolorbox[rgb]{边框rgb}{背景rgb}{内容｝</code></pre>
+<p>以上可以嵌套使用。</p>
+<h2 id="纸张边距">纸张、边距</h2>
+<p>纸张</p>
+<pre class="latex"><code>\usepackage[landscape]{geometry} % 横向纸张
+
+\usepackage{geometry}
+
+\geometry{a4paper,left=2cm, right=1cm, top=1cm,bottom=2cm} % 纸张，页边距（四个）
+\geometry{a4paper,hmargin=2cm, vmargin=1cm}
+\geometry{a4paper,margin=2cm} % 四个边距一样</code></pre>
+<h2 id="分页分栏">分页、分栏</h2>
+<p>分页</p>
+<pre class="latex"><code>\newpage
+\clearpage</code></pre>
+<p>分栏</p>
+<pre class="latex"><code>\documentclass[11pt,twocolumn]{article}
+
+\twocolumn % 分栏
+\onecolumn % 恢复</code></pre>
+<h2 id="摘要摘录脚注边注">摘要、摘录、脚注、边注</h2>
+<p><strong>摘要、关键词</strong></p>
+<pre class="latex"><code>\begin{abstract}
+    随便写点什么
+    
+    \noindent{\textbf{关键词:}LaTex；学习；练习｝
+\end{abstract}</code></pre>
+<p>但一般摘要是找已有的模版，自己配置太复杂。 <strong>摘录</strong></p>
+<pre class="latex"><code>\begin{quote}
+
+\end{quote}</code></pre>
+<p>顶格。通常用于短句。</p>
+<pre class="latex"><code>\begin{quotation}
+\end{quotation}</code></pre>
+<p>首行缩进2字符。通常用于段落。</p>
+<pre class="latex"><code>\begin{verse}
+\end{verse}</code></pre>
+<p>首行顶格，下行缩进。通常用于诗歌。</p>
+<pre class="latex"><code>\begin{verbatim}
+\end{verbatim}</code></pre>
+<p>用于排版代码。 <strong>脚注</strong></p>
+<pre class="latex"><code>\footnote{}</code></pre>
+<p>修改脚注序号。重新从1开始。</p>
+<pre class="latex"><code>\setcounter{footnote}{0}</code></pre>
+<p><strong>边注</strong></p>
+<pre class="latex"><code>\marginpar{}
+\marginpar{\tiny 内容}
+\marginpar{\footnotesize 内容}</code></pre>
+<h2 id="box">box</h2>
+<p>独立区域进行设计和操作。 狭义：独立于正文之外。</p>
+<pre class="latex"><code>\fbox{内容} % 带边框的盒子，不自动换行
+\setlength{\fboxrule}{2pt} % 边框线条大小
+\setlength{\fboxsep}{5pt} % 边框与内容距离
+
+% 对齐。l: left c: center r: right s:分散对齐
+\framebox[宽度][对齐]{内容｝
+
+% 默认外对齐是与外部居中对齐
+% 对齐。t: top m: middle b: bottom
+\begin{minipage}[外对齐][高度][内对齐]{宽高｝
+\end{minipage} % 不带边框，竖向
+\fbox{
+\begin{minipage}[外对齐][高度][内对齐]{宽高｝内容}
+\end{minipage} % 可加fbox使其带边框
+
+\rule[升降]{宽度}{高度｝% 黑色的框，高度1pt是线
+
+\usepackage{graphicx}
+% 旋转。l，c，r。逆时针角度。
+\rotatebox[origin=c]{角度}{内容｝
+
+\rlap{\rule[-2pt]{2em}{1em}} 11ap % 将内容用黑框遮住</code></pre>
+<h2 id="自定义命令">自定义命令</h2>
+<pre class="latex"><code>\newcommand{名字}{内容}
+
+\newcommand{}[]{} % 最多可以写9个参数
+\newcommand{\bi}[2]{\textbf{#1} \textit{#2}} % 加粗、斜体
+\bi{Hello }{ world}
+
+\renewcommand{}{}</code></pre>
+<h2 id="图片">图片</h2>
+<h3 id="插入图片">插入图片</h3>
+<pre class="latex"><code>\usepackage[draft]{graphicx} % 草稿
+\usepackage{graphicx}</code></pre>
+<p>新建一个image文件夹，上传图片。</p>
+<pre class="latex"><code>\includegraphics[width=0.5\linewidth]{img/test_img_1.jpg} % 图片路径
+\includegraphics[scale=0.2]{img/test_img_1.jpg} % 缩放</code></pre>
+<h3 id="浮动体与图片排版">浮动体与图片排版</h3>
+<pre class="latex"><code>\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]
+    {img/test_img_1.jpg}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}</code></pre>
+<p>自定义位置。</p>
+<pre class="latex"><code>% h: here 这里 t：top 顶部 b: bottom !:忽略一些限制 p:page 新一页
+% 通常全部写上系统自己选择
+\begin{figure}[htbp!]
+    \centering
+    \includegraphics[width=\linewidth]
+    {img/test_img_1.jpg}
+    \caption{Caption} % 图片标题，根据放在图片路径上下决定标题上下
+    \label{fig:enter-label}
+\end{figure}</code></pre>
+<p>在双栏格式下，加<code>*</code>可跨栏。</p>
+<pre class="latex"><code>% 跨栏只有两个位置可选，tb
+\begin{figure*}{tb}
+    \centering
+    \includegraphics[width=\linewidth]
+    {img/test_img_1.jpg}
+    \caption｛一张风景｝
+    \label{fig:enter-label}
+\end{figurel}</code></pre>
+<p>第一种排版：三张共用一标题</p>
+<div class="image-placeholder">图片未发布：Pasted image 20251119213216.png</div>
+<pre class="latex"><code>\begin{figure}
+    \centering
+    \includegraphics[width=0.4\linewidth]
+    {img/test_img_2.jpg} \hfill % 上面两个图片中间空间占满
+    \includegraphics[width=0.4\linewidth]
+    {img/test_img_3.jpg} \\
+    \vspace{1em}
+    \includegraphics [width=\linewidth]
+    {img/test_img_1.jpg}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}</code></pre>
+<p>第二种排版：两张两标题</p>
+<div class="image-placeholder">图片未发布：Pasted image 20251120195532.png</div>
+<pre class="latex"><code>\begin{figure}
+    \centering
+    \begin{minipage}{0.4\linewidth}
+        \includegraphics[width=\linewidth]
+        {img/test_img_2.jpg}
+        \caption｛并排标题1｝
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.4\linewidth}
+        \includegraphics[width=\linewidth]
+        {img/test_img_3.jpg}
+        \caption｛并排标题2｝
+    \end{minipage}
+\end{figure}</code></pre>
+<p>第三种排版：三张一主标题三小标题</p>
+<div class="image-placeholder">图片未发布：Pasted image 20251120200218.png</div>
+<pre class="latex"><code>\usepackage{subcaption}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.4\linewidth}
+        \includegraphics[width=\linewidth]
+        {img/test_img_2.jpg}
+        \caption{子标题1}
+    \end{subfigure} \hspace{2em}
+    \begin{subfigure}{0.4\linewidth}
+        \includegraphics[width=\linewidth]
+        {img/test_img_3.jpg}
+        \caption｛子标题2｝
+    \end{subfigure} \\ \vspace{1em}
+    \begin{subfigure}{\linewidth}
+        \includegraphics[width=\linewidth]
+        {img/test_img_1.jpg}
+        \caption｛子标题3｝
+    \end{subfigure}
+    \caption{大标题}
+    \label{fig:enter-label}
+\end{figure}</code></pre>
+<h3 id="图片引用">图片引用</h3>
+<pre class="latex"><code>\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]
+    {img/test_img_1.jpg}
+    \caption{Caption}
+    \label{fig:enter-label} % 每次创建自动生成的，保证每个label里内容唯一，格式是fig：唯一号（英文）
+\end{figure}
+
+% 简单图片引用，需要自己写图
+\ref{fig:enter-label} % {}内可选label的内容，显示图的序号
+\pageref{} % 显示图所在的纸张序号
+
+% 自动带图
+\usepackage[hidelinks]{hyperref}
+
+\renewcommand{\figureautorefname}{图} 
+\autoref{fig:enter-label}</code></pre>
+<h2 id="文档设置背景图片">文档设置背景图片</h2>
+<pre class="latex"><code>\usepackage{wallpaper}
+% 前是全局设置，后是单页设置
+% \TileSquareWallPaper{平铺数}{图形名} \ThisTileSquareWallPaper 平铺好几张照片
+% \TileWallPaper{图宽}{图高}{图形名} \ThisTileWallPaper 一张照片
+% \CenterWallPaper{缩放系数}{图形名} \ThisCenterWallPaper
+% \ULCornerWal1Paper{缩放系数}{图形名} \ThisULCornerWallPaper
+% \URCornerWallPaper{缩放系数}{图形名} \ThisURCornerWallPaper
+% \LLCornerWallPaper{缩放系数}{图形名} \ThisLLCornerWallPaper
+% \LRCornerWallPaper{缩放系数}{图形名} \ThisLRCornerWallPaper
+% \ClearWallPaper 清除壁纸样式</code></pre>
+<h2 id="cutwin文字环绕排版">cutwin文字环绕排版</h2>
+<p>难设置，需查找</p>
+<pre class="latex"><code>\usepackage{cutwin}
+
+% \opencutleft 在左边挖孔
+% \opencutright 在右边挖孔
+% \opencutcenter 在中间挖孔
+% \begin{cutout}{顶部行数}{左边文字宽度}{右边文字宽度}{高度行数}
+% 在右边挖孔时(右边文字宽度)无效
+% 在左边挖孔时(左边文字宽度)无效
+% 用\renewcommand{\windowpagestuff}{}定义放入空白处的内容</code></pre>
+<h2 id="有序列表无序列表">有序列表、无序列表</h2>
+<p>无序列表</p>
+<pre class="latex"><code>\begin{document}
+\Large
+{\heiti 我这一天就干三件事：}
+\begin{itemize}
+    \item 吃饭
+        \begin{itemize}
+            \item 吃早饭
+                \begin{itemize}
+                    \item 喝牛奶
+                    \item 吃面条
+                \end{itemize}
+            \item 吃午饭
+            \item 吃晚饭
+        \end{itemize}
+    \item 睡觉
+    \item 打豆豆
+\endfitemize｝
+
+\end{document}</code></pre>
+<p>有序列表</p>
+<pre class="latex"><code>\begin{enumerate}
+    \item 吃饭
+        \begin{enumerate}
+            \item 吃早饭
+                \begin{enumerate}
+                    \item 喝牛奶
+                    \item 吃面条
+                \end {enumerate}
+            \item 吃午饭
+            \item 吃晚饭
+        \end{enumerate}
+    \item 睡觉
+    \item 打豆豆
+\end{enumerate}</code></pre>
+<p>解释说明</p>
+<pre class="latex"><code>\begin{description}
+    \item[吃饭］为了活下去把食物放进肚子里
+\end｛description｝</code></pre>
+<h2 id="空格与填充">空格与填充</h2>
+<pre class="latex"><code>\hspace \vspace
+\thinspace \, \negthinspace \enspace \nobreakspace ~
+\quad \qquad \enskip \ 
+\hfill % 水平方向上剩余空白填充满
+\vfill % 垂直方向
+\stretch{} 
+\hspace{\stretch{1}}\hspace{\stretch{2}}\hspace{\stretch{3}} % 按比例填充空白
+\hrulefill % 用横线填充
+\dotfill % 用点填充</code></pre>
+<h2 id="表格">表格</h2>
+<h3 id="简单表格tabular">简单表格tabular</h3>
+<pre class="latex"><code>% \begin{tabular}[外对齐]{列格式}
+% l c r p{4em}
+% *{重复次数}{重复内容}
+% t m b
+\begin{tabular}[m]{*{5}{|c}|}
+    \hline
+    姓名   &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+    \hline
+    冯宝宝 &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+    \hline
+    张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+    \hline
+    张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+    \hline
+    诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+    \hline
+\end{tabular}</code></pre>
+<h3 id="表格浮动表格引用">表格浮动、表格引用</h3>
+<pre class="latex"><code>\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    \begin{tabular}[m]{*{5}{|c}|}
+        \hline
+        姓名   &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        \hline
+        冯宝宝 &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+        \hline
+        张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+        \hline
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        \hline
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+% 引用
+\ref{tab:my_label} 
+
+% 自动
+\usepackage[hidelinks]{hyperref}
+\renewcommand{\tableautorefname}{表}
+\autoref{tab:my_label}</code></pre>
+<h3 id="表格样式">表格样式</h3>
+<p>：全线 :指定单元格划线</p>
+<p>样式1</p>
+<div class="image-placeholder">图片未发布：Pasted image 20251123133424.png</div>
+<pre class="latex"><code>\usepackage{diagbox}
+
+\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    \begin{tabular}[m]{*{5}{|c}|}
+        \hline
+        \diagbox{姓名}{分数}{内容} &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        \hline
+        冯宝宝 &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+        \hline
+        张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+        \hline
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        \hline
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}</code></pre>
+<p>样式2</p>
+<div class="image-placeholder">图片未发布：Pasted image 20251123143432.png</div>
+<pre class="latex"><code>\usepackage{multirow}
+
+% 纵向合并：\multirow{合并数量}{合并后宽度}{合并后内容}
+% * 表示系统分配宽度
+% 横向合并：\multicolumn{合并数量}{合并后格式}{合并后内容} lcrp
+\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    \begin{tabular}[m]{*{5}{|c}|}
+        \hline
+        \multirow{2}{*}{姓名}   &amp; \multicolumn{3}{c|}{考试内容} &amp; \multirow{2}{*}{考评结果} \\
+        \cline{2-4}
+               &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp;  \\
+        \hline
+        冯宝宝 &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+        
+        张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+        
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}</code></pre>
+<h3 id="三线表">三线表</h3>
+<pre class="latex"><code>\usepackage{booktabs}
+
+\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    \begin{tabular}[m]{*{5}{c}}
+        \toprule[1pt]
+        姓名   &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        \midrule
+        冯宝宝 &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+        % \cmidrule{2-4}
+        张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+        % \morecmidrules 用于画多条
+        % 双边框线：\cmidrule{2-4} \morecmidrules \cmidrule{2-4}
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        % \specialrule{粗细}{上方空白}{下方空白}
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        \bottomrule
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}</code></pre>
+<h3 id="自动变宽表格tabularx">自动变宽表格tabularx</h3>
+<pre class="latex"><code>\usepackage{tabularx}
+
+% \arraybackslash 格式调整
+\newcommand{\RC}{\centering\arraybackslash} % 居中
+\newcommand{\RL}{\raggedleft\arraybackslash} % 右对齐
+\newcommand{\RR}{\raggedright\arraybackslash} % 左对齐
+
+\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    \begin{tabularx}{\linewidth}{
+    |&gt;{\RC}x|
+    &gt;{\RL}x|
+    &gt;{\RC}x|
+    &gt;{\RC}x|
+    &gt;{\RR}x|
+    }
+        \hline
+        姓名   &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        \hline
+        冯宝宝 &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+        \hline
+        张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+        \hline
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        \hline
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        \hline
+    \end{tabularx}
+    \label{tab:my_label}
+\end{table}</code></pre>
+<h3 id="新式表格tabularray">新式表格tabularray</h3>
+<h4 id="换行q格式">换行、Q格式</h4>
+<pre class="latex"><code>\usepackage{tabularray}
+
+\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    % 此格式自带空格
+    % 消除空格：\setTblrInner{rowsep=0pt}
+    
+    % Q[ 水平方向,垂直方向,列宽] 3个参数其中两个可以任意组合
+    % l c r   h:head f:foot m
+    \begin{tblr}[m]{|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|}
+        \hline
+        姓名   &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        \hline
+        % 可手动换行
+        {冯宝宝 \\ 冯宝宝} &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+        \hline
+        张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+        \hline
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        \hline
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        \hline
+    \end{tblr}
+    \label{tab:my_label}
+\end{table}</code></pre>
+<h4 id="可变宽行列设置分离">可变宽、行列设置分离</h4>
+<pre class="latex"><code>\usepackage{tabularray}
+
+\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    % X[c,2] X[c,3] 表格空间比例2:3
+    % X[c,-1] -1是根据表格内容自动修改
+    \begin{tblr}{
+        % l c r   h:head f:foot m
+        colspec = {|X[c]|X[c]|c|c|c|}, % 列格式
+        rowspec = {|Q[m]|Q[m]|Q[m]|Q[m]|Q[m]|}, % 行格式
+        width = 0.8\linewidth % 表格宽度
+    }
+        
+        姓名   &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        
+        冯宝宝 &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+        
+        张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+        
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        
+    \end{tblr}
+    \label{tab:my_label}
+\end{table}</code></pre>
+<h4 id="框线样式颜色按行列绘制边框线自由绘制边框线">框线样式颜色、按行列绘制边框线、自由绘制边框线</h4>
+<pre class="latex"><code>\usepackage{tabularray}
+\usepackage{xcolor} % 颜色
+
+\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    \begin{tblr}{
+        colspec = {ccccc},
+        % 框线样式颜色
+        hlines = {2pt, dashe，red}, % solid：实线 dashed：点线 dotted：密集点线
+        vlines = {2pt, dashed, green},
+        
+        % 按行列绘制边框线
+        % h[v]lines = {范围}{边框线样式} odd/even 奇数/偶数
+        hlines = {-}{}, % - 是全列
+        vlines = {}{}
+    
+        %多边框线
+        % h[v]lines = {序号}{范围}{边框线样式}
+        hlines = {1}{-}{},
+        hlines = {2}{-}{}
+        
+        % 自由绘制边框线
+        hline{3,5} = {3,4}{dashed, blue},
+        vline{3,5} = {3,43}{dashed, blue},
+        hline{2,3} = {1}{},
+        vline{1,2} = {2}{}
+    }   
+        
+        姓名   &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        
+        冯宝宝 &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+        
+        张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+        
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        
+    \end{tblr}
+    \label{tab:my_label}
+\end{table}</code></pre>
+<h4 id="设置行列样式单元格合并与样式">设置行列样式、单元格合并与样式</h4>
+<pre class="latex"><code>\usepackage{tabularray}
+\usepackage{xcolor}
+
+\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    \begin{tblr}{
+        colspec = {ccccc},
+        hlines,vlines,
+        
+        % 设置行列样式
+        % columns = {c,bg=cyan, fg=white,font=\kaishu\Large},
+        % bg：背景色 fg：字体色
+        % rows = {m}
+        row{1} = {bg=cyan, font=\heiti\large},
+        column{1} = {font=\kaishu, fg=blue}
+        
+        % 单元格合并与样式
+        % cell{行}{列}={单元格样式}
+        % cell{行}{列}={合并数}{单元格样式}
+        % r = N, c = M
+        cell{13{13 = {r=2}83,
+        cell{1}{53 = {r=2}{},
+        cell{1}{2} = {0=3}{},
+        cell{3}{2} = {c=3, r=4}{}
+    }
+        姓名   &amp; 考试内容 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        姓名   &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        
+        冯宝宝 &amp; 85   &amp; 90     &amp;    85   &amp; 合格 \\
+        
+        张楚岚 &amp; 90   &amp; 55     &amp;    60   &amp; 不合格\\
+        
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        
+    \end{tblr}
+    \label{tab:my_label}
+\end{table}</code></pre>
+<h4 id="三线表-1">三线表</h4>
+<pre class="latex"><code>\usepackage{tabularray}
+\usepackage{xcolor}
+\UseTblrLibrary{booktabs} % 引入宏包不一样
+
+\begin{table}[htbp]
+    \centering
+    \caption{表名}
+    \begin{tblr}{
+        colspec = {ccccc},
+    }
+        \toprule
+        姓名   &amp; 面试 &amp; 理论知识 &amp; 上机考试 &amp; 考评结果 \\
+        \toprule
+        冯宝宝 &amp;  85  &amp; 90     &amp;    85   &amp; 合格 \\
+        张楚岚 &amp;  90  &amp; 55     &amp;    60   &amp; 不合格\\
+        张灵玉  &amp; 90   &amp; 82    &amp;   75    &amp; 合格 \\
+        诸葛青 &amp; 75     &amp; 90   &amp;   58.   &amp; 不合格\\
+        \bottomrule
+    \end{tblr}
+    \label{tab:my_label}
+\end{table}</code></pre>
+<h4 id="长表格longtblr">长表格longtblr</h4>
+<pre class="latex"><code>\usepackage{tabularray}
+\usepackage{xcolor}
+% 中文
+\DefTblrTemplate{contfoot-text}{chs}{接下页\dots}
+\SetTblrTemplate{contfoot-text}{chs}
+\DefTblrTemplate{conthead-text}{chs}{续表}
+\SetTblrTemplate{conthead-text}{chs}
+
+\begin{longtblr}[
+    caption = {一个很长的表格},
+    label = {tab:long_tab}
+]{
+    colspec = {cccc},
+    hlines, vlines,
+    rowhead = 1 % 若无表头，写为0
+}   
+    内容
+\end{longtblr}</code></pre>
+<h4 id="横向表格宽表">横向表格（宽表）</h4>
+<pre class="latex"><code>\usepackage{tabularray}
+\usepackage{xcolor}
+\usepackage{rotating} % 将表格横向显示
+
+\begin{sidewaystable}[htbp]
+    \centering
+    \caption{表名}
+    \begin{tblr}{
+        colspec = {*{23}{c}},
+        hlines
+    }
+        内容
+    \end{tblr}
+    \label{tab:my_label}
+\end{sidewaystable}</code></pre>
+<h3 id="补充">补充</h3>
+<p>https://www.latex-tables.com 表格转LaTeX</p>
+<h2 id="公式">公式</h2>
+<h3 id="数学模式与公式引用">数学模式与公式引用</h3>
+<p>https://www.latexlive.com 在线公式编辑</p>
+<p>数学模式： 行内公式<code>$$</code> 行间公式<code>\[ \]</code>,即公式单独一行 带编号行间公式</p>
+<pre class="latex"><code>\usepackage{amsmath} % 引用
+\usepackage[hidelinks]{hyperref} % 自带文字
+
+\renewcommand{\equationautorefname}{公式}
+
+\begin{equation}
+    \label{eq:eq_1}
+    公式
+\end{equation}
+
+% 引用
+\ref{eq:eq_1}
+% 有宏包引用
+\eqref{eq:eq_1}
+% 带文字引用
+\autoref{eq:eq_1}</code></pre>
+<h3 id="分式与根式">分式与根式</h3>
+<pre class="latex"><code>% 分式
+$\frac{分子}{分母}$ % 行内压缩比较小
+
+\usepackage{amsmath}
+$\dfrac{分子}{分母}$ % 解决公式小
+
+\[
+\dfrac{23}{45} \quad 4\dfrac{2}{3} 
+\]
+
+% 根式 
+\[
+\sqrt[根次]{被开方数}
+\]</code></pre>
+<h3 id="上下标">上下标</h3>
+<div class="image-placeholder">图片未发布：Pasted image 20251125191947.png</div>
+<pre class="latex"><code>% 上标：^ 下标：_
+\[
+A^m_n \quad A_{ij} \quad f(x)=e^{x^2+x+3} \quad 45^{\circ} \quad (е^х)&#39;&#39; = (е^х)&#39; = e^x \quad f^{(n)}(x) 
+% 三阶以内单引号
+\]</code></pre>
+<h3 id="上下线">上下线</h3>
+<div class="image-placeholder">图片未发布：Pasted image 20251125194058.png</div>
+<pre class="latex"><code>% 上小箭头：\vec
+% 向量用黑体
+% 上大箭头：\overrightarrow
+% 上横线：\overline{}、\bar
+% 下划线：\underline
+% \hat
+\[
+\vec{a} \cdot \vec{b} \quad \boldsymbol{a} \times \boldsymbol{b} \quad \overrightarrow{AB} \cdot \overrightarrow{CD} \quad \overline{AB} \quad \underline{CD} \quad \bar{x} \quad \bar{x}_0 \quad \hat{a}
+\]
+% 复杂
+\[
+\overbrace{(a + a + \cdots + a)}^{\text{$n$个$a$}} \times \underbrace{(b + b + \cdots + b)}_{\text{$m$个$b$}}
+\]</code></pre>
+<h3 id="求和与公式样式调整">求和与公式样式调整</h3>
+<div class="image-placeholder">图片未发布：Pasted image 20251125205650.png</div>
+<pre class="latex"><code>\usepackage{amsmath}
+\usepackage{mathtools}
+% 无穷：\infty
+% 换行需借助\substack
+\[
+S_{n} = \sum_{i=0}^{n} a_n \quad \sum_{\substack{O&lt;i&lt;n \\ 0&lt; j&lt;m}} A_{ij}
+\]
+
+\[
+\hat{b} = \dfrac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
+\]
+
+\[
+\hat{a} = \bar{y} - \hat{b}\bar{x}
+\]
+
+\[
+\hat{y} = \hat{b} x + \hat{a}
+\]
+
+% 求和号上下:\limits  \displaystyle
+$S_{n} = \sum\limits_{i=0}^{\infty} a_n$
+$ \displaystyle S_{n} = \sum\limits_{i=0}^{\infty} a_n$
+
+% 被求和数与求和符号太远：\smashoperator
+\[
+\smashoperator{\sum_{\substack{0&lt;i&lt;n \\ 0 &lt; j&lt; m}}}A_{ij}
+\]
+% 上标高度不一致：\mathstrut
+\[
+\hat{\mathstrut a} \hat{\mathstrut b} \hat{\mathstrut y}
+\quad \vect{\mathstrut a} \cdot \vec{\mathstrut b} \quad
+\sqrt{\mathstrut b} \sqrt{\mathstrut y}
+\]
+% 移动根号上的角标
+\[
+\sqrt[\uproot{12}\leftroot{-3}[3]]{\dfrac{x+y}{x-y}}
+\]</code></pre>
+<h3 id="极限与积分">极限与积分</h3>
+<div class="image-placeholder">图片未发布：Pasted image 20251126144357.png</div>
+<pre class="latex"><code>% 极限
+\[
+\lim_{x \to 0} \dfrac{\sin x}{x} = 1 \quad \lim_{n \to \infty}(1 + \dfrac{1}{n})^n = e
+\]
+% 积分
+\newcommand{\di}{\mathrm{d}}
+\[
+\int x \di x \quad \int_{0}^{1} \sqrt{1-x^2} \di x \quad 
+\iint\limits_{S} \sqrt{x^2 + y^2} \di x \di y
+\]
+% 带圆圈的积分符号
+\[
+\boxed{
+\oint_{\Gamma} P(x, y, z) \di x + Q(x, y, z) \di y + R(x,y,z) \di z}
+\]
+% 偏导数
+% 括号要完全包裹用\left \right 大括号要转义\{ \} 或者||当绝对值
+% 只想保留一个括号\left . 或者 \right .  left和right必须成对出现
+\[
+\oint_{L} p \di x +Q \di y = \iint\limits_{D} \left(\dfrac{\partial Q}{\partial x} - \dfrac{\partial P} {\partial y}\right) \di x \di y
+\]</code></pre>
+<h3 id="矩阵">矩阵</h3>
+<div class="image-placeholder">图片未发布：Pasted image 20251126155944.png</div>
+<pre class="latex"><code>矩阵 
+% matrix:无修饰仅排版 bmatrix：方括号 vmatrix：竖线行列式 pmatrix：圆括号矩阵 Bmatrix：花括号 Vmatrix：双竖线
+% 自己排版
+\[
+A = \left (
+\begin{array}{rrr} 
+    11.11 &amp;  12 &amp; 13 \\
+    21    &amp; -22 &amp; 23 \\
+    31    &amp; 32  &amp;-33.33 \\
+\end{array} \right )
+\]
+
+\[
+pM =
+\begin{pmatrix}
+    11 &amp; 12 &amp; 13 \\
+    21 &amp; 22 &amp; 23 \\
+    31 &amp; 32 &amp; 33
+\end{pmatrix}
+\]
+
+% 矩阵中有分数
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{tabularray}
+\usepackage{xcolor}
+
+\UseTblrLibrary{amsmath}
+
+\[
+A =
+\begin{+pmatrix}[cells=r,row{2}={blue9}]
+    \drac{1}{3} &amp; -\dfrac{1}{4} &amp; \dfrac{1}{5} \\
+    \dfrac{113{133 &amp; -\dfrac{11}{14} &amp; \dfrac{11}{15} \\
+    \dfrac{1}{3} &amp; \dfrac{1}{4} &amp; -\dfrac{1}{5}
+\end{+pmatrix}
+\]
+
+\[
+A=
+\begin{pmatrix}
+    a_{11} &amp; a_{12} &amp; \cdots &amp; a_{1n} \\
+    a_{213 &amp; a_{22} &amp; \cdots &amp; a_{2n} \\
+    \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+    a_{n1} &amp; a_{n2} &amp; \cdots &amp; a_{nn}
+\end{pmatrix}
+\]</code></pre>
+<h3 id="多行公式">多行公式</h3>
+<pre class="latex"><code>% 手动折行1
+\[
+\begin{split}
+    (a+b)^3 &amp;= (a+b)^{2}(a+b) \\
+            &amp;= (a^2 + 2ab + b^2) (a + b) \\
+            &amp;= (a^3 + ...)
+\end{split}
+\]
+% 手动折行2
+\[
+\left \{
+\begin{array}{l}
+    x + y + z = 10 \\
+    x-y-z=-5   \\
+    2x + 3y +4z = 35
+\end{array} \right .
+\]
+% 自动换行
+\usepackage{breqn}
+
+\begin{dmath}
+    (a+b)^3 = (a+b)^{2}(a+b)
+            = (a^2 + 2ab + b^2)(a + b)
+            = (a^3 +...)
+\end{dmath}
+% 自动生成编号，不要编号：dmath*</code></pre>
+<h3 id="分支公式">分支公式</h3>
+<div class="image-placeholder">图片未发布：Pasted image 20251126194340.png</div>
+<pre class="latex"><code>\[
+f（x）=
+\begin{cases}
+    1，&amp; x \text｛为有理数｝\\
+    0，&amp; x \text｛为无理数｝
+\end{cases}
+\]
+
+\[
+f(x) =
+\begin{dcases}
+    \dfrac{1}{2} x^2,   &amp; x \leq 0 |\
+    \dfrac{1}{3} \ln x, &amp; 0 &lt; x &lt; 10 \\
+    \dfrac{13{10} \sqrt{x3, &amp; x \geq 10
+\end{dcases}
+\]
+
+% 调整大于等于号
+\usepackage {amsymb}
+\[
+f(x) =
+\begin{dcases}
+\dfrac{1}{2} x12, &amp; x \leqslant 0 1\
+\dfrac{13{3} \In x, 80 &lt; x &lt; 10 |\
+Idfrac{13{10} Isqrt{x}, &amp; x \geqslant 10
+\end{dcases}
+\]
+% 括号在右
+\[
+\begin{drcases}
+    S \subset T \\
+    S \supset T
+\end{drcases}
+\quad
+\Rightarrow
+\quad
+S = T
+\]</code></pre>
+<h3 id="定理环境与cleveref引用">定理环境与cleveref引用</h3>
+<pre class="latex"><code>\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+% \newtheorem{环境名}[计数器]{显示名}[编号层次]
+\newtheorem{definition}{定义}
+\newtheorem{theorem}{定理}
+\newtheorem{lemma}{引理}
+\newtheorem{corollary}{推论}
+% 编号层次  chapter section
+% 计数器 此例按定理计数
+\newtheorem{corollary}[theorem]{推论}
+
+\section{定理环境}
+
+\begin{definition} \label{def:1}
+    两组对边分别平行的四边形叫平行四边开
+\end{definition}
+
+\begin{theorem}  \label{th: 1}
+    两组对边分别相等的四边形是平行四边形
+\end{theorem}
+% 证明环境
+\usepackage{amsthm}
+
+\begin{proof}[拉格朗日中值定理证明］
+    引进辅助函擞
+    \[
+    \phi (x) = f(x) - f(a) - \dfrac{f(b) - f(a)}{b-x}(x-a).
+    \]
+    容易验证函数$\phi（x）$适合罗尔定理的条件：$\phi（a）=\phi（b)= O$， $\phi（x）$在闭区间$[a,b]$上连续，在开区间$[a,b]$上可导
+    \[
+    \cdots
+    \]
+\end{proof}
+
+% 引用
+\ref{th:1}
+% 引用显示文字
+\usepackage[hidelinks]{hyperref}
+
+% \renewcommand{\equationautorefname}{式}
+% \renewcommand{\footnoteautorefname}(脚注}
+% \renewcommand{\itemautorefname}{项}
+% \renewcommand{\figureautprefname}{图}
+% \renewcommand{\tableautorefname}{表}
+% \renewcommandf\partautorefname}{篇｝
+% \renewcommandf\appendixautorefname}{附录｝
+% \renewcommand{\chapterautorefname}{章}
+% \renewcommand{\sectionautorefname}{节}
+% \renewcommand{\subsectionautorefnamel{小小节}
+% \renewcommand{\subsubsectionautorefname}{subsubsection}
+% \renewcommand{\paragraphautorefname}{段落}
+% \renewcommand{\subparagraphautorefname}{子段落}
+% \renewcommand{\FancyVerbLineautorefname}{行}
+% \renewcommand{\theoremautorefname}{定理}
+\usepackage{cleveref}
+
+% 将文字转为中文
+\crefname{definition}{定义}{定义}
+\crefname{theorem}{定理}{定理}
+\crefname{lemma}{引理}{引理}
+\crefname{corollary}{推论}{推论}
+
+\cref{def:1}
+% 引用可跳转
+\hyperref[def:1]{\cref{def:1}} % 前一个参数是需跳转的标签，后一个是跳转位置的坐标</code></pre>
+<h2 id="章节标题与目录">章节标题与目录</h2>
+<pre class="latex"><code>\chapter{title}  % 一级
+\section{title}  % 二级
+\subsection{(title)}  %三级
+\subsubsection{(title)} 
+\paragraph{(title)} 
+\subparagraph{(title)}</code></pre>
+<p>article 文档类带编号的层级为\section、\subsection、\subsubsection 三级； report 和 book 文档类带编号的层级为\chapter、\section、。</p>
+<pre class="latex"><code>% 生成目录
+\tableofcontents
+% 表格的目录
+\listoftables
+% 图片的目录
+\listoffigures</code></pre>
+<p>简短的目录</p>
+<pre class="latex"><code>\usepackage{shorttoc}
+
+\shorttoc{简明目录}{0} % 0只有章，1有章节</code></pre>
+<p>设置双栏</p>
+<pre class="latex"><code>\usepackage[toc, lot, lof]{multitoc} % toc文章，lot表格，lof图片</code></pre>
+<p>目录可跳转</p>
+<pre class="latex"><code>\usepackage[hidelinks]{hyperref}</code></pre>
+<h2 id="文档结构-前言正文附录后记">文档结构-前言正文附录后记</h2>
+<pre class="latex"><code>% 自带目录的结构
+\tableofcontents \addcontentsline{toc}{chapter}{目录｝
+\istoftables \addcontentsline{toc}{chapter}{表格列表｝
+\listoffigures \addcontentsline{toc}{chapter}{图片列表｝</code></pre>
+<pre class="latex"><code>% 前言，后记结构
+\frontmatter
+\mainmatter
+\backmatter
+\appendix</code></pre>
+<h2 id="文档拆分">文档拆分</h2>
+<p>引入主文档</p>
+<pre class="latex"><code>\include{文件名} % 前后重新开一页引用,一般用于章节
+\input{文件名} % 直接引用，不会重新开一页，一般用于导言区</code></pre>
+<h2 id="页眉页脚">页眉页脚</h2>
+<p>页码</p>
+<pre class="latex"><code>\pagenumbering{arabic} % 页码重新计数，阿拉伯数字</code></pre>
+<div class="line-block">命令 | 样式 | 范围 |</div>
+<div class="line-block">— | — | — |</div>
+<div class="line-block">| 阿拉伯数字（默认）| |</div>
+<div class="line-block">| 小写字母 | 限 0-126 |</div>
+<div class="line-block">| 大写字母 | 限0-26 |</div>
+<div class="line-block">| 小写罗马数字 | 限非负整数 |</div>
+<div class="line-block">| 大写罗马数字 | 限非负整数 |</div>
+<div class="line-block"> | 一系列符号，用于\thanks 命令生成的脚注 | 限 0-9 |</div>
+<p>页眉页脚</p>
+<pre class="latex"><code>\pagestyle{empty}
+\thispagestyle{empty}</code></pre>
+参数 empty:页眉页脚空 plain:页眉为空，页脚页码。（article 和 report 文档类默认；book文档类的每章第一页也为 plain 格式） headings：页眉为章节标题和页码，页脚空。（book 文档类默认） myheadings：页眉为页码及
+和
+<p>命令手动指定的内容，页脚为空。</p>
+<p>fancyhdr宏包设置 fancyhdr 的 fancy 页面风格把页面的页眉和页脚分为6个部分。区分奇偶数有12个部分。</p>
+<div class="image-placeholder">图片未发布：Pasted image 20251130151657.png</div>
+<pre class="latex"><code>\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % 页眉自动有一条线
+\chead｛\kaishu 北京大学毕业论文（设计）｝
+\lhead{\thepage} % 页码
+\rhead{\leftmark} % \leftmark章节标题，\rightmark小节标题
+\renewcommand{\headrulewidth}{Opt} % 页眉消除横线
+\renewcommand{\footrulewidth}{1pt} % 页脚添加横线
+\fancyhead[EC]{\thepage}
+
+% 语法
+\lhead{内容} % 设置页眉左
+\chead{内容} % 设置页眉中
+\rhead{内容} % 设置页眉右
+\lfootf{内容} % 设置页脚左
+\cfoot{内容} % 设置页脚中
+\rfoot{内容} % 设置页脚右
+\fancyhead[位置]{内容} % 设置页眉，位置可以是E、O与L、C、R的组合
+\fancyfoot[位置]{内容} % 设置页脚，位置可以是E、0与L、C、R的组合
+\fancyhf[位置]{内容} % 设置页眉及页脚，位置可以是H、F与B、O与L、C、R的组合</code></pre>
+<h2 id="参考文献">参考文献</h2>
+<pre class="latex"><code>% 手动调整
+\begin{thebibliography}{}
+    \bibitem[item number]{citation} ...
+\end{thebibliography}</code></pre>
+<p>自动生成 BIBTEX 数据库以.bib 作扩展名，其内容是若干个文献条目，每个条目的格式为：</p>
+<pre><code>@type{citation,
+    key1 = {value1},
+    key2 = {value2},
+    ……
+}</code></pre>
+<p>不同文献有不同格式。 可借助文献管理工具JabRef、Zotero等生成。 样式：</p>
+<div class="image-placeholder">图片未发布：Pasted image 20251130163527.png</div>
+<pre class="latex"><code>% 以gbt7714样式为例
+\usepackage{gbt7714}
+
+\bibliographystyle{gbt7714-numerical}
+
+\begin{document}
+第一个文献\cite{bk1}
+第二个文献\cite｛wx1｝
+第三个文献\cite｛wx2｝
+
+\bibliography{ckwx}
+end{document}
+
+% 使用biblatex宏包
+\usepackage[style=gb7714-2015]{biblatex}
+\addbibresource{ckwx.bib}
+……
+内容\cite{}
+\citeauthor{}
+\citeyear{}
+\textcite{}
+\parentcite{}
+\footcite{}
+……
+
+\printbibliography</code></pre>
+<h2 id="索引">索引</h2>
+<pre class="latex"><code>\usepackage{imakeidx}
+
+\makeindex
+\begin{document}
+索引
+勾股定理\index{勾股定理}
+% !可以分级
+\index{地名!北京}
+\index{人名!王也}
+\index{地名!浙江!杭州}
+\index{人名!冯宝宝}
+% 用@符号显示
+\index{gougu@$a^2+b^2=c^2$}
+% 标记开始和结束，页码范围
+\index{北京大学|(}
+内容
+\index{北京大学|)}
+% 索引到另一个词条
+\index{毕达歌拉斯定理|see{勾股定理}}
+\index{商高定理|seealso{勾股定理}}
+% 中文
+\renewcommand{\seename}{参见}
+\renewcommand{\alsoname}{又见}
+
+\printindex
+\end{document}</code></pre>
+<pre class="latex"><code>% 分类索引
+\makeindex[name={person},title={人物索引}]
+\makeindex[name={org},title={机构索引}]
+
+\index[person]{人名!冯宝宝}
+
+\printindex[person]
+\printindex[org]
+</code></pre>
+<h2 id="tikz绘图">TikZ绘图</h2>
+<h3 id="直线坐标">直线、坐标</h3>
+<pre class="latex"><code>\usepackage{tikz}
+
+\begin{document}
+\section{直线绘制与坐标表示}
+% 直线绘制：\draw（&lt;起点&gt;）--（&lt;终点&gt;）；
+% 坐标表示：
+% 直角坐标：（x，y）
+% 极坐标：（a:r）（&lt;极角&gt;：＜极径&gt;）极角使用角度
+% 默认单位为cm，可改为其他单位，
+% 坐标点定义：\coordinate（&lt;名称&gt;）at（&lt;点坐标&gt;）；
+\begin{tikzpicture}
+    \draw(0，-1)--(0,3);
+    \draw(-1,0)--(3,0);
+    \draw(0, 0)--(30:2);
+    \draw(30:2)--(60:2);
+    
+    \coordinate(A） at （2, 1);
+    \coordinate(B） at （5, 1);
+    \draw(A)--(B)
+\end{tikzpicture}
+\end{document}</code></pre>
+<h3 id="基本图形绘制">基本图形绘制</h3>
+<p>https://texample.net</p>
+<pre class="latex"><code>\section{基本图形绘制}
+% 箭头：-&gt; &lt;- &lt;-&gt;  |&lt;-&gt;| &gt;-&gt;
+% 风格：stealth latex to
+\begin{figure} Chtbp]
+    \centering
+    \begin{tikzpicture}
+    % 设置全局风格 \begin{tikzpicture}[&gt;=latex]
+        \draw[-&gt;] (0, 0) -- (5, 0);
+        \draw[|&lt;-] (0, 1) -- (5, 1);
+        \draw[|&lt;-&gt;|] (0, 1.2) -- (5, 1.2);
+        \draw[&lt;-&lt;] (0, 1.4) -- (5, 1.4);
+        \draw[stealth-] (0, 1.6) -- (5, 1.6);
+        \draw[-latex] (0, 1.8) -- (5, 1.8);
+    \end{tikzpicture}
+    \caption{箭头}
+    \label{fig:enter-label}
+\end{figure}
+% 直角：-| |-
+\begin{tikzpicture}
+    % \draw (0, 1) -| (1, 0);
+    \draw (0, 1) |- (1, 0);
+\end{tikzpicture}
+% 矩形：\draw（&lt;起点&gt;）rectangle（&lt;对角点&gt;）
+%      \draw（&lt;起点&gt;）rectangle +（&lt;坐标差值（宽/高）&gt;）
+
+% 网格：\draw［step=1]（&lt;起点&gt;）grid（&lt;网格区域对角坐标&gt;）
+
+% 圆：\draw（&lt;圆心&gt;） circle（&lt;半径&gt;）
+%     \draw [&lt;圆心&gt;)circle [radius=&lt;R&gt;]
+
+% 椭圆：\draw ellipse ［x radius=a, y radius = b］
+% 圆弧：\draw（&lt;起点&gt;）arc（&lt;初始角&gt;:＜终止角&gt;:＜半径&gt;）
+%      \draw(&lt;起点&gt;) arc
+%      ［start angle=&lt;初始角&gt;，end angle=&lt;终止角&gt;，radius=&lt;半径&gt;］
+
+% 椭圆弧
+% \draw（&lt;起点&gt;）arc（&lt;初始角&gt;：＜终止角&gt;：&lt;X轴径&gt; and &lt;y轴径&gt;）
+% \draw（&lt;起点&gt;） arc
+%       ［start angle=&lt;初始角&gt;，end angle=&lt;终止角&gt;，
+%              × radius=&lt;X轴径&gt;，y radius=&lt;y轴径&gt;］</code></pre>
+<h3 id="线条样式">线条样式</h3>
+<pre class="latex"><code>\section｛线条样式｝
+% 粗细
+% ultra thin 0.1pt
+% very thin 0.2pt
+% thin 0.4pt
+% semithick 0.6pt
+% thick 0.8pt
+% very thick 1.2pt
+% ultra thick 1.6pt
+% line width =
+\begin{tikzpicture}
+% 全局:[]
+    \draw (0, 1.4) -- (5, 1.4);
+    % \draw[thin](0,1.4) -- (5,1.4);
+    \draw (0, 1.2) -- (5, 1.2);
+    \draw (0, 1) -- (5, 1);
+    \draw (0, 0.8) -- (5, 0.8);
+    \draw (0, 0.6) -- (5, 0.6);
+    \draw (0, 0.4) -- (5, 0.4);
+    \draw (0, 0.2) -- (5, 0.2);
+    \draw (0, 0) -- (5, 0);
+\end{tikzpicture}
+% 样式
+% help lines 辅助线
+%          solid
+% densely dashed
+%         dotted
+% loosely dash dot
+%         dash dot dot
+% 也是用[]
+
+% 颜色
+% [颜色!百分数] 百分数不需要加百分号
+
+% 圆角与直角
+% rounded corners [=r] / sharp corners
+\begin{tikzpicture}
+    \draw[rounded corners=10pt, thick, blue, dashed]
+     (0, 0) rectangle (3, 4); % 矩形框是圆角
+\end{tikzpicture}</code></pre>
+<h3 id="scope环境样式复用">scope环境、样式复用</h3>
+<pre class="latex"><code>\section{scope环境、样式复用}
+%［&lt;名称&gt;/.style=｛样式｝
+\begin{tikzpicture}
+    [garrow/.style={green, thick, -latex}]
+    \begin{scope} [blue, dash dot dot]
+        \draw (0, 1.4) -- (5, 1.4);
+        \draw (0, 1.2) -- (5, 1.2);
+        \draw (0, 1) -- (5, 1);
+    \end{scope}
+    
+    \draw[garrow] (0, 0.8) -- (5, 0.8);
+    \draw (0, 0.6) -- (5, 0.6);
+    \draw[garrow](0, 0.4 -- (5, 0.4);
+    \draw (0, 0.2) -- (5, 0.2);
+    \draw[garrow,red](0, 0-- (5, 0);
+\end{tikzpicture}</code></pre>
+<h3 id="形变">形变</h3>
+<pre class="latex"><code>\section{形变}
+% 位移 xshift yshift xslant yslant：把一个边平移
+% 缩放 scale
+% 旋转 rotate
+\begin{tikzpicture}
+% 作用于整体[]
+    \draw[dashed] (0, 0) rectangle (1, 1);
+    \draw[blue, xshift=2cm] (0, 0) rectangle (1, 1);
+    \draw[blue, yslant=1.5] (0, 0) rectangle (1, 1);
+    \draw[blue, scale=0.5] (0, 0) rectangle (1, 1);
+    \draw[blue, rotate=30] (0, 0) rectangle (1, 1); % 按顺序
+\end{tikzpicture}</code></pre>
+<h3 id="绘制与填充">绘制与填充</h3>
+<pre class="latex"><code>\section{绘制与填充}
+\begin{tikzpicture}[thick]
+    \draw[green, fill=blue!20] (0, 0) rectangle (2,1) ;
+    % \fill[green, draw=blue] (0, 0) rectangle (2, 1);
+    % \filldraw[fill=green, draw=blue] (0, 0) rectangle(2, 1) ;
+\end{tikzpicture}</code></pre>
+<h3 id="文字结点">文字结点</h3>
+<pre class="latex"><code>\section{文字结点}
+% \node[选项](名称）at （坐标){文本内容};
+% ＜对象&gt;node[选项]{文本内容};
+% 选项：
+%      fill=&lt;背景颜色&gt;
+%      draw=&lt;边框颜色＞
+%      text=&lt;文字颜色＞
+%      node font ={字体}
+%      位置：
+%          above=2pt
+%          below
+%          left
+%          right
+%          centered
+%          above left
+%          above right
+%          below left
+%          below right
+% 为所有结点设置相同样式：
+%      [every node/.style={样式}]
+\begin{tikzpicture}
+% 为所有结点设置相同样式：\begin{tikzpicture}[]
+    \node[fill=blue!20, below]at (0, 0){文字};
+    \draw (-2, 0)node[left]{A} --node[fill=blue!20]{7cm}(5, 0)node[right]{B};
+    
+    \node （A）at （1, 1） ｛A节点｝；
+    \node （B） at （5，-2） ｛B节点｝；
+    \draw (A.south) -- (B.north);
+\end{tikzpicture}</code></pre>
+<h3 id="循环绘制坐标轴">循环、绘制坐标轴</h3>
+<pre class="latex"><code>% 循环
+% \foreach \&lt;变量名&gt;in ｛&lt;列表&gt;｝｛&lt;绘图命令&gt;｝
+\section｛循环 绘制坐标轴｝
+\begin{tikzpicture}
+    \draw （O, 1.4） -- （5,1.4）；
+    \draw （O, 1.2） -- （5,1.2）；
+    \draw (0, 1) -- (5, 1);
+    \draw （O.8）-- （5，.8）；
+    \draw (0, .6) -- (5, .6) ;
+    \draw (0, .4) -- (5, .4) ;
+    \draw (0, .2) -- (5, .2) ;
+    \draw (0, 0) -- (5, 0);
+    
+    \foreach \y in {1.4, 1.2, 1, .8, .6, .4, .2, 0}{\draw(0, \y) -- (5, \y);}
+    \foreach \y in {1.4, 1.2,..., 0}{\draw(0, \y) -- (5, \y);}
+\end{tikzpicture}</code></pre>
+<pre class="latex"><code>% 绘制坐标轴
+\begin{tikzpicture}
+    \draw[-stealth] (-5, 0) -- (5, 0)node[right]{$x$};
+    \draw[-stealth] (0, -5) -- (0, 5)node[left]{$y$};
+    
+    \node[below left] at (0, 0) {$O$};
+    \foreach \x in {-4, -3,..., -1, 1, 2, ..., 4} {
+    \draw (\x, 0)node [below]{$\x$} -- (\x, 0.1);
+    \draw (0, \x)node[left]{$\x$} -- (0.1, \x);}
+\end{tikzpicture}</code></pre>
+<h3 id="绘制函数图象">绘制函数图象</h3>
+<pre class="latex"><code>\section｛绘制函数图象｝
+% у = 0.5 * х * x
+% y = x
+% у = 0.25 * 2^x
+% y=×^0.5
+% 定义域：domain=x1:x2 采样点数：samples= N
+
+\begin{tikzpicture}[thick,domain=0:4.5, samples=100]
+    \draw[-stealth] (-5, 0) -- (5, 0)node[right]{$x$};
+    \draw[-stealth] (0, -1) -- (0, 9)node[left]{$y$};
+    \node[below left] at (0, 0) {$0$};
+    \node[below] at (-4, 0) {$-4$};
+    \node[below] at (4, 0) {$4$};
+    \node[left] at (0, 8) {$8$};
+    \draw[dashed, help lines, ultra thin] (-4.5, -1)
+    grid (4.5, 8.5);
+    
+    \draw[] plot (\x, {\x})node[right]{$y=x$};
+    \draw[samples=100, red] plot (\x,{0.5 * \x * \x})node[right]{$\frac{1}{2}x^2$};
+    \draw[blue] plot(\x, {0.25 * 2^\x})node[right]{$y=\frac{1}{4}\times2^x$};
+    \draw[green] plot (\x, {\x^0.5}) node[right] {$y=\sqrt{x}$};
+    
+\end{tikzpicture}
+% 三角函数
+% y = sin x
+% y = sin x + 1
+% y = sin(x + 1)
+\begin{tikzpicture}[thick, scale=0.8,domain=-2*pi:2*pi,samples=100]
+    \draw[-stealth] (-6.5, 0) -- (6.5, 0)node[right]{$x$};
+    \draw[-stealth] (0, -2) -- (0, 2.3)node[left]{$y$};
+    \node[below left] at (0, 0) {$O$};
+    \draw[dashed, help lines, ultra thin] (-6.5, -2)
+    grid (6.5, 2);
+    \node[below] at (-4, 0) {$-4$};
+    \node[below] at (4, 0) {$4$};
+    \node[left] at (0, -1) {$-1$};
+    \node[left] at (0, 1) {$1$};
+    
+    \draw plot (\x, {sin(\x r)}); % r表示弧度制
+    \draw[red] plot (\x, {sin(\x r) + 1});
+    \draw[blue] plot (\x, {sin(\x r + 1 r)});
+\end{tikzpicture}</code></pre>
+<h2 id="beamer幻灯片">beamer幻灯片</h2>
+<pre class="latex"><code>\documentclass[aspectratio=169]{beamer}
+\usepackage{ctex}
+
+\author{张大彪}
+\institute{北京大学}
+\date{2024年8月8日}
+
+\begin{document}
+    \maketitle
+    
+    \begin{frame} {\LaTeX 概论}{\LaTeX 的发展} % 一页幻灯片
+        % \frametitle{\LaTex 概论}
+        % \framesubtitle{\LaTeX 的发展}
+        \begin{block}{常用命令}
+            1324165416565256341655
+        \end{block}
+    \end{frame}
+\end{document}</code></pre>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></div>
+<div><a href="../articles/linux命令.html">Linux 命令笔记</a></div>
+<div><a href="../articles/远程服务器.html">远程服务器使用笔记</a></div>
+<div><a href="../articles/x-anylabeling.html">X-AnyLabeling 标注工具使用记录</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/git.html">Git 使用笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

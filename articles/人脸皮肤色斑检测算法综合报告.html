@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="对色斑检测与分割领域的两阶段检测、YOLO 小目标、多模态融合、临床诊断逻辑和轻量化部署进行综述。">
+  <title>人脸皮肤色斑检测算法综合报告 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>人脸皮肤色斑检测算法综合报告</span></h1>
+  <div class="postDesc">posted @ 2026-01-05 swilderyude 分类: <a href="../categories.html#文献精读">文献精读</a></div>
+  <p class="postSummary">对色斑检测与分割领域的两阶段检测、YOLO 小目标、多模态融合、临床诊断逻辑和轻量化部署进行综述。</p>
+  <div class="postTags"><span>综述</span> <span>色斑检测</span> <span>多模态</span> <span>轻量化</span></div>
+  
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>基于对2020年以来十余篇中英文核心文献的系统梳理，对人脸皮肤色斑检测与分割领域的算法演进、关键技术突破、性能评估进行总结。报告发现，该领域在解决小目标检测、背景复杂干扰、多模态信息融合、模型轻量化与部署等核心痛点上取得了显著进展。从早期的Mask R-CNN与Faster R-CNN两阶段框架，发展到以YOLO系列为主导的单阶段目标检测，再到多模态深度学习、注意力机制、动态卷积乃至前沿的Mamba状态空间模型与量子神经网络的应用，技术路线持续创新。同时，研究重心也从单纯的像素级分割或分类，转向结合临床诊断逻辑（如“丑小鸭准则”）、实现高精度定量分析，并积极向移动端、消费级设备及智能诊疗系统落地。</p>
+<p>过去五年，人脸皮肤色斑检测算法经历了从“两阶段分割”到“单阶段检测”，再到“多模态融合与前沿架构探索”的演进路径。 在深度学习初期，以Mask R-CNN为代表的两阶段实例分割框架因其强大的目标定位与像素级分割能力，成为处理色斑问题的首选。 <strong>文献1《基于 Mask R-CNN 的人脸皮肤色斑检测分割方法》（2019）</strong> 是早期针对色斑特点对Mask R-CNN进行深度适配的代表性工作。该研究的核心贡献不在于网络架构的颠覆性创新，而在于极具工程实践价值的<strong>“全脸干扰项数据标注方案”</strong>。</p>
+<ul>
+<li><p><strong>痛点解决</strong>：色斑在全脸占比极小，若仅标注色斑，模型会将正常的五官、痤疮、黑痣等误判为色斑，导致严重的过拟合和高误报率。</p></li>
+<li><p><strong>创新策略</strong>：提出了从“仅标注色斑”到“标注色斑+细小干扰项”再到“标注色斑+全脸干扰项（包括五官轮廓等）”的三级标注策略。通过强制将非色斑特征作为明确的负样本，使模型学习到色斑与正常皮肤纹理、五官边缘的本质区别。</p></li>
+<li><p><strong>效果验证</strong>：实验表明，采用“全脸干扰项标注”后，模型分割的Jaccard系数（JSI）从67.3%提升至77.2%，显著缓解了样本不平衡导致的过拟合问题。</p></li>
+<li><p><strong>骨干网络选型</strong>：研究对比了ResNet-18至152，发现ResNet-34在保持与更高层网络相当精度（准确率超75%）的同时，推理延迟最低，最适合实时或准实时应用。</p></li>
+<li><p><strong>Anchor尺度调优</strong>：针对色斑极小的特点，调整RPN中的锚点框尺度为16、32、64、128、256，确保微小色斑特征不被下采样丢失。</p></li>
+</ul>
+<p><strong>文献2《The Development of a Skin Cancer Classification System for Pigmented Skin Lesions Using Deep Learning》（2020）</strong> 则采用了Faster R-CNN（FRCNN）架构，侧重于<strong>病变分类而非像素级分割</strong>，但同样证明了定位与分类结合思路的价值。</p>
+<ul>
+<li><p><strong>架构选择</strong>：选用VGG-16作为主干网络的FRCNN，相较于纯分类模型，其先通过区域建议网络（RPN）定位病变区域，再进行分类的策略，在处理复杂背景的临床面部图像时鲁棒性更强。</p></li>
+<li><p><strong>临床对标</strong>：研究将模型与20位专业皮肤科医生（10位专家、10位住院医）进行同场竞技。在六分类任务中，FRCNN准确率达86.2%，显著高于医生群体（79.5%和75.1%）。在良性/恶性二分类中，其误报率（5.5%）远低于医生（13%-14%），展现了极高的稳定性和诊断辅助价值。</p></li>
+<li><p><strong>工程优化</strong>：采用了<strong>推理时数据增强</strong>和<strong>过采样</strong>策略来处理数据不平衡。TTA通过对一张图生成30个变换版本（翻转、旋转、缩放组合）进行预测并取最高置信度，极大提高了诊断稳定性。 早期工作利用Mask R-CNN和Faster R-CNN的强大能力，通过精细的标注策略设计、骨干网络选型、锚点优化及训练策略改进，有效提升了色斑的检测分割精度和分类可靠性。这些工作奠定了利用深度学习处理色斑问题的方法论基础。</p></li>
+</ul>
+<p>随着YOLO系列算法的迭代发展，其在速度与精度平衡上的优势，使其迅速成为追求实时性和移动端部署的应用场景下的主流选择。研究者们针对色斑小目标特性，对YOLOv5等基础模型进行了大量针对性改进。 <strong>文献3《基于改进 YOLOv5s 的人脸色斑检测方法》（2025）</strong> 集中体现了针对小目标检测和移动端部署的深度优化，是YOLO框架改进的典范。</p>
+<ul>
+<li><p><strong>精度提升模型YOLOv5s-CCB</strong>：</p>
+<ul>
+<li><p><strong>坐标注意力机制（CA）</strong>：在骨干网络的C3模块中嵌入CA，区别于仅关注通道的SE注意力，CA能同时编码通道关系和方向信息，帮助模型精确锁定色斑的空间位置。</p></li>
+<li><p><strong>内容感知特征重组（CARAFE）</strong>：替换原有的最近邻上采样，CARAFE拥有更大的感受野，能根据图像内容动态生成上采样核，更好地恢复色斑边缘细节。</p></li>
+<li><p><strong>双向特征金字塔</strong>：将原PANet替换为带加权机制的BiFPN，通过可学习的权重自适应融合深层和浅层特征。</p></li>
+<li><p><strong>效果</strong>：在Melasma数据集（小目标占比99.1%）上，mAP达到29.1%，比基准YOLOv5s提升3.1%，比当时的YOLOv8提升9.1%。</p></li>
+</ul></li>
+<li><p><strong>轻量化部署模型YOLOv5s-CBNA-A</strong>*：</p>
+<ul>
+<li><p><strong>动态卷积（AKConv）</strong>：用可改变核形状的卷积替换标准卷积。卷积核能根据色斑不规则形状动态调整采样网格，且参数量随核尺寸线性增加（非平方增长），极大降低计算成本。</p></li>
+<li><p><strong>Alpha-IoU损失函数</strong>：改进CIoU，引入可调参数α，增强预测框与真实框几何一致性的约束，在处理极度小目标数据集时显著提升定位鲁棒性。</p></li>
+<li><p><strong>效果</strong>：FLOPs下降26.7%，FPS提升至93帧/秒，在mAP仅比最高精度版本下降0.4%的情况下，实现了极致的轻量化。</p></li>
+</ul></li>
+</ul>
+<p><strong>文献4《An improved YOLOv5 algorithm for automatic scleral plaque and pigmentation detection》（2024）</strong> 虽然针对眼白（巩膜）色素沉着，但其技术逻辑与人脸色斑高度一致，且引入了前沿架构。</p>
+<ul>
+<li><p><strong>算法组合</strong>：采用“UNet++分割ROI（巩膜区域）+ 改进YOLOv5检测病灶”的分阶段策略，有效排除了眼睑、睫毛等干扰，这与人脸检测中“先分区再检测”的工业界标准流程一致。</p></li>
+<li><p><strong>核心改进</strong>：</p>
+<ul>
+<li><p><strong>注意力机制CBAM</strong>：嵌入骨干网络，包含通道和空间注意力，帮助过滤反光、血丝等冗余信息。</p></li>
+<li><p><strong>Mamba块集成（SSM模型）</strong>：在Neck部分引入Mamba状态空间模型。Mamba具有线性计算复杂度和极强的长程依赖建模能力，扩展了模型感受野，能更好地联系不同区域的上下文信息。</p></li>
+<li><p><strong>小目标检测头策略</strong>：增加P2级高分辨率检测头，移除处理超大目标的P5头，专门提升微小点状病灶的检出率。</p></li>
+</ul></li>
+<li><p><strong>性能</strong>：在临床数据集上，mAP50达到75%，显著优于基准YOLOv5-n和YOLOv8-n。消融实验证明，Mamba块的引入贡献最大。 以YOLO系列为代表的单阶段检测框架，通过嵌入高效注意力机制、改进特征融合与上采样模块、采用动态卷积和优化损失函数，在保持乃至超越两阶段框架精度的同时，大幅提升了推理速度，满足了实时性和移动端部署的需求。引入Mamba等新型架构，则为进一步提升对复杂背景和小目标的建模能力打开了新思路。</p></li>
+</ul>
+<p>传统RGB图像在区分深层色素、浅层痘印、阴影等方面存在固有局限。多光谱成像技术能够捕捉皮肤在不同波段的反射与荧光特性，为色斑检测提供了更丰富的信息。利用深度学习融合多模态数据，是近年来提升检测精度的关键方向。 <strong>文献5《基于多模态深度学习的面部皮肤检测系统研究》（2024）</strong> 系统性地展示了多模态融合在皮肤检测中的巨大潜力。</p>
+<ul>
+<li><p><strong>数据基础</strong>：利用Think View皮肤检测仪获取六种光谱图像（平行偏振、交叉偏振、近红外、红外混合、紫外UV、棕色光），构建了高质量多模态数据集。</p></li>
+<li><p><strong>针对性算法</strong>：</p>
+<ul>
+<li><p><strong>毛孔检测（UV-YOLOv5）</strong>：融合平行偏振光（主特征）与紫外光（细菌代谢产物荧光辅助）的双模态输入，并在骨干网络中引入SE注意力机制，采用“切片检测法”（200x300切片）解决毛孔微小问题，mAP50达到0.802。</p></li>
+<li><p><strong>皮损分割（CMNEXT-UNET）</strong>：以U-Net为基础，融合CMNeXt跨模态分割模型设计。核心是<strong>SQ-Hub（自我查询中心）</strong> 和 <strong>PPX（平行混合器）</strong> 模块。SQ-Hub动态计算不同光谱模态的贡献得分，自动筛选最有用的模态特征；PPX捕捉多尺度模态特征，并结合SE注意力促进跨模态信息深度耦合。采用非对称双支路编码器，将六光谱分为“主模态（RGB）”和“五种补充模态”，有效减少主模态特征损失。</p></li>
+</ul></li>
+<li><p><strong>结果</strong>：对于色斑分割，Dice系数达74.6，mIOU为57.3，显著高于单模态的DeepLabv3+或FCN。实验发现色斑在棕色光和紫外光下特征更明显，模型能自动识别色素沉淀特征。</p></li>
+<li><p><strong>产品雏形</strong>：集成软件与硬件，实现了从采集、算法调用到结果统计的闭环产品原型，支持面部分区统计（额头、脸颊等）和定量报告生成，具备临床应用价值。 多模态深度学习，特别是引入如SQ-Hub这样的动态模态特征选择与融合机制，代表了当前提升色斑检测与分割精度的前沿方向。它充分利用了皮肤在不同光谱下的差异化表现，能够有效解决RGB图像信息不足导致的分类与分割难题。</p></li>
+</ul>
+<p>算法研究不再局限于孤立地处理每一个斑点，而是开始模仿皮肤科医生的临床思维模式，将诊断逻辑融入算法设计。 <strong>文献6《Using deep learning for dermatologist-level detection of suspicious pigmented skin lesions from wide-field images》（2021）</strong> 的核心贡献在于量化了皮肤科经典的“丑小鸭准则”。</p>
+<ul>
+<li><p><strong>问题设定</strong>：处理普通消费级相机拍摄的广角全身/局部照片，旨在识别与患者其他斑点明显不同的“异类”（即“丑小鸭”）。</p></li>
+<li><p><strong>系统架构</strong>：采用“经典算法+深度学习”混合流水线。先用SIFT和LoG算法在复杂背景下快速定位所有可能的斑点（Blob Detection）；再用基于VGG16的迁移学习模型将斑点分为6类（包括背景、皮肤边缘等）；最后计算每个斑点特征向量与该患者所有斑点特征中心之间的几何距离（余弦距离）。</p></li>
+<li><p><strong>“丑小鸭”显著性排序</strong>：距离越远，代表该斑点与患者其他斑点差异越大，“丑小鸭”得分越高。算法输出热力图，直观标记出最值得关注的斑点。</p></li>
+<li><p><strong>临床对标</strong>：在135张广角图像测试中，算法给出的“前三名最可疑斑点”与3位认证皮肤科医生的共识高度一致，一致性评分达82.96%（Top-3范围）。算法敏感性与特异性均达90%左右，AUC达0.97。</p></li>
+<li><p><strong>价值</strong>：这种“群组比对”逻辑更符合医生临床思维，是未来高端智能镜子、全身皮肤分析仪等产品的核心技术方向，能有效辅助医生快速聚焦风险病灶。</p></li>
+</ul>
+<p><strong>文献7《Computer-aided classification of suspicious pigmented lesions using wide-field images》</strong> 同样处理广角图像，但采用了更传统的机器学习特征提取路线。</p>
+<ul>
+<li><p><strong>方法</strong>：预处理后，从每个病灶提取399个基于临床ABCD准则的定量特征（对称性、边缘、颜色、纹理），经降维后用逻辑回归进行分类。</p></li>
+<li><p><strong>结果</strong>：在自然光、低分辨率广角图像上，敏感性（针对高危病灶）达100%，特异性72.1%，AUC 0.89。证明了通过科学的预处理和基于医学知识的特征建模，消费级相机照片也能满足初步筛查需求。</p></li>
+<li><p><strong>启示</strong>：解释性强，模型轻量化。与纯深度学习黑盒模型相比，在需要高可解释性的场景下仍有价值。 将“丑小鸭准则”等临床诊断思维量化为算法，标志着人脸皮肤色斑检测从纯粹的技术问题，向深度融合医学专业知识、模拟专家决策过程的“人工智能辅助诊断”系统演进。这类研究的产品化应用潜力巨大。</p></li>
+</ul>
+<p><strong>文献8《Optimizing melanoma diagnosis: A hybrid deep learning and quantum computing approach for enhanced lesion classification》（2025）</strong> 大胆探索了量子计算在皮肤病变（包括黑色素瘤）分类中的应用，展示了未来技术的一种可能前沿。</p>
+<ul>
+<li><p><strong>混合架构</strong>：构建“预处理（自动编码器去毛发）- U-Net分割- CNN特征提取- 量子神经网络（QNN）分类”流水线。</p></li>
+<li><p><strong>核心创新</strong>：将CNN提取的特征向量映射到量子比特上，通过量子门（RY旋转、CNOT纠缠）操作建立特征间复杂的非线性关联。量子层提供了更紧凑的特征表示。</p></li>
+<li><p><strong>结果</strong>：在HAM10000数据集上，混合模型准确率达99.35%，精确率和召回率均达99.67%，F1-Score 99.50%，性能达到“天花板”级别。消融实验证明量子层的加入显著提升了精度。</p></li>
+<li><p><strong>现状与展望</strong>：目前量子层多为“模拟运行”，实际落地到手机或美容仪器仍面临硬件轻量化与成本挑战。但该研究为解决极度相似病变的精细分类问题指明了全新的方向。</p></li>
+</ul>
+<p><strong>文献9《Utilizing deep learning algorithms for the early identification and categorization of skin cancer》（2025）</strong> 对EfficientNet-B0, VGG16, Inception-V3三种架构进行了系统对比，清晰揭示了当前趋势。</p>
+<ul>
+<li><p><strong>EfficientNet-B0胜出</strong>：采用复合缩放策略，平衡深度、宽度和分辨率。其MBConv模块结合SE注意力，在保证轻量化的同时（FLOPs最低），取得了最高综合性能（准确率92%，F1-Score 93%）。</p></li>
+<li><p><strong>Inception-V3</strong>：特征捕捉能力好，但计算量大。</p></li>
+<li><p><strong>VGG16</strong>：作为稳健的基准，但参数冗余。</p></li>
+<li><p><strong>趋势</strong>：研究明确指向<strong>轻量化、高性能、适合部署在边缘设备（如手机）的架构</strong>。EfficientNet代表了这一趋势，预示着未来产品的核心将是离线、实时的端侧智能。</p></li>
+</ul>
+<p>常用评价指标</p>
+<ul>
+<li><p><strong>分割任务</strong>：Jaccard相似指数、交并比（IoU）、Dice系数。</p></li>
+<li><p><strong>检测/分类任务</strong>：平均精度均值、准确率、精确率、召回率、敏感性、特异性、F1-Score、ROC曲线下面积（AUC）。</p></li>
+<li><p><strong>综合与速度</strong>：每秒帧数（FPS）、浮点运算量（FLOPs）、模型参数量。</p></li>
+</ul>
+<p>数据集特点与挑战</p>
+<ul>
+<li><p><strong>数据规模</strong>：从早期60张图的探索性研究，发展到如今包含数千乃至数万张图像（如文献8使用HAM10000，文献6使用33,980个标注样本）的规模。</p></li>
+<li><p><strong>标注质量</strong>：专业医疗机构采集的高标准临床数据（如文献5的Melasma数据集，文献2的六光谱数据）成为研究基石。标注方式从简单的目标框，发展到像素级分割掩膜、多模态联合标注。</p></li>
+<li><p><strong>不平衡问题</strong>：色斑（尤其是恶性色斑）样本稀缺是普遍挑战。常用解决方案包括：过采样、数据增强（旋转、翻转、缩放、颜色偏移）、引入类别权重、设计难例挖掘策略、以及文献1的创新性“全脸干扰项标注”。</p></li>
+<li><p><strong>多样性需求</strong>：广角图像的引入带来了光照、背景、分辨率的巨大变异性，更贴近真实应用场景，但也对算法鲁棒性提出了更高要求。肤色多样性仍是未来需关注的方向。</p></li>
+</ul>
+<p>总结</p>
+<ol type="1">
+<li><p><strong>技术路线多元化且深度融合</strong>：从两阶段到单阶段，从单模态到多模态，从纯数据驱动到融合医学知识，技术发展呈现交叉融合态势。Mask R-CNN、YOLO系列、U-Net变体、EfficientNet等主流架构在不同场景下各有优势。</p></li>
+<li><p><strong>核心问题解决方案日益成熟</strong>：针对小目标，有注意力机制（CA, CBAM, SE）、特征金字塔（BiFPN）、小目标检测头、切片检测法等方案。针对复杂背景，有精准ROI分割（UNet++）、多光谱融合、干扰项标注等策略。针对部署，有动态卷积、模型剪枝、知识蒸馏及轻量架构设计。</p></li>
+<li><p><strong>性能大幅提升并逼近/超越专家水平</strong>：在特定数据集上，顶级算法的准确率、敏感性等指标已达到90%以上，尤其是在稳定性（抗疲劳）和误报率控制上优势明显。</p></li>
+<li><p><strong>产品化导向明确</strong>：大量研究明确提出了向移动端、消费级设备或医疗辅助系统落地的目标，推动了算法向实时、鲁棒、可解释、低成本的方向优化。</p></li>
+</ol>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/circulant-attention.html">Circulant Attention 精读笔记</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/mobilenet.html">MobileNet 精读笔记</a></div>
+<div><a href="../articles/知识蒸馏.html">知识蒸馏精读笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

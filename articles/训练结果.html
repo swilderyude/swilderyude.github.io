@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="汇总模型训练过程中的主要结果、指标变化和阶段性判断。">
+  <title>人脸色斑检测训练结果 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>人脸色斑检测训练结果</span></h1>
+  <div class="postDesc">posted @ 2026-05-28 swilderyude 分类: <a href="../categories.html#项目实践">项目实践</a></div>
+  <p class="postSummary">汇总模型训练过程中的主要结果、指标变化和阶段性判断。</p>
+  <div class="postTags"><span>训练</span> <span>指标</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#各类别详细指标">各类别详细指标</a></li>
+<li class="toc-level-1"><a href="#详细超参数与策略">详细超参数与策略</a></li>
+<li class="toc-level-1"><a href="#模型性能评估">模型性能评估</a></li>
+<li class="toc-level-1"><a href="#切图训练">切图训练</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <div class="line-block">实验编号 | 日期 | 实验目的 | 数据集版本 | 模型架构 | 超参数 | mAP50 | mAP50-95 | P / R | val loss | 结论与下一步计划 (Notes) |</div>
+<div class="line-block">:—— | :—– | :———————— | :————————————– | :—————————- | :—————————————— | :———————— | :———————— | :———————– | :——- | :——————————————– |</div>
+<div class="line-block">001 | 3月 | 测试yolov8n效果 | Hosdataset医院数据集（六小象标注）<br>train：val=8:2 | <strong>YOLOv8n</strong> | 触发早停(<code>patience=100</code>)<br>Best Epoch: 79 | <strong>0.389</strong> | 0.120 | P: 0.462<br>R: 0.445 | - | spot 漏检严重，整体偏低。 |</div>
+<div class="line-block">002 | 3月 | 尝试通过大模型v8m解决小目标漏检 | Hosdataset<br>train：val=8:2 | <strong>YOLOv8m</strong> | 早停patience=50<br>Best Epoch: 115 | <strong>0.401</strong><br>(+0.012) | 0.128 (+0.008) | P: 0.470<br>R: 0.456 | | 算力翻了近10倍，但精度只提升了 1%~2%。说明单纯堆算力和参数无法解决当前痛点。 |</div>
+<div class="line-block">003 | 4月 | v8n增加P2层检测头解决小目标漏检 | Hosdataset<br>train：val：test=8:1:1 | <strong>YOLOv8n</strong><br>（增加P2层检测头） | 早停patience=100<br>Best Epoch: 146 | <strong>0.420</strong> | 0.139 | P: 0.476<br>R: 0.473 | | 效果提升较小。 |</div>
+<div class="line-block"><strong>004</strong> | <strong>4月</strong> | <strong>在切图数据集上测试改进v8n，测试像素因素</strong> | <strong>Hosdataset-split</strong> | ****YOLOv8n<strong><br>（增加P2层检测头）</strong> | <strong>触发早停(<code>patience=100</code>)<br>Best Epoch: 58</strong> | ****0.526<strong><br>(+0.106)</strong> | ****0.285<strong><br>(+0.080)</strong> | <strong>P: 0.603<br>R: 0.509</strong> | | <strong>增长较小</strong> |</div>
+<div class="line-block">005 | 4月 | 测试单类别的性能 | onlydataset-split（重新标注） | <strong>YOLOv8n</strong>（增加P2层检测头） | 跑满 300 轮未触发早停! | <strong>0.897</strong><br> | 0.510 | P: 0.883<br>R: 0.841 | | 数据集少，过拟合。 |</div>
+<div class="line-block"><strong>006</strong> | <strong>5月</strong> | <strong>增大数据量，测试单类别性能</strong> | <strong>onlydataset-split-big</strong> | ****YOLOv8n<strong>（增加P2层检测头）</strong> | <strong>触发早停(<code>patience=100</code>)<br>Best Epoch: 165</strong> | ****0.590**** | <strong>0.218</strong> | <strong>P: 0.725<br>R: 0.561</strong> | | <strong>比多分类高出约 6.4%，说明单纯“找病灶”比“分类”容易。</strong> |</div>
+<div class="line-block"><strong>007</strong> | <strong>5月</strong> | <strong>切图测试高分辨率1280，简单数据集三类</strong> | <strong>simdataset-split</strong> | ****YOLOv8n<strong>（增加P2层检测头）</strong> | <strong>触发早停(<code>patience=100</code>)<br>Best Epoch: 33</strong> | ****0.397**** | <strong>0.129</strong> | <strong>P: 0.362<br>R: 0.487</strong> | | <strong>虽然划分简单数据集且分辨率翻倍，但整体指标相比 004 严重下滑。</strong> |</div>
+<div class="line-block"><strong>008</strong> | <strong>5月</strong> | <strong>测试高分辨率1280下的单类极限</strong> | <strong>simdataset-split</strong> | ****YOLOv8n<strong>（增加P2层检测头）</strong> | <strong>触发早停(<code>patience=100</code>)<br>Best Epoch: 59</strong> | ****0.514**** | <strong>0.166</strong> | <strong>P: 0.617<br>R: 0.489</strong> | | <strong>改成单类后比多类涨了近12个点，但依然低于不拆分数据集640分辨率时的0.590。</strong> |</div>
+<div class="line-block">009 | 5月 | 测试减少背景图/负样本的影响（三类） | simdataset-split-filter | <strong>YOLOv8n</strong>（增加P2层检测头） | 触发早停(<code>patience=100</code>)<br>Best Epoch: 60 | <strong>0.382</strong> | 0.128 | P: 0.409<br>R: 0.448 | | 没有太大影响。 |</div>
+<div class="line-block">010 | 5月 | 测试减少背景图/负样本的影响（单类） | simdataset-split-filter | <strong>YOLOv8n</strong>（增加P2层检测头） | 触发早停(<code>patience=100</code>)<br>Best Epoch: 71 | <strong>0.498</strong> | 0.165 | P: 0.547<br>R: 0.53 | | 删除背景图对单类识别有影响 |</div>
+<p>1455 数据集名称</p>
+<p>总图片数</p>
+<p>train/val/test 图片数</p>
+<p>类别数</p>
+<p>各类别实例数</p>
+<p>空标签图片数量</p>
+<p>是否切图</p>
+<p>输入尺寸</p>
+<p>标注格式</p>
+<p>备注</p>
+<div class="line-block">数据集名称 | 总图片 | 训练集数量 | 验证集数量 | 测试集数量 | 类别数 | 各类别实例数分布 | 空标签图片数量 | 是否切图 | 输入尺寸 | 备注 |</div>
+<div class="line-block">:——————- | :—- | :—- | :—- | :—- | :– | :——————————————————————————————————————————————————– | :——— | :——————- | :——————————————– | ———————- |</div>
+<div class="line-block">simple dataset | 713 | 570 | 71 | 72 | 3 | 0 (斑): 1593<br> 1 (痘): 1188<br> 2 (痣): 2527<br><br> 0 (斑): 238<br> 1 (痘): 181<br> 2 (痣): 273<br><br><br> 0 (斑): 208<br> 1 (痘): 178<br> 2 (痣): 355 | 0 | 否 | 5184X3456 | 重新标注，不同于六小象 |</div>
+<div class="line-block">simple dataset split | 9121 | 8035 | 1014 | 72 | 3 | | 1378:167:0 | train,val已切图，test未切图 | train，val<br>1280 x 1280<br>test<br>5184X3456 | |</div>
+<div class="line-block">hos | 46939 | 37477 | 4604 | | | | | | | |</div>
+<div class="line-block">Hos-split | 46939 | 37477 | 4604 | 4858 | | | | | | test也切图。其实是全部切图后冲洗划分的。 |</div>
+<h2 id="各类别详细指标">各类别详细指标</h2>
+<p>v8n</p>
+<div class="line-block">类别 (Class) | 验证集图片数 | 实例数量 (Instances) | 精确率 Box(P) | 召回率 (R) | mAP50 | mAP50-95 |</div>
+<div class="line-block">:— | :— | :— | :— | :— | :— | :— |</div>
+<div class="line-block"><strong>all (总体)</strong> | 551 | 8799 | 0.462 | 0.445 | 0.389 | 0.120 |</div>
+<div class="line-block"><strong>spot (斑点)</strong> | 551 | 3199 | <strong>0.277</strong> | <strong>0.201</strong> | <strong>0.135</strong> | <strong>0.0379</strong> |</div>
+<div class="line-block"><strong>acne (痘痘)</strong> | 551 | 2491 | 0.518 | 0.451 | 0.419 | 0.131 |</div>
+<div class="line-block"><strong>mole (痣)</strong> | 551 | 3109 | 0.591 | 0.683 | 0.612 | 0.192 |</div>
+<p>v8m</p>
+<div class="line-block">类别 (Class) | 精确率 Box(P) | 召回率 (R) | mAP50 | mAP50-95 | 诊断分析 |</div>
+<div class="line-block">————- | —————— | —————— | ————– | ————— | —————————————- |</div>
+<div class="line-block"><strong>all (总体)</strong> | 0.470 (+0.008) | 0.456 (+0.011) | 0.401 (+0.012) | 0.128 (+0.008) | 整体仅有微小提升。 |</div>
+<div class="line-block"><strong>spot (斑点)</strong> | <strong>0.311</strong> (+0.034) | <strong>0.183</strong> (-0.018) | 0.155 (+0.020) | 0.0444 (+0.006) | 精确率上升，但召回率反而下降。（模型虽然找得准了一点，但漏掉的斑点比以前更多。） |</div>
+<div class="line-block"><strong>acne (痘痘)</strong> | 0.498 (-0.020) | 0.491 (+0.040) | 0.424 (+0.005) | 0.141 (+0.010) | 变化不大。 |</div>
+<div class="line-block"><strong>mole (痣)</strong> | 0.602 (+0.011) | 0.694 (+0.011) | 0.623 (+0.011) | 0.199 (+0.007) | 表现依然最好。 |</div>
+<p>v8n改进</p>
+<div class="line-block">类别 (Class) | 验证集图片数 | 实例数量 (Instances) | 精确率 Box(P) | 召回率 (R) | mAP50 | mAP50-95 |</div>
+<div class="line-block">————- | —— | —————- | ———- | ——— | ——— | ———- |</div>
+<div class="line-block"><strong>all (总体)</strong> | 275 | 4291 | 0.476 | 0.473 | 0.420 | 0.139 |</div>
+<div class="line-block"><strong>spot (斑点)</strong> | 198 | 1921 | <strong>0.372</strong> | <strong>0.207</strong> | <strong>0.205</strong> | <strong>0.0603</strong> |</div>
+<div class="line-block"><strong>acne (痘痘)</strong> | 210 | 955 | 0.450 | 0.523 | 0.448 | 0.151 |</div>
+<div class="line-block"><strong>mole (痣)</strong> | 245 | 1415 | 0.605 | 0.688 | 0.608 | 0.206 |</div>
+<p>split v8n改进</p>
+<div class="line-block">类别 (Class) | 验证集图片数 | 实例数量 | 精确率 Box(P) | 召回率 (R) | mAP50 | mAP50-95 |</div>
+<div class="line-block">————- | ——– | ——– | ———- | ——— | ——— | ———- |</div>
+<div class="line-block"><strong>all (总体)</strong> | 4604 | 7113 | 0.603 | 0.509 | 0.526 | 0.195 |</div>
+<div class="line-block"><strong>spot (斑点)</strong> | <strong>1961</strong> | <strong>3182</strong> | <strong>0.553</strong> | <strong>0.191</strong> | <strong>0.285</strong> | <strong>0.0952</strong> |</div>
+<div class="line-block"><strong>acne (痘痘)</strong> | 1246 | 1568 | 0.609 | 0.615 | 0.610 | 0.232 |</div>
+<div class="line-block"><strong>mole (痣)</strong> | 1975 | 2363 | 0.646 | 0.722 | 0.682 | 0.256 |</div>
+<p>单一类 v8n改进</p>
+<p>|类别 (Class)|验证集图片数|实例数量 (Instances)|精确率 Box(P)|召回率 (R)|mAP50|mAP50-95|</p>
+<p>|—|—|—|—|—|—|—|</p>
+<p>|<strong>all (单一类)</strong>|<strong>182</strong>|<strong>233</strong>|<strong>0.883</strong>|<strong>0.841</strong>|<strong>0.897</strong>|<strong>0.510</strong>| 单一类 大数据（原本）</p>
+<div class="line-block">类别 (Class) | 验证集图片数 | 实例数量 (Instances) | 精确率 Box(P) | 召回率 (R) | mAP50 | mAP50-95 |</div>
+<div class="line-block">————- | ——– | —————- | ———- | ——— | ——— | ——— |</div>
+<div class="line-block"><strong>all (单一类)</strong> | <strong>4604</strong> | <strong>7113</strong> | <strong>0.725</strong> | <strong>0.561</strong> | <strong>0.590</strong> | <strong>0.218</strong> |</div>
+<p>简单数据集三类</p>
+<div class="line-block">类别 (Class) | 验证集图片数 | 实例数量 | 精确率 Box(P) | 召回率 (R) | mAP50 |</div>
+<div class="line-block">——————— | —— | —- | ———- | ———— | —– |</div>
+<div class="line-block"><strong>all (总体)  全部（总体）</strong> | 1014 | 1729 | 0.362 | 0.487 | 0.397 |</div>
+<div class="line-block"><strong>spot (斑点)</strong> | 360 | 589 | <strong>0.465</strong> | <strong>0.110</strong> ⚠️ | 0.233 |</div>
+<div class="line-block"><strong>acne (痘痘)  痤疮（痘痘）</strong> | 284 | 477 | 0.336 | 0.554 | 0.389 |</div>
+<div class="line-block"><strong>mole (痣)</strong> | 474 | 663 | 0.286 | <strong>0.796</strong> | 0.568 |</div>
+<p>简单数据集单一类</p>
+<p>|类别 (Class)|验证集图片数|实例数量 (Instances)|精确率 Box(P)|召回率 (R)|mAP50|mAP50-95|</p>
+<p>|—|—|—|—|—|—|—|</p>
+<p>|<strong>all (单一类)</strong>|<strong>1014</strong>|<strong>1729</strong>|<strong>0.617</strong>|<strong>0.489</strong>|<strong>0.514</strong>|<strong>0.166</strong>| 减少背景图（三类）</p>
+<div class="line-block">类别 (Class) | 验证集图片数 | 实例数量 | 精确率 Box(P) | 召回率 (R) | mAP50 | mAP50-95 |</div>
+<div class="line-block">——————— | —— | —- | ————————— | ————————— | ——— | ———- |</div>
+<div class="line-block"><strong>all (总体)  全部（总体）</strong> | 880 | 1729 | 0.409 | 0.448 | 0.382 | 0.128 |</div>
+<div class="line-block"><strong>spot (斑点)</strong> | 360 | 589 | <strong>0.375</strong><br><em>(上次 0.465)</em>⬇️ | <strong>0.159</strong><br><em>(上次 0.110)</em>⬆️ | <strong>0.208</strong> | <strong>0.0649</strong> |</div>
+<div class="line-block"><strong>acne (痘痘)  痤疮（痘痘）</strong> | 284 | 477 | 0.431 | 0.505 | 0.408 | 0.147 |</div>
+<div class="line-block"><strong>mole (痣)</strong> | 474 | 663 | 0.419 | 0.680 | 0.530 | 0.172 |</div>
+<p>减少背景图（单类）</p>
+<div class="line-block">类别 (Class) | 验证集图片数 | 实例数量 | 精确率 Box(P) | 召回率 (R) | mAP50 | mAP50-95 |</div>
+<div class="line-block">————- | ——- | ——– | ———- | ——— | ——— | ——— |</div>
+<div class="line-block"><strong>all (单一类)</strong> | <strong>880</strong> | <strong>1729</strong> | <strong>0.547</strong> | <strong>0.530</strong> | <strong>0.498</strong> | <strong>0.165</strong> |</div>
+<h1 id="详细超参数与策略">详细超参数与策略</h1>
+<div class="line-block">实验编号 | 优化器 | 初始学习率 | 学习率衰减策略 | 批次大小 | 实际运行轮数 (Epochs) | 最优轮数 (Best Epoch) | 早停策略 (Patience) | 损失权重 | 数据增强 |</div>
+<div class="line-block">:— | :– | :—- | :—— | :— | :————– | :—————- | :————– | :— | :— |</div>
+<div class="line-block">001 | <code>-</code> | <code>-</code> | <code>-</code> | <code>-</code> | <strong>179</strong> | <strong>79</strong> | <strong>100</strong> | <code>-</code> | <code>-</code> |</div>
+<div class="line-block">002 | | | | | 165 | 115 | 50 | | |</div>
+<div class="line-block">003 | - | - | - | | <strong>246</strong>  | <strong>146</strong> | <strong>100</strong> | - | |</div>
+<p>|004|-|-|-|-|<strong>158</strong> |<strong>58</strong>|100|-|-|</p>
+<h1 id="模型性能评估">模型性能评估</h1>
+<div class="line-block">模型架构 | 输入分辨率 | 参数量 (Params) | 计算量 (FLOPs) | 权重大小 | 推理单张耗时 (Speed)/帧率 | 综合速度 (包含前后处理) |</div>
+<div class="line-block">:————————– | :—— | :———————– | :———- | :———————— | :——————– | :————————————————————————————– |</div>
+<div class="line-block"><strong>YOLOv8n</strong><br>(168层) | 640X640 | <strong>3.0 M</strong><br>(3,006,233) | <strong>8.1 G</strong> | <strong>6.2 MB</strong><br>(<code>best.pt</code>) | <strong>0.8 ms</strong><br>(纯推理阶段) | Preprocess: 0.1ms<br>Inference: 0.8ms<br>Postprocess: 0.7ms<br><strong>Total: 1.6ms / image</strong> |</div>
+<div class="line-block"><strong>YOLOv8m</strong>（218） | 640X640 | 25.8 M | <strong>78.7 G</strong> | <strong>52.0 MB</strong> | <strong>3.6 ms</strong> / 图 | Preprocess: 0.1ms<br>Inference: 3.6ms<br>Postprocess: 1.1ms<br><strong>Total:4.8ms / image</strong> |</div>
+<div class="line-block"><strong>YOLOv8n修改</strong><br><strong>(72 层)</strong> | 640X640 | <strong>3.0 M</strong><br>(3,006,233) | <strong>8.1 G</strong> | <strong>6.3 MB</strong><br>(best.pt) | <strong>0.6 ms</strong><br>(纯推理阶段) | Pre: 0.1ms<br>Inf: 0.6ms<br>Post: 0.7ms<br><strong>Total: 1.4ms / image</strong> |</div>
+<div class="line-block"><strong>YOLOv8n修改 (72层)  </strong> | 640X640 | 3.0 M | <strong>8.1 G</strong> | <strong>6.3 MB</strong> <br>(best.pt) | <strong>0.7 ms</strong> | Pre: 0.1ms<br>Inf: 0.7ms<br>Post: 0.7ms<br><strong>Total: 1.5ms / image</strong> |</div>
+<h1 id="切图训练">切图训练</h1>
+<p>操作步骤：</p>
+<ol type="1">
+<li><p>批量切割大图为小图并处理标签</p></li>
+<li><p>删除没有标注的小图及其标签</p></li>
+<li><p>训练模型</p></li>
+<li><p>预测时切图并合并结果</p></li>
+</ol>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></div>
+<div><a href="../articles/修改.html">检测与分割双模型协同方案</a></div>
+<div><a href="../articles/优化计划.html">人脸色斑检测优化计划</a></div>
+<div><a href="../articles/超市识别项目.html">超市识别项目：视频预处理、标注与 YOLO 训练</a></div>
+<div><a href="../articles/实验记录.html">人脸色斑检测实验记录</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/标注规范.html">人脸色斑检测标注规范</a></div>
+<div><a href="../articles/数据集.html">人脸色斑检测数据集整理笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

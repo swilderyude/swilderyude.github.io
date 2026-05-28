@@ -1,0 +1,1262 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="整理数据集结构、标注格式、训练/验证划分和数据管理中的注意事项。">
+  <title>人脸色斑检测数据集整理笔记 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>人脸色斑检测数据集整理笔记</span></h1>
+  <div class="postDesc">posted @ 2026-03-09 swilderyude 分类: <a href="../categories.html#项目实践">项目实践</a></div>
+  <p class="postSummary">整理数据集结构、标注格式、训练/验证划分和数据管理中的注意事项。</p>
+  <div class="postTags"><span>数据集</span> <span>标注</span> <span>YOLO</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#标签分类">标签分类</a></li>
+<li class="toc-level-3"><a href="#处理">处理</a></li>
+<li class="toc-level-3"><a href="#单类">单类</a></li>
+<li class="toc-level-2"><a href="#医院数据集">医院数据集</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <h2 id="标签分类">标签分类</h2>
+<p>数据集中所有标签：斑点spots  痘点pimple  痣点moles 痤疮acne 色斑pigmentation 分类只有三类 斑（斑点spots、色斑pigmentation） 痘（痘点pimple、痤疮acne） 痣（痣点moles）</p>
+<h3 id="处理">处理</h3>
+<ol type="1">
+<li><p>单个数据集筛选。将不需要的标注标签的txt和图片删除，图片上有多类，仅删除不需要的一类，保留需要的类。</p></li>
+<li><p>所有数据集标签一致。spot acne mole。data.yaml</p></li>
+<li><p>将数据集合并为一个，合并时类别顺序一致。先把类别的01调整好，或者不按照01进行分类，而是名称。合并仅针对txt，最后仅一个data.yaml</p></li>
+</ol>
+<p>单一数据集。 改类名，直接在data.yaml里修改。 改顺序或合并类，必须用 Python 脚本批量修改所有的 .txt 文件。nc: X（类别总数）也改掉。</p>
+<p>多个数据集合并。 文件夹层级合并</p>
+<p>```python title:“merge.py” import os import shutil</p>
+<p>def merge_all_datasets(): # 最终合并到的目标文件夹 target_root = ‘data’ # 需要识别的标准子集 target_splits = [‘train’, ‘valid’, ‘test’]</p>
+<pre><code># 统计数据
+stats = {&#39;images&#39;: 0, &#39;json&#39;: 0, &#39;labels&#39;: 0, &#39;skipped&#39;: 0}
+
+print(&quot;开始深度扫描并合并所有数据集...&quot;)
+
+# 使用 os.walk 递归遍历当前目录下所有的文件夹
+# 这可以确保无论数据集嵌套在几层目录下都能被找到
+for root, dirs, files in os.walk(&#39;.&#39;):
+    
+    # 如果当前文件夹名字是 [&#39;train&#39;, &#39;valid&#39;, &#39;test&#39;] 之一
+    # 且我们不在目标文件夹 &#39;data&#39; 内部
+    dir_name = os.path.basename(root)
+    if dir_name in target_splits and target_root not in root:
+        
+        split = dir_name # train, valid 或 test
+        print(f&quot;发现数据集片段: {root}&quot;)
+
+        # 1. 处理 images 文件夹 (图片 + JSON)
+        src_img_dir = os.path.join(root, &#39;images&#39;)
+        if os.path.exists(src_img_dir):
+            dst_img_dir = os.path.join(target_root, split, &#39;images&#39;)
+            os.makedirs(dst_img_dir, exist_ok=True)
+            
+            for f in os.listdir(src_img_dir):
+                if f.startswith(&#39;.&#39;): continue
+                src_file = os.path.join(src_img_dir, f)
+                dst_file = os.path.join(dst_img_dir, f)
+                
+                if not os.path.exists(dst_file):
+                    shutil.copy2(src_file, dst_file)
+                    if f.lower().endswith(&#39;.json&#39;): stats[&#39;json&#39;] += 1
+                    else: stats[&#39;images&#39;] += 1
+                else:
+                    stats[&#39;skipped&#39;] += 1
+
+        # 2. 处理 labels 文件夹 (TXT)
+        src_lab_dir = os.path.join(root, &#39;labels&#39;)
+        if os.path.exists(src_lab_dir):
+            dst_lab_dir = os.path.join(target_root, split, &#39;labels&#39;)
+            os.makedirs(dst_lab_dir, exist_ok=True)
+            
+            for f in os.listdir(src_lab_dir):
+                if f.startswith(&#39;.&#39;): continue
+                src_file = os.path.join(src_lab_dir, f)
+                dst_file = os.path.join(dst_lab_dir, f)
+                
+                if not os.path.exists(dst_file):
+                    shutil.copy2(src_file, dst_file)
+                    stats[&#39;labels&#39;] += 1
+                else:
+                    stats[&#39;skipped&#39;] += 1
+
+print(&quot;\n&quot; + &quot;=&quot;*40)
+print(&quot;合并工作全部完成！&quot;)
+print(f&quot;合并后的数据存放在: {os.path.abspath(target_root)}&quot;)
+print(f&quot;成功合并图片: {stats[&#39;images&#39;]} 张&quot;)
+print(f&quot;成功合并 JSON: {stats[&#39;json&#39;]} 个&quot;)
+print(f&quot;成功合并 TXT 标签: {stats[&#39;labels&#39;]} 个&quot;)
+print(f&quot;因同名跳过文件: {stats[&#39;skipped&#39;]} 个 (已去重)&quot;)
+print(&quot;=&quot;*40)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: merge_all_datasets()</p>
+<pre><code>
+#### 问题
+
+1. 有的图片显示全部人脸，但有的只是局部。
+
+2. 有的图片标注的仅有一类，有的是多类。
+
+## Universe数据集
+
+**一个小技巧**。
+对于已经标注好的yolo文件txt，如何在X-AnyLabeling中显示标注框？
+1.准备好classes.txt文件
+2.X-AnyLabeling界面`导入`-`导入yolo水平标注框`，导入classes.txt文件，再选择labels文件夹。
+3.标注框显示。images文件夹里出现了json文件。
+可能会出现的问题：
+txt文件不是utf-8，但文件确实是utf-8的格式。
+是因为mac的隐藏文件也会被识别。要删除。
+
+```bash
+# 删除所有隐藏的 AppleDouble 文件 (以 ._ 开头的文件) 
+dot_clean . 
+# 删除所有的 .DS_Store 文件 
+find . -name &quot;.DS_Store&quot; -depth -exec rm {} \;</code></pre>
+<p>```python title:“delete.py” import os import shutil</p>
+<p>def deep_clean_hidden_files(start_path=‘.’): deleted_files_count = 0 deleted_dirs_count = 0</p>
+<pre><code>print(f&quot;开始从 {os.path.abspath(start_path)} 递归清理隐藏文件...\n&quot;)
+
+# os.walk 会遍历目录下所有的文件夹和文件
+# topdown=False 表示先处理子目录中的文件，再处理父目录，这样更安全
+for root, dirs, files in os.walk(start_path, topdown=False):
+    
+    # 1. 处理文件
+    for filename in files:
+        if filename.startswith(&#39;.&#39;):
+            file_path = os.path.join(root, filename)
+            try:
+                os.remove(file_path)
+                print(f&quot;已删除文件: {file_path}&quot;)
+                deleted_files_count += 1
+            except Exception as e:
+                print(f&quot;删除文件失败 {file_path}: {e}&quot;)
+
+    # 2. 处理文件夹 (可选：如果你也想删除像 .ipynb_checkpoints 这样的隐藏文件夹)
+    for dirname in dirs:
+        if dirname.startswith(&#39;.&#39;):
+            dir_path = os.path.join(root, dirname)
+            try:
+                # 使用 shutil.rmtree 删除整个文件夹
+                shutil.rmtree(dir_path)
+                print(f&quot;已删除目录: {dir_path}&quot;)
+                deleted_dirs_count += 1
+            except Exception as e:
+                print(f&quot;删除目录失败 {dir_path}: {e}&quot;)
+
+print(&quot;-&quot; * 40)
+print(f&quot;清理完成！&quot;)
+print(f&quot;共删除隐藏文件: {deleted_files_count} 个&quot;)
+print(f&quot;共删除隐藏目录: {deleted_dirs_count} 个&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: # 确认提示（防止误删） confirm = input(“该操作将递归删除当前目录下所有以 ‘.’ 开头的文件和文件夹。确认继续吗？(y/n):”) if confirm.lower() ** ‘y’: deep_clean_hidden_files() else: print(“操作已取消。”)</p>
+<pre><code>
+### 多类
+
+采用的数量：8824
+**1**.acne  6类（acne mole1 mole2 pimple scar spot）3239张
+[1](https://universe.roboflow.com/buyumedatasets/acne-new)
+
+&gt; 筛选：mole1和2合并为moles，pimple合并到acne，spot保留，scar删除。
+
+```python title:&quot;alter.py&quot;
+import os
+import json
+
+def process_full_dataset():
+    label_dir = &#39;labels&#39;
+    image_dir = &#39;images&#39;
+    img_exts = [&#39;.jpg&#39;, &#39;.jpeg&#39;, &#39;.png&#39;, &#39;.bmp&#39;, &#39;.webp&#39;]
+
+    # 1. TXT 映射 (旧 ID : 新 ID) - 顺序: spot(0), acne(1), mole(2)
+    txt_mapping = {
+        &#39;5&#39;: &#39;0&#39;, # spot -&gt; spot
+        &#39;0&#39;: &#39;1&#39;, # acne -&gt; acne
+        &#39;3&#39;: &#39;1&#39;, # pimple -&gt; acne
+        &#39;1&#39;: &#39;2&#39;, # mole1 -&gt; mole
+        &#39;2&#39;: &#39;2&#39;  # mole2 -&gt; mole
+    }
+
+    # 2. JSON 映射 (旧类名 : 新类名)
+    json_mapping = {
+        &#39;spot&#39;: &#39;spot&#39;,
+        &#39;acne&#39;: &#39;acne&#39;,
+        &#39;pimple&#39;: &#39;acne&#39;,
+        &#39;mole1&#39;: &#39;mole&#39;,
+        &#39;mole2&#39;: &#39;mole&#39;
+    }
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        print(&quot;错误：请确保脚本位于 images 和 labels 文件夹同级目录下！&quot;)
+        return
+
+    txt_files = [f for f in os.listdir(label_dir) if f.endswith(&#39;.txt&#39;) and f != &#39;classes.txt&#39;]
+    
+    count_kept = 0
+    count_deleted = 0
+
+    print(f&quot;开始同步处理 TXT 和 JSON 文件...&quot;)
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- A. 处理 TXT 内容 ---
+        new_txt_lines = []
+        try:
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5 and parts[0] in txt_mapping:
+                    parts[0] = txt_mapping[parts[0]]
+                    new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;读取 TXT 出错 {txt_name}: {e}&quot;)
+            continue
+
+        # --- B. 处理 JSON 内容 (如果存在) ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                # 过滤并修改 shapes 列表
+                new_shapes = []
+                for shape in data.get(&#39;shapes&#39;, []):
+                    old_label = shape.get(&#39;label&#39;)
+                    if old_label in json_mapping:
+                        shape[&#39;label&#39;] = json_mapping[old_label]
+                        new_shapes.append(shape)
+                
+                # 更新 JSON 数据
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except Exception as e:
+                print(f&quot;处理 JSON 出错 {json_path}: {e}&quot;)
+
+        # --- C. 执行文件更新或删除 ---
+        # 只要 TXT 处理后为空，就认为该图片不需要了（即使 JSON 里可能有别的）
+        if not new_txt_lines:
+            # 1. 删 TXT
+            if os.path.exists(txt_path): os.remove(txt_path)
+            # 2. 删 JSON
+            if os.path.exists(json_path): os.remove(json_path)
+            # 3. 删图片
+            for ext in img_exts:
+                img_path = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_path):
+                    os.remove(img_path)
+                    break
+            count_deleted += 1
+        else:
+            # 1. 保存修改后的 TXT
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # 2. 保存修改后的 JSON (如果原本有 JSON)
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            
+            count_kept += 1
+
+    # D. 更新 classes.txt
+    with open(os.path.join(label_dir, &#39;classes.txt&#39;), &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\nacne\nmole\n&quot;)
+
+    print(&quot;-&quot; * 40)
+    print(f&quot;同步处理完成！&quot;)
+    print(f&quot;保留并修改: {count_kept} 组 (TXT 和 JSON 已同步)&quot;)
+    print(f&quot;删除无效文件: {count_deleted} 组&quot;)
+    print(f&quot;当前类别顺序: 0:spot, 1:acne, 2:mole&quot;)
+
+if __name__ ** &quot;__main__&quot;:
+    process_full_dataset()</code></pre>
+<p>修改data.yaml文件</p>
+<pre class="bash"><code>nc: 3 
+names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre>
+<p>仅有train文件，将其分为常规三类。</p>
+<p>```python title:“split.py” import os import random import shutil</p>
+<p>def split_train_dataset(train_ratio=0.7, valid_ratio=0.2): # 1. 定义路径 base_train_img = os.path.join(‘train’, ‘images’) base_train_lab = os.path.join(‘train’, ‘labels’)</p>
+<pre><code>if not os.path.exists(base_train_img) or not os.path.exists(base_train_lab):
+    print(&quot;错误：找不到 &#39;train/images&#39; 或 &#39;train/labels&#39; 文件夹！&quot;)
+    return
+
+# 2. 获取所有图片的文件名（不含后缀）
+# 过滤掉隐藏文件
+all_names = [os.path.splitext(f)[0] for f in os.listdir(base_train_img) 
+             if not f.startswith(&#39;.&#39;) and not f.endswith(&#39;.json&#39;)]
+
+# 随机打乱
+random.seed(42) # 固定随机种子，保证结果可复现
+random.shuffle(all_names)
+
+# 3. 计算拆分数量
+total_count = len(all_names)
+train_count = int(total_count * train_ratio)
+valid_count = int(total_count * valid_ratio)
+
+# 划分名单
+train_list = all_names[:train_count]
+valid_list = all_names[train_count:train_count + valid_count]
+test_list = all_names[train_count + valid_count:]
+
+# 4. 创建文件夹结构
+for sub in [&#39;valid&#39;, &#39;test&#39;]:
+    os.makedirs(os.path.join(sub, &#39;images&#39;), exist_ok=True)
+    os.makedirs(os.path.join(sub, &#39;labels&#39;), exist_ok=True)
+
+def move_files(name_list, target_sub):
+    print(f&quot;正在移动 {len(name_list)} 个文件到 {target_sub}...&quot;)
+    img_extensions = [&#39;.jpg&#39;, &#39;.jpeg&#39;, &#39;.png&#39;, &#39;.bmp&#39;, &#39;.webp&#39;]
+    
+    for name in name_list:
+        # 移动图片
+        moved_img = False
+        for ext in img_extensions:
+            src_img = os.path.join(base_train_img, name + ext)
+            if os.path.exists(src_img):
+                shutil.move(src_img, os.path.join(target_sub, &#39;images&#39;, name + ext))
+                moved_img = True
+                break
+        
+        # 移动对应的 TXT 标签
+        src_txt = os.path.join(base_train_lab, name + &quot;.txt&quot;)
+        if os.path.exists(src_txt):
+            shutil.move(src_txt, os.path.join(target_sub, &#39;labels&#39;, name + &quot;.txt&quot;))
+        
+        # 移动对应的 JSON (如果有)
+        src_json = os.path.join(base_train_img, name + &quot;.json&quot;)
+        if os.path.exists(src_json):
+            shutil.move(src_json, os.path.join(target_sub, &#39;images&#39;, name + &quot;.json&quot;))
+
+# 5. 执行移动 (Train 保持不动，只把 Valid 和 Test 移出去)
+move_files(valid_list, &#39;valid&#39;)
+move_files(test_list, &#39;test&#39;)
+
+print(&quot;-&quot; * 30)
+print(f&quot;拆分完成！&quot;)
+print(f&quot;Train (保留): {len(train_list)} 张&quot;)
+print(f&quot;Valid (移动): {len(valid_list)} 张&quot;)
+print(f&quot;Test  (移动): {len(test_list)} 张&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: split_train_dataset()</p>
+<pre><code>
+
+7.Acne 4类 （blackheads  dark spot  fore  papules） 1159张
+[7](https://universe.roboflow.com/new-workspace-ii6dw/acne-gsoza)
+
+&gt; 已下载。fore痘痘一类。仅一类。其他类需要删除。fore为acne。
+
+```python title:&quot;alter.py&quot;
+import os
+import json
+
+def process_and_clean_dataset():
+    # 基础配置
+    subfolders = [&#39;train&#39;, &#39;valid&#39;, &#39;test&#39;]
+    img_exts = [&#39;.jpg&#39;, &#39;.jpeg&#39;, &#39;.png&#39;, &#39;.bmp&#39;, &#39;.webp&#39;]
+    root_classes_file = &#39;classes.txt&#39;
+    
+    # 映射逻辑
+    old_target_idx = &#39;2&#39; # fore
+    new_target_idx = &#39;1&#39; # acne
+    new_label_name = &#39;acne&#39;
+
+    print(&quot;开始处理数据集...&quot;)
+
+    # 1. 遍历子文件夹
+    for sub in subfolders:
+        if not os.path.exists(sub):
+            continue
+            
+        print(f&quot;正在清洗文件夹: {sub}&quot;)
+        label_dir = os.path.join(sub, &#39;labels&#39;)
+        image_dir = os.path.join(sub, &#39;images&#39;)
+
+        if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+            continue
+
+        txt_files = [f for f in os.listdir(label_dir) if f.endswith(&#39;.txt&#39;) and f != &#39;classes.txt&#39;]
+        
+        kept_count = 0
+        deleted_count = 0
+
+        for txt_name in txt_files:
+            base_name = os.path.splitext(txt_name)[0]
+            txt_path = os.path.join(label_dir, txt_name)
+            json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+            
+            # --- 处理 TXT ---
+            new_txt_lines = []
+            try:
+                # 使用 errors=&#39;ignore&#39; 解决 0xb0 编码报错
+                with open(txt_path, &#39;rb&#39;) as f:
+                    content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+                
+                for line in content.splitlines():
+                    parts = line.strip().split()
+                    if len(parts) &gt;= 5 and parts[0] ** old_target_idx:
+                        parts[0] = new_target_idx
+                        new_txt_lines.append(&quot; &quot;.join(parts))
+            except Exception as e:
+                print(f&quot;读取 {txt_path} 出错: {e}&quot;)
+                continue
+
+            # --- 处理 JSON ---
+            new_json_data = None
+            if os.path.exists(json_path):
+                try:
+                    with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                        data = json.load(f)
+                    
+                    new_shapes = []
+                    for shape in data.get(&#39;shapes&#39;, []):
+                        if shape.get(&#39;label&#39;) ** &#39;fore&#39;:
+                            shape[&#39;label&#39;] = new_label_name
+                            new_shapes.append(shape)
+                    data[&#39;shapes&#39;] = new_shapes
+                    new_json_data = data
+                except: pass
+
+            # --- 物理清理或保存 ---
+            if not new_txt_lines:
+                # 删除全套文件
+                if os.path.exists(txt_path): os.remove(txt_path)
+                if os.path.exists(json_path): os.remove(json_path)
+                for ext in img_exts:
+                    img_p = os.path.join(image_dir, base_name + ext)
+                    if os.path.exists(img_p):
+                        os.remove(img_p)
+                        break
+                deleted_count += 1
+            else:
+                # 写入修改后的内容
+                with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+                if new_json_data:
+                    with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                        json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+                kept_count += 1
+        
+        print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count}&quot;)
+
+    # 2. 更新根目录下的 classes.txt
+    # 为了保证 acne 为数字 1，必须在第一行放置一个占位符或 spot
+    try:
+        with open(root_classes_file, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+            f.write(&quot;placeholder\nacne\n&quot;)
+        print(f&quot;\n根目录 {root_classes_file} 已成功更新。&quot;)
+    except Exception as e:
+        print(f&quot;更新根目录 classes.txt 失败: {e}&quot;)
+
+    print(&quot;\n所有任务已执行完毕！&quot;)
+
+if __name__ ** &quot;__main__&quot;:
+    process_and_clean_dataset()</code></pre>
+<p>class类为了使acne为1，前面加一个placeholder占位。 data.yaml也进行占位。</p>
+<pre class="bash"><code>nc: 2
+names: [&#39;placeholder&#39;, &#39;acne&#39;]</code></pre>
+<p>14.acne 3类（hyperpigmentation  inflamed  noninflamed） 921张 <a href="https://universe.roboflow.com/acneagent/acne-c5qud">14</a></p>
+<blockquote>
+<p>已下载。hyperpigmentation为spot，inflamed和noninflamed合并为acne.</p>
+</blockquote>
+<p>```python title:“alter.py” import os import json</p>
+<p>def process_dataset(): # 配置 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
+<pre><code># TXT 索引映射: 0-&gt;0, 1-&gt;1, 2-&gt;1
+txt_mapping = {
+    &#39;0&#39;: &#39;0&#39;, # hyperpigmentation -&gt; spot
+    &#39;1&#39;: &#39;1&#39;, # inflamed -&gt; acne
+    &#39;2&#39;: &#39;1&#39;  # noninflamed -&gt; acne
+}
+
+# JSON 标签映射
+json_mapping = {
+    &#39;hyperpigmentation&#39;: &#39;spot&#39;,
+    &#39;inflamed&#39;: &#39;acne&#39;,
+    &#39;noninflamed&#39;: &#39;acne&#39;
+}
+
+print(&quot;开始处理数据集并合并类别...&quot;)
+
+for sub in subfolders:
+    if not os.path.exists(sub):
+        continue
+        
+    print(f&quot;正在处理文件夹: {sub}&quot;)
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    image_dir = os.path.join(sub, &#39;images&#39;)
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        continue
+
+    # 获取所有有效的 txt 文件，跳过 Mac 隐藏文件
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+    
+    kept_count = 0
+    deleted_count = 0
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- 1. 处理 TXT ---
+        new_txt_lines = []
+        try:
+            # 使用二进制读取并忽略错误，彻底解决 0xb0 问题
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5:
+                    old_cls = parts[0]
+                    if old_cls in txt_mapping:
+                        parts[0] = txt_mapping[old_cls]
+                        new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;读取 {txt_path} 失败: {e}&quot;)
+            continue
+
+        # --- 2. 处理 JSON ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                new_shapes = []
+                for shape in data.get(&#39;shapes&#39;, []):
+                    old_label = shape.get(&#39;label&#39;)
+                    if old_label in json_mapping:
+                        shape[&#39;label&#39;] = json_mapping[old_label]
+                        new_shapes.append(shape)
+                
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except:
+                pass
+
+        # --- 3. 决定保留还是删除 ---
+        if not new_txt_lines:
+            # 删除全套文件
+            if os.path.exists(txt_path): os.remove(txt_path)
+            if os.path.exists(json_path): os.remove(json_path)
+            for ext in img_exts:
+                img_p = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_p):
+                    os.remove(img_p)
+                    break
+            deleted_count += 1
+        else:
+            # 保存修改后的 TXT
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # 保存修改后的 JSON
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            kept_count += 1
+    
+    print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count}&quot;)
+
+# 4. 更新根目录下的 classes.txt
+try:
+    with open(&#39;classes.txt&#39;, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\nacne\n&quot;)
+    print(&quot;\n根目录 classes.txt 已更新为: 0:spot, 1:acne&quot;)
+except:
+    print(&quot;\n警告: 未能更新根目录 classes.txt&quot;)
+
+print(&quot;\n所有任务已执行完毕！&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 2 
+names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre>
+<p>19.Acne 8类（Веснушка  Морщина  Пигментация  Постакне (рубец)  Прыщ  Расширенная пора  Родинка  Черная точка 雀斑 皱纹 色素沉着 痤疮后疤痕 粉刺 毛孔粗大 痣 黑头） 845张 <a href="https://universe.roboflow.com/acne-mdodj/acne-mz8ar">19</a></p>
+<blockquote>
+<p>已下载。Веснушка雀斑为spot，Пигментация色素沉着为spot，即前二者合并为spot，Прыщ疙瘩即acne，Родинка痣为mole。</p>
+</blockquote>
+<p>```python title:“alter.py” import os import json</p>
+<p>def process_dataset(): # 配置子文件夹 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
+<pre><code># TXT 索引映射 (字符串形式匹配)
+txt_mapping = {
+    &#39;0&#39;: &#39;0&#39;, # &#39;----&#39; -&gt; spot
+    &#39;2&#39;: &#39;0&#39;, # &#39;------ -----&#39; -&gt; spot
+    &#39;4&#39;: &#39;1&#39;, # &#39;--------&#39; -&gt; acne
+    &#39;6&#39;: &#39;2&#39;  # &#39;-----------&#39; -&gt; mole
+}
+
+# JSON 标签字符串映射
+json_mapping = {
+    &#39;----&#39;: &#39;spot&#39;,
+    &#39;------ -----&#39;: &#39;spot&#39;,
+    &#39;--------&#39;: &#39;acne&#39;,
+    &#39;-----------&#39;: &#39;mole&#39;
+}
+
+print(&quot;开始处理横线格式的数据集...&quot;)
+
+for sub in subfolders:
+    if not os.path.exists(sub):
+        continue
+        
+    print(f&quot;正在处理文件夹: {sub}&quot;)
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    image_dir = os.path.join(sub, &#39;images&#39;)
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        continue
+
+    # 过滤掉 Mac 隐藏文件和根目录 classes.txt
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+    
+    kept_count = 0
+    deleted_count = 0
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- 1. 处理 TXT (修改索引) ---
+        new_txt_lines = []
+        try:
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5:
+                    old_cls = parts[0]
+                    if old_cls in txt_mapping:
+                        parts[0] = txt_mapping[old_cls]
+                        new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;解析 TXT 失败 {txt_path}: {e}&quot;)
+            continue
+
+        # --- 2. 处理 JSON (修改横线标签) ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                new_shapes = []
+                for shape in data.get(&#39;shapes&#39;, []):
+                    old_label = shape.get(&#39;label&#39;)
+                    if old_label in json_mapping:
+                        shape[&#39;label&#39;] = json_mapping[old_label]
+                        new_shapes.append(shape)
+                
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except Exception as e:
+                print(f&quot;解析 JSON 失败 {json_path}: {e}&quot;)
+
+        # --- 3. 保存或删除 ---
+        if not new_txt_lines:
+            # 删除全套文件
+            if os.path.exists(txt_path): os.remove(txt_path)
+            if os.path.exists(json_path): os.remove(json_path)
+            for ext in img_exts:
+                img_p = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_p):
+                    os.remove(img_p)
+                    break
+            deleted_count += 1
+        else:
+            # 写入修改后的 TXT
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # 写入修改后的 JSON
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            kept_count += 1
+    
+    print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count}&quot;)
+
+# 4. 更新同级目录的 classes.txt
+try:
+    with open(&#39;classes.txt&#39;, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\nacne\nmole\n&quot;)
+    print(&quot;\n根目录 classes.txt 已重写为: spot, acne, mole&quot;)
+except Exception as e:
+    print(f&quot;\n无法更新根目录 classes.txt: {e}&quot;)
+
+print(&quot;\n所有操作已完成！请记得手动更新 data.yaml。&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 3 
+names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre>
+<p>21.spots 10类（Acne, Blackheads, Dark-Spots, Dry-Skin, Englarged-Pores, Eyebags, Oily-Skin, Skin-Redness, Whiteheads, Wrinkles）2660张 <a href="https://app.roboflow.com/swilder/skin-problem-detection-relabel-clean3-dtinq/1">21</a></p>
+<blockquote>
+<p>已下载。Dark-Spots为spot，Acne为acne</p>
+</blockquote>
+<p>```python title:“alter.py” import os import json</p>
+<p>def process_dataset(): # 子文件夹列表 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
+<pre><code># TXT 索引映射: 
+# 原 2 (Dark-Spots) -&gt; 新 0 (spot)
+# 原 0 (Acne) -&gt; 新 1 (acne)
+txt_mapping = {
+    &#39;2&#39;: &#39;0&#39;, 
+    &#39;0&#39;: &#39;1&#39;
+}
+
+# JSON 标签字符串映射
+json_mapping = {
+    &#39;Dark-Spots&#39;: &#39;spot&#39;,
+    &#39;Acne&#39;: &#39;acne&#39;
+}
+
+print(&quot;开始清洗数据集，目标类：spot(0), acne(1)...&quot;)
+
+for sub in subfolders:
+    if not os.path.exists(sub):
+        continue
+        
+    print(f&quot;正在处理文件夹: {sub}&quot;)
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    image_dir = os.path.join(sub, &#39;images&#39;)
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        continue
+
+    # 遍历 labels 文件夹下的 txt，跳过隐藏文件和 classes.txt
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+    
+    kept_count = 0
+    deleted_count = 0
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- 1. 处理 TXT (修改索引并过滤) ---
+        new_txt_lines = []
+        try:
+            # 使用二进制读取以防编码错误 (0xb0)
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5:
+                    old_cls = parts[0]
+                    if old_cls in txt_mapping:
+                        parts[0] = txt_mapping[old_cls]
+                        new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;读取 TXT 失败 {txt_path}: {e}&quot;)
+            continue
+
+        # --- 2. 处理 JSON (同步标签名) ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                new_shapes = []
+                for shape in data.get(&#39;shapes&#39;, []):
+                    old_label = shape.get(&#39;label&#39;)
+                    if old_label in json_mapping:
+                        shape[&#39;label&#39;] = json_mapping[old_label]
+                        new_shapes.append(shape)
+                
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except:
+                pass
+
+        # --- 3. 决定保留还是彻底删除 ---
+        if not new_txt_lines:
+            # 删除该组所有文件
+            if os.path.exists(txt_path): os.remove(txt_path)
+            if os.path.exists(json_path): os.remove(json_path)
+            for ext in img_exts:
+                img_p = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_p):
+                    os.remove(img_p)
+                    break
+            deleted_count += 1
+        else:
+            # 写入修改后的 TXT
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # 写入修改后的 JSON
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            kept_count += 1
+    
+    print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count} 组无效数据&quot;)
+
+# 4. 更新同级目录的 classes.txt
+try:
+    with open(&#39;classes.txt&#39;, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\nacne\n&quot;)
+    print(&quot;\n根目录 classes.txt 已更新: 0:spot, 1:acne&quot;)
+except:
+    print(&quot;\n警告: 无法更新根目录 classes.txt&quot;)
+
+print(&quot;\n所有操作已完成！&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 2 
+names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre>
+<h4 id="未采用数据集">未采用数据集</h4>
+<p>2.Acne-Spots-eyebag-darkcircle 6类 1125张 <a href="https://universe.roboflow.com/buyume-ahuro/acne-spots-eyebag-darkcircle">2</a></p>
+<blockquote>
+<p>未下载。类别为0-5的六类，无法得知类别名称。</p>
+</blockquote>
+<p>3.First Dataset 4类（Acne Blackhead Whiteheads Wrinkle）30785张 <a href="https://universe.roboflow.com/moiz-wklhw/first-dataset-3">3</a></p>
+<blockquote>
+<p>未下载。类别仅有acne能用，观望一下吧。</p>
+</blockquote>
+<p>4.skin 2类 （acne blackhead）540张 <a href="https://universe.roboflow.com/money-c3d31/skin-h0msm">4</a></p>
+<blockquote>
+<p>未下载。类别仅有acne能用，观望一下吧。</p>
+</blockquote>
+<p>5.Acne 17类 （3 Dark Circle Dark circle Eyebag acne scar blackhead blackheads dark spot freckle nodules papules pustules skinredness vascular whitehead whiteheads wrinkle） 246张 <a href="https://universe.roboflow.com/bluesense-afv3w/acne-detection-fl4kw">5</a></p>
+<blockquote>
+<p>未下载。类别仅有acne和black spot能用，观望一下吧。</p>
+</blockquote>
+<p>6.Acne 7类 （Pustula  acne fulminans  blackhead  fungal acne  nodules  papula  whitehead） 491张 <a href="https://universe.roboflow.com/acne-n5isv/acne-zruhx">6</a></p>
+<blockquote>
+<p>未下载。类别仅有acne能用，观望一下吧。</p>
+</blockquote>
+<p>8.acne 6类 （blackheads  dark spot  nodules  papules  pustules  whiteheads） 962张 <a href="https://universe.roboflow.com/acne-ugaek/acne-bwhc5">8</a></p>
+<blockquote>
+<p>未下载。类别仅有acne和black spot能用，观望一下吧。</p>
+</blockquote>
+<p>9.acne 5类 （blackheads  nodules  papules  pustules  whiteheads） 1705张 <a href="https://universe.roboflow.com/skripsi-wez5j/acne-ygqhs">9</a></p>
+<blockquote>
+<p>未下载。类别仅有acne能用，观望一下吧。</p>
+</blockquote>
+<p>10.acne 2类 （Cystic  Papules） 63张 <a href="https://universe.roboflow.com/finalyearproject-qe4w9/acne-hh7ag">10</a></p>
+<blockquote>
+<p>未下载。</p>
+</blockquote>
+<p>11.acne 10类 （1 2 3 4 acne  dot inflammation  post  Прыщ  зщк） 127张 <a href="https://universe.roboflow.com/acne-rfjpz/acne-ilski">11</a></p>
+<blockquote>
+<p>未下载。</p>
+</blockquote>
+<p>12.Acne 6类 （blackheads  cysts  nodules  papules  pustules  whiteheads） 1755张 <a href="https://universe.roboflow.com/eczema-veixh/acne-acr5p">12</a></p>
+<blockquote>
+<p>未下载。</p>
+</blockquote>
+<p>13.acne 6类（blackheads  dark spot  nodules  papules  pustules  whiteheads） 917张 <a href="https://universe.roboflow.com/acne-a0moy/acne-dg3pa">13</a></p>
+<blockquote>
+<p>未下载。类别仅有acne和black spot能用，观望一下吧。</p>
+</blockquote>
+<p>15.Acne 7类(PIH  blackhead  nodule  non acne  papule  pustule  whitehead) 315张 <a href="https://universe.roboflow.com/capstone-v0wnd/acne-khbou">15</a></p>
+<blockquote>
+<p>未下载。</p>
+</blockquote>
+<p>16.Acne 6类（blackheads  dark spot  nodules  papules  pustules  whiteheads） 929张 <a href="https://universe.roboflow.com/kritsakorn/acne-kbm0q">16</a></p>
+<blockquote>
+<p>未下载。</p>
+</blockquote>
+<p>17.Acne 9类（Acne  Birthmark  Blackhead  Cysts  Milium  Papular  Purulent  Scars  Whitehead） 9462张 <a href="https://universe.roboflow.com/runner-e0dmy/acne-ijcab">17</a></p>
+<blockquote>
+<p>未下载。</p>
+</blockquote>
+<p>18.acne 15类 （Acne  Blackhead  Conglobata Crystanlline  Cystic  Flat_wart Folliculitis  Keloid  Milium  Papular  Purulent  Scars  Sebo-crystan-conglo Syringoma  Whitehead） 9026张 <a href="https://universe.roboflow.com/project-pcw5n/acne-6rzah">18</a></p>
+<blockquote>
+<p>未下载。类别太多，没看完。</p>
+</blockquote>
+<p>20.acne 7类（acne  blackhead  cystic  nodule  papule  pustule  whitehead） 1037张 <a href="https://universe.roboflow.com/eiei-zysbk/acne-t1pxl">20</a></p>
+<blockquote>
+<p>未下载。</p>
+</blockquote>
+<h3 id="单类">单类</h3>
+<h4 id="acne">acne</h4>
+<p>采用的数量：8322 3.acne 905张 <a href="https://universe.roboflow.com/acne-qmv2v/acne-ctiit">3</a> 将0改为1.</p>
+<p>```python title:“alter.py” import os</p>
+<p>def change_class_index(): # 目标文件夹 subfolders = [‘train’, ‘valid’, ‘test’]</p>
+<pre><code>count_modified = 0
+print(&quot;开始修改类别索引：从 0 改为 1...&quot;)
+
+for sub in subfolders:
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    
+    # 检查文件夹是否存在
+    if not os.path.exists(label_dir):
+        print(f&quot;跳过 {sub}: 找不到 labels 文件夹&quot;)
+        continue
+        
+    print(f&quot;正在处理: {sub}/labels&quot;)
+
+    # 获取目录下所有 txt 文件，并排除隐藏文件
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+
+    for txt_name in txt_files:
+        file_path = os.path.join(label_dir, txt_name)
+        
+        try:
+            # 1. 读取内容
+            with open(file_path, &#39;r&#39;, encoding=&#39;utf-8&#39;, errors=&#39;ignore&#39;) as f:
+                lines = f.readlines()
+            
+            # 2. 修改每一行开头的 0 为 1
+            new_lines = []
+            modified_this_file = False
+            for line in lines:
+                parts = line.strip().split()
+                if len(parts) &gt; 0:
+                    if parts[0] ** &#39;0&#39;:
+                        parts[0] = &#39;1&#39;
+                        modified_this_file = True
+                    new_lines.append(&quot; &quot;.join(parts))
+            
+            # 3. 写回文件
+            if modified_this_file:
+                with open(file_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    f.write(&quot;\n&quot;.join(new_lines) + &quot;\n&quot;)
+                count_modified += 1
+                
+        except Exception as e:
+            print(f&quot;处理文件 {txt_name} 时出错: {e}&quot;)
+
+print(&quot;-&quot; * 30)
+print(f&quot;处理完成！&quot;)
+print(f&quot;共成功修改了 {count_modified} 个标注文件。&quot;)
+print(&quot;请记得将 data.yaml 中的 nc 改为 2，并确保索引 1 对应正确的类名。&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: change_class_index()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 2 
+names: [&#39;placeholder&#39;, &#39;acne&#39;] # 索引 0 留个占位符</code></pre>
+<p>7.acne 1419张 <a href="https://universe.roboflow.com/yolotest-bu1i2/acne-ho1jq">7</a> 13.acne 800张 <a href="https://universe.roboflow.com/tezim/acne-k7v7j">13</a></p>
+<p>17.acne 1419张 <a href="https://universe.roboflow.com/learning-jth0d/acne-hrslq">17</a></p>
+<h5 id="未采用">未采用</h5>
+<p>1.acne 216张 <a href="https://universe.roboflow.com/zahra-oy1dk/acne-2bwmy">1</a></p>
+<blockquote>
+<p>未下载。检查数据集发现有数据增强：椒盐噪声。</p>
+</blockquote>
+<p>2.acne 1000张 <a href="https://universe.roboflow.com/university-wfu5i/acne-cwblu">2</a></p>
+<blockquote>
+<p>标注大块不能采用。</p>
+</blockquote>
+<p>4.acne 136张 <a href="https://universe.roboflow.com/acne-zwzir/acne-mlk8h">4</a></p>
+<blockquote>
+<p>标注大块不能采用。</p>
+</blockquote>
+<p>5.acne 93张 <a href="https://universe.roboflow.com/skin-issue-detection-4rcyp/acne-m8osn">5</a></p>
+<blockquote>
+<p>标注大块不能采用。</p>
+</blockquote>
+<p>6.acne 1623张 <a href="https://universe.roboflow.com/redness/acne-l6cao">6</a></p>
+<blockquote>
+<p>未下载。标注框太大。</p>
+</blockquote>
+<p>8.acne 977张 <a href="https://universe.roboflow.com/enes-nacarolu/acne-uz95a">8</a></p>
+<blockquote>
+<p>标注大块不能采用。</p>
+</blockquote>
+<p>9.acne 1000张 <a href="https://universe.roboflow.com/devil-nhcw8/acne-fkveb">9</a></p>
+<blockquote>
+<p>标注大块不能采用。</p>
+</blockquote>
+<p>10.acne 7872张 <a href="https://universe.roboflow.com/pr-ckfve/acne-z5l96">10</a></p>
+<blockquote>
+<p>没有标注。</p>
+</blockquote>
+<p>11.acne 1265张 <a href="https://universe.roboflow.com/gloria-fzhfs/acne-zvxww">11</a></p>
+<blockquote>
+<p>标注大块不能采用。</p>
+</blockquote>
+<p>12.acne 967张 <a href="https://universe.roboflow.com/acnemodel-fyjwb/acne-jmq0i">12</a></p>
+<blockquote>
+<p>有的标注不是一个一个的，几个一起。</p>
+</blockquote>
+<p>14.acne 78张 <a href="https://universe.roboflow.com/alphhabet/acne-6gt6f">14</a></p>
+<blockquote>
+<p>标注大块不能采用。</p>
+</blockquote>
+<p>15.acne 973张 <a href="https://universe.roboflow.com/acnemodel-4whfg/acne-lfdx7">15</a></p>
+<blockquote>
+<p>有的标注不是一个一个的，几个一起。</p>
+</blockquote>
+<p>16.acne 615张 <a href="https://universe.roboflow.com/luon/acne-pp0mn">16</a></p>
+<blockquote>
+<p>标注框有的有点大，先不采用。</p>
+</blockquote>
+<h4 id="pigmentation">pigmentation</h4>
+<p>1.pigmentation 69张 <a href="https://universe.roboflow.com/umm-alqura-ac9k1/pigmentation-ijdal">1</a></p>
+<blockquote>
+<p>标注太大。</p>
+</blockquote>
+<h4 id="spots">spots</h4>
+<p>4.spots 75张 <a href="https://app.roboflow.com/swilder/spots-nizes-dtm7v/1">4</a></p>
+<blockquote>
+<p>已下载。删除non spots类</p>
+</blockquote>
+<p>```python title:“alter.py” import os import json</p>
+<p>def process_spot_dataset(): # 基础配置 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
+<pre><code># 目标：只保留索引 0 (spot)
+target_idx = &#39;0&#39;
+target_label_name = &#39;spot&#39;
+
+print(&quot;开始清理数据集，仅保留 &#39;spot&#39; 类...&quot;)
+
+for sub in subfolders:
+    if not os.path.exists(sub):
+        continue
+        
+    print(f&quot;正在处理文件夹: {sub}&quot;)
+    label_dir = os.path.join(sub, &#39;labels&#39;)
+    image_dir = os.path.join(sub, &#39;images&#39;)
+
+    if not os.path.exists(label_dir) or not os.path.exists(image_dir):
+        print(f&quot;跳过 {sub}: 缺少 images 或 labels 文件夹&quot;)
+        continue
+
+    # 获取所有有效 txt 文件
+    txt_files = [f for f in os.listdir(label_dir) 
+                 if f.endswith(&#39;.txt&#39;) and not f.startswith(&#39;.&#39;) and f != &#39;classes.txt&#39;]
+    
+    kept_count = 0
+    deleted_count = 0
+
+    for txt_name in txt_files:
+        base_name = os.path.splitext(txt_name)[0]
+        txt_path = os.path.join(label_dir, txt_name)
+        json_path = os.path.join(image_dir, base_name + &quot;.json&quot;)
+        
+        # --- 1. 处理 TXT (只保留索引 0) ---
+        new_txt_lines = []
+        try:
+            # 使用二进制读取并忽略错误，防止 Mac 编码报错
+            with open(txt_path, &#39;rb&#39;) as f:
+                content = f.read().decode(&#39;utf-8&#39;, errors=&#39;ignore&#39;)
+            
+            for line in content.splitlines():
+                parts = line.strip().split()
+                if len(parts) &gt;= 5 and parts[0] ** target_idx:
+                    new_txt_lines.append(&quot; &quot;.join(parts))
+        except Exception as e:
+            print(f&quot;读取 TXT 失败 {txt_path}: {e}&quot;)
+            continue
+
+        # --- 2. 处理 JSON (只保留 label 为 spot 的 shapes) ---
+        new_json_data = None
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                    data = json.load(f)
+                
+                # 过滤 shapes
+                new_shapes = [shape for shape in data.get(&#39;shapes&#39;, []) 
+                              if shape.get(&#39;label&#39;) ** target_label_name]
+                
+                data[&#39;shapes&#39;] = new_shapes
+                new_json_data = data
+            except Exception as e:
+                print(f&quot;处理 JSON 失败 {json_path}: {e}&quot;)
+
+        # --- 3. 执行删除或写回 ---
+        if not new_txt_lines:
+            # --- 删除该组所有关联文件 ---
+            if os.path.exists(txt_path): os.remove(txt_path)
+            if os.path.exists(json_path): os.remove(json_path)
+            # 寻找并删除图片
+            for ext in img_exts:
+                img_p = os.path.join(image_dir, base_name + ext)
+                if os.path.exists(img_p):
+                    os.remove(img_p)
+                    break
+            deleted_count += 1
+        else:
+            # --- 写入修改后的 TXT ---
+            with open(txt_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                f.write(&quot;\n&quot;.join(new_txt_lines) + &quot;\n&quot;)
+            
+            # --- 写入修改后的 JSON ---
+            if new_json_data is not None:
+                with open(json_path, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+                    json.dump(new_json_data, f, ensure_ascii=False, indent=2)
+            kept_count += 1
+    
+    print(f&quot;[{sub}] 完成: 保留 {kept_count}, 删除 {deleted_count} 组无效文件&quot;)
+
+# 4. 更新同级目录的 classes.txt
+try:
+    with open(&#39;classes.txt&#39;, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f:
+        f.write(&quot;spot\n&quot;)
+    print(&quot;\n根目录 classes.txt 已更新为: spot&quot;)
+except:
+    pass
+
+print(&quot;\n所有操作已完成！&quot;)</code></pre>
+<p>if <strong>name</strong> ** “<strong>main</strong>”: process_spot_dataset()</p>
+<pre><code>data.yaml
+
+```bash
+nc: 1 
+names: [&#39;spot&#39;]</code></pre>
+<h5 id="未采用-1">未采用</h5>
+<p>1.spots 1439张 <a href="https://app.roboflow.com/swilder/spots-euwan-rpeuc/browse?queryText=&amp;pageSize=50&amp;startingIndex=0&amp;browseQuery=true">1</a></p>
+<blockquote>
+<p>但是看标注不属于色斑，倒是像痘和痣。不准备用了目前。</p>
+</blockquote>
+<p>2.spots 3114张 <a href="https://app.roboflow.com/swilder/spots-d2cwa-i5w11/1">2</a></p>
+<blockquote>
+<p>未下载。5类还是0-4，怎么知道哪一类是什么？</p>
+</blockquote>
+<p>3.spots 624张 <a href="https://app.roboflow.com/swilder/spots-rtkyn-shmws/3">3</a></p>
+<blockquote>
+<p>spot类像斑痘痣都有。</p>
+</blockquote>
+<p>5.spots 216张 <a href="https://app.roboflow.com/swilder/spots-3kp1q-lmk6v/1">5</a></p>
+<blockquote>
+<p>但是看标注不属于色斑，倒是像痘和痣。不准备用了目前。</p>
+</blockquote>
+<p>6.Dark Spots 272张 <a href="https://app.roboflow.com/swilder/dark-spots-fr6g1-bkpke/1">6</a></p>
+<blockquote>
+<p>未下载。仅分类，没有标注。</p>
+</blockquote>
+<h4 id="pimple">pimple</h4>
+<p>1.pimple on face 35张 <a href="https://app.roboflow.com/swilder/pimple-on-face-sjq4e/1">1</a></p>
+<blockquote>
+<p>已下载。仅有一类，问题和spots1一样。</p>
+</blockquote>
+<p>2.pimple 38张 <a href="https://app.roboflow.com/swilder/pimple-d4osd-7agik/1">2</a></p>
+<blockquote>
+<p>不太符合痘痘的判定，像是疾病。</p>
+</blockquote>
+<h2 id="医院数据集">医院数据集</h2>
+<p>问题：</p>
+<ol type="1">
+<li>蓝色笔的痕迹有的看着很像痣。怎么解决？</li>
+</ol>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></div>
+<div><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></div>
+<div><a href="../articles/修改.html">检测与分割双模型协同方案</a></div>
+<div><a href="../articles/优化计划.html">人脸色斑检测优化计划</a></div>
+<div><a href="../articles/超市识别项目.html">超市识别项目：视频预处理、标注与 YOLO 训练</a></div>
+<div><a href="../articles/实验记录.html">人脸色斑检测实验记录</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/标注规范.html">人脸色斑检测标注规范</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

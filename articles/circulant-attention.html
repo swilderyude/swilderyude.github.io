@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="围绕 Vision Transformer 中的 Circulant Attention 机制，整理论文结构、核心方法和实现理解。">
+  <title>Circulant Attention 精读笔记 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>Circulant Attention 精读笔记</span></h1>
+  <div class="postDesc">posted @ 2026-04-28 swilderyude 分类: <a href="../categories.html#文献精读">文献精读</a></div>
+  <p class="postSummary">围绕 Vision Transformer 中的 Circulant Attention 机制，整理论文结构、核心方法和实现理解。</p>
+  <div class="postTags"><span>Transformer</span> <span>Attention</span> <span>论文精读</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#图1">图1</a></li>
+<li class="toc-level-1"><a href="#相关工作">2 相关工作</a></li>
+<li class="toc-level-1"><a href="#预备知识">3 预备知识</a></li>
+<li class="toc-level-2"><a href="#注意力公式">3.1 注意力公式</a></li>
+<li class="toc-level-3"><a href="#图像-token-序列-x">1. 图像 token 序列 x</a></li>
+<li class="toc-level-3"><a href="#qkv-是什么">2. Q, K, V 是什么？</a></li>
+<li class="toc-level-3"><a href="#注意力矩阵-a-是什么">3. 注意力矩阵 A 是什么？</a></li>
+<li class="toc-level-3"><a href="#为什么除以-sqrt-d">4. 为什么除以 $\sqrt d$？</a></li>
+<li class="toc-level-3"><a href="#输出-o-是什么">5. 输出 O 是什么？</a></li>
+<li class="toc-level-2"><a href="#循环矩阵">3.2 循环矩阵</a></li>
+<li class="toc-level-2"><a href="#bccb-矩阵">3.3 BCCB 矩阵</a></li>
+<li class="toc-level-1"><a href="#方法">4 方法</a></li>
+<li class="toc-level-2"><a href="#视觉-transformer-中的高效模式">4.1 视觉 Transformer 中的高效模式</a></li>
+<li class="toc-level-2"><a href="#循环注意力circulant-attention">4.2 循环注意力（Circulant Attention）</a></li>
+<li class="toc-level-2"><a href="#实现细节">4.3 实现细节</a></li>
+<li class="toc-level-3"><a href="#推理公式">推理公式</a></li>
+<li class="toc-level-3"><a href="#两种重加权">两种重加权</a></li>
+<li class="toc-level-1"><a href="#实验">5 实验</a></li>
+<li class="toc-level-2"><a href="#imagenet-分类">5.1 ImageNet 分类</a></li>
+<li class="toc-level-2"><a href="#目标检测">5.2 目标检测</a></li>
+<li class="toc-level-2"><a href="#语义分割">5.3 语义分割</a></li>
+<li class="toc-level-2"><a href="#分析与可视化">5.4 分析与可视化</a></li>
+<li class="toc-level-2"><a href="#消融研究">5.5 消融研究</a></li>
+<li class="toc-level-3"><a href="#图表">图表</a></li>
+<li class="toc-level-1"><a href="#结论">6 结论</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>Transformer模型近年来在计算机视觉领域的应用已取得显著进展。其自注意力机制能有效地捕获图像中的全局依赖关系。然而，自注意力计算的二次复杂度（O(N²)）在高分辨率图像处理时，带来了巨大的计算负担。为此，许多方法通过手工设计注意力模式，如局部注意力或稀疏注意力，以提升计算效率。然而，这些方法通常会牺牲全局表达能力，限制模型的性能。 为了解决这一问题，本文提出了一种名为循环注意力（Circulant Attention）的新机制，通过离散傅里叶变换（DFT）和快速傅里叶变换（FFT）实现高效的自注意力计算。该方法利用BCCB矩阵的性质，实现了O(N log N)的计算复杂度，显著降低了计算开销，同时保持了模型的表达能力。</p>
+<h2 id="图1">图1</h2>
+<p>标准自注意力与提出的循环注意力的示意图。</p>
+<ul>
+<li><p><strong>σ</strong> 代表 Softmax 函数。</p></li>
+<li><p><strong>Θ</strong> 是 Hadamard （<strong>阿达玛</strong>）乘积（元素级乘积）。</p></li>
+<li><p><strong>F₂D</strong> 和 <strong>F⁻²D</strong> 分别表示二维离散傅里叶变换（DFT）及其逆变换。<br />
+为了简化，忽略了缩放因子和头部求和。</p></li>
+</ul>
+<p><strong>标准自注意力（Self-Attn）</strong> - 图中 (a)</p>
+<ul>
+<li><p><strong>矩阵乘法（Mat mul）</strong>:</p>
+<ol type="1">
+<li><p>在标准自注意力中，首先你有三个矩阵：查询矩阵（Q）、键矩阵（K）和值矩阵（V）。</p></li>
+<li><p>查询矩阵（Q）和键矩阵（K）进行矩阵乘法，计算得到注意力分数（通常是点积）。</p></li>
+<li><p>然后，这些分数会经过 <strong>Softmax</strong> 函数（标记为 σ）归一化处理，输出的结果就是一个注意力权重矩阵，表示每个 token 与其他 token 的相对重要性。 <strong>循环注意力（Circulant Attn）</strong> - 图中 (b)</p></li>
+</ol></li>
+<li><p><strong>基于 DFT 的矩阵乘法（DFT mul）</strong>:</p>
+<ol type="1">
+<li><p>在循环注意力中，矩阵 (Q)、(K) 和 (V) 会经过 DFT 变换。DFT 将时域数据转化到频域进行更高效的处理。conj复共轭。</p></li>
+<li><p>然后，这些经过 DFT 变换的矩阵会进行矩阵乘法，从而避免了标准自注意力中昂贵的矩阵操作。</p></li>
+<li><p>和标准自注意力一样，乘法后会应用 <strong>Softmax</strong>（σ）函数来获得归一化的注意力分数。</p></li>
+</ol></li>
+</ul>
+<p>标准自注意力中的矩阵乘法 在自注意力机制中，假设我们有三个矩阵：</p>
+<ul>
+<li><p>( Q ) (查询矩阵，Query)</p></li>
+<li><p>( K ) (键矩阵，Key)</p></li>
+<li><p>( V ) (值矩阵，Value) 它们的维度分别是：</p></li>
+<li><p>( Q ) 的维度是 ( <span class="math inline"><em>N</em> × <em>d</em></span> )，其中 ( N ) 是输入的 token 数量，( d ) 是每个 token 的特征维度。</p></li>
+<li><p>( K ) 的维度也是 ( <span class="math inline"><em>N</em> × <em>d</em></span> )，同样，( N ) 是 token 数量，( d ) 是每个 token 的特征维度。</p></li>
+<li><p>结果矩阵的维度是 ( <span class="math inline"><em>N</em> × <em>N</em></span> )，每个元素表示<strong>第 ( i ) 个 token 与第 ( j ) 个 token 的相似度</strong>（通过计算它们的点积实现）。这就是所谓的<strong>注意力矩阵</strong>。 <strong>( Q )</strong> 和 <strong>( K )</strong> 的作用是计算出每个 token 与其他 token 的关系（即注意力分数），而 <strong>( V )</strong> 则提供了每个 token 在最终表示中应该如何被加权。</p></li>
+</ul>
+<p>自注意力的整体过程：</p>
+<ol type="1">
+<li><p><strong>计算相似度（注意力分数）</strong>：通过计算查询矩阵 ( Q ) 和键矩阵 ( K ) 的乘积 ( Q K^T )，得到一个 <strong>注意力矩阵</strong>。这个矩阵表示了每个 token 与其他 token 的相关性（即相似度）。</p></li>
+<li><p><strong>归一化分数</strong>：通过 <strong>Softmax</strong> 对得到的相似度进行归一化，使得注意力权重变成一个概率分布，这样每个 token 对其他 token 的“关注”程度就有了具体的权重。</p></li>
+<li><p><strong>加权求和</strong>：然后，这些权重会与 <strong>值矩阵 ( V )</strong> 进行加权求和。具体来说，经过 Softmax 后的注意力分数矩阵与值矩阵 ( V ) 相乘，最终得到每个 token 的加权表示。这个加权的结果将作为该 token 的最终输出。</p></li>
+</ol>
+<p>因此，<strong>( V )</strong> 其实是在计算出每个 token 与其他 token 之间的关系后，用来合并信息的关键部分。最终的加权求和结果就是每个 token 的新的表示，它包含了全局信息，并且是通过关注（加权）其他 token 来得到的。</p>
+<p><strong>傅里叶变换（Fourier Transform）的基本概念</strong> 傅里叶变换的核心思想是：任何一个周期性的信号都可以用不同频率的正弦波和余弦波加权叠加表示。 在计算机视觉中，数据往往是时序数据或空间数据（如图像）。傅里叶变换能够将这些数据从时域或空间域（原始数据的表现形式）转化为频域（包含不同频率成分的表示）。这种变换能够帮助我们在频域中处理信号，特别是当数据包含周期性变化时。 <strong>时域 vs 频域</strong></p>
+<ul>
+<li><p><strong>时域（Time Domain）</strong>：这是原始的信号表示（例如图像像素、声音波形等）。</p></li>
+<li><p><strong>频域（Frequency Domain）</strong>：通过傅里叶变换，将时域信号分解成不同频率的正弦波和余弦波的组合。频域中的数据可以更清晰地揭示信号的周期性和频率成分。 在标准自注意力中，计算的是 <strong>矩阵乘法</strong>，也就是对每个 token 与其他 token 之间的相似度进行加权计算。通过 DFT，将时域的矩阵乘法转化为频域的卷积计算，而频域中的卷积操作实际上变成了元素级的乘法。 <strong>计算复杂度为什么变低到 (O(N N))？</strong> 要理解为什么使用 DFT 和 FFT（快速傅里叶变换）可以将计算复杂度降低到 (O(N N))，我们需要看看 <strong>FFT</strong>（快速傅里叶变换）如何优化离散傅里叶变换（DFT）的计算。 <strong>DFT 的时间复杂度：</strong> 离散傅里叶变换（DFT）是将时域信号转换为频域信号的基本方法，通常需要 (O(N^2)) 的计算复杂度。如果我们使用直接计算的方式，DFT 的计算复杂度是 (O(N^2))，因为每个输出点都需要计算 (N) 个输入点的加权和。 <strong>FFT 的优化：</strong> 快速傅里叶变换（FFT）是 DFT 的一种高效实现，能够将计算复杂度降低到 (O(N N))。FFT 通过递归分解和合并计算来减少计算量，它基于分治法，将一个大的 DFT 问题分解成多个较小的 DFT 问题来解决。</p></li>
+<li><p><strong>分治法</strong>：FFT 使用分治法将一个长度为 (N) 的序列分解为多个更小的序列，从而减少了直接计算的工作量。FFT 在每个递归步骤中处理的数据量逐步减小，最终将整个问题的复杂度降低到 (O(N N))。</p></li>
+</ul>
+<h1 id="相关工作">2 相关工作</h1>
+<p><strong>视觉 Transformer（Vision Transformer）</strong> 近年来，Transformer 架构和注意力机制在计算机视觉领域取得了显著进展（Vaswani et al. 2017）。然而，自注意力的二次计算复杂度在处理全局特征图时会导致难以承受的开销。为了解决这一问题，已有多种方法通过引入人工设计的模式（如局部性或稀疏性）来降低计算负担。 局部方法（如 Swin Transformer（Liu et al. 2021））将注意力限制在不重叠窗口内，从而降低计算成本。CSwin（Dong et al. 2022）通过十字形窗口扩展了这一思想，以获取更丰富的上下文。Neighborhood Attention Transformer（NAT）（Hassani et al. 2023）进一步通过将每个查询的注意力限制在局部邻域来模拟卷积。 除这些设计外，另一条研究路线采用稀疏注意力范式。PVT（Wang et al. 2021）通过对键和值下采样来降低计算复杂度；DAT（Xia et al. 2022）提出了输入依赖的稀疏注意力模式；BiFormer（Zhu et al. 2023）采用双层路由注意力为每个查询动态确定感兴趣区域。 尽管这些方法具有效率优势，但这些人工设计的注意力模式不可避免地会削弱全局自注意力的表达能力。本文利用自注意力的一种内在高效结构，在效率与表达能力之间实现更优平衡。</p>
+<p><strong>基于 DFT 的高效架构（Efficient architecture with DFT）</strong> 离散傅里叶变换（DFT）长期以来一直是数字图像处理中的重要工具（Pitas 2000）。近期工作将 DFT 与快速傅里叶变换（FFT）用于设计高效网络组件（Li et al. 2021; Rao et al. 2021; Guibas et al. 2021; Huang et al. 2023; Kong et al. 2023）。 GFNet（Rao et al. 2021）利用 DFT 的卷积定理构建全局逐通道卷积模块，并通过 FFT 实现 <span class="math inline"><em>O</em>(<em>N</em>log <em>N</em>)</span> 复杂度。FNO（Li et al. 2021）进一步将该思路推广到稠密全局卷积。AFNO（Guibas et al. 2021）和 AFFNet（Huang et al. 2023）通过输入依赖的频域滤波器实现了等价的动态逐通道卷积。 本文使用二维 DFT 与 FFT 算法来高效实现所提出的循环注意力机制。</p>
+<h1 id="预备知识">3 预备知识</h1>
+<h2 id="注意力公式">3.1 注意力公式</h2>
+<h3 id="图像-token-序列-x">1. 图像 token 序列 <span class="math inline"><em>x</em></span></h3>
+<p><span class="math display"><em>x</em> ∈ ℝ<sup><em>N</em> × <em>C</em></sup></span> 输入是一组图像 token。 <strong>什么是 token？</strong> 在视觉 Transformer 中，一张图像通常会被切成很多小块，或者经过特征提取后变成很多位置上的特征。 每一个位置的特征就可以看成一个 <strong>token</strong>。 比如一张特征图大小是： <span class="math display"><em>H</em> × <em>W</em></span> 那么总共有：</p>
+<p><span class="math display"><em>N</em> = <em>H</em> × <em>W</em></span> 个位置，也就是 <span class="math inline"><em>N</em></span> 个 token。 每个 token 有 <span class="math inline"><em>C</em></span> 个通道特征，所以整个输入写成：</p>
+<p><span class="math display"><em>x</em> ∈ ℝ<sup><em>N</em> × <em>C</em></sup></span></p>
+<p>含义是：</p>
+<ul>
+<li><p><span class="math inline"><em>N</em></span>：token 数量</p></li>
+<li><p><span class="math inline"><em>C</em></span>：每个 token 的特征维度</p></li>
+</ul>
+<h3 id="qkv-是什么">2. <span class="math inline"><em>Q</em>, <em>K</em>, <em>V</em></span> 是什么？</h3>
+<p>输入 <span class="math inline"><em>x</em></span> 会通过三个投影矩阵：</p>
+<p><span class="math display"><em>W</em><sub><em>Q</em></sub>, <em>W</em><sub><em>K</em></sub>, <em>W</em><sub><em>V</em></sub></span></p>
+<p>得到： <span class="math display"><em>Q</em>, <em>K</em>, <em>V</em> ∈ ℝ<sup><em>N</em> × <em>d</em></sup></span></p>
+<p>这就是 Transformer 里的 Query、Key、Value。</p>
+<div class="line-block">符号 | 中文 | 含义 |</div>
+<p>|—|—|—|</p>
+<div class="line-block"><span class="math inline"><em>Q</em></span> | Query，查询 | 当前 token 用它去“查找”其他 token |</div>
+<div class="line-block"><span class="math inline"><em>K</em></span> | Key，键 | 每个 token 提供自己的“被匹配信息” |</div>
+<div class="line-block"><span class="math inline"><em>V</em></span> | Value，值 | 最终被加权汇总的信息 |</div>
+<p>可以粗略理解为：</p>
+<ul>
+<li><p><span class="math inline"><em>Q</em></span>：我想找什么信息</p></li>
+<li><p><span class="math inline"><em>K</em></span>：我拥有什么特征，能不能被你匹配到</p></li>
+<li><p><span class="math inline"><em>V</em></span>：如果你关注我，我实际贡献什么内容 投影矩阵 <span class="math inline"><em>W</em><sub><em>Q</em>/<em>K</em>/<em>V</em></sub></span></p></li>
+</ul>
+<h3 id="注意力矩阵-a-是什么">3. 注意力矩阵 <span class="math inline"><em>A</em></span> 是什么？</h3>
+<p><span class="math display"><em>Q</em><em>K</em><sup>⊤</sup> ∈ ℝ<sup><em>N</em> × <em>N</em></sup></span></p>
+<p>这个矩阵的每一个元素表示：</p>
+<p>某个 token 的 Query 和另一个 token 的 Key 的相似度。</p>
+<p>也就是说，<span class="math inline"><em>A</em></span> 里面存的是：</p>
+<p>“第 <span class="math inline"><em>i</em></span> 个 token 应该多关注第 <span class="math inline"><em>j</em></span> 个 token”。</p>
+<h3 id="为什么除以-sqrt-d">4. 为什么除以 <span class="math inline">$\sqrt d$</span>？</h3>
+<p>原文公式：</p>
+<p><span class="math display">$$
+A=QK^\top/\sqrt d
+$$</span></p>
+<p>这里的 <span class="math inline">$\sqrt d$</span> 是标准自注意力公式中的缩放项。 它把 <span class="math inline"><em>Q</em><em>K</em><sup>⊤</sup></span> 的结果进行缩放。</p>
+<p>所以 <span class="math inline"><em>A</em></span> 是缩放后的原始注意力矩阵。 也就是说，原本 <span class="math inline"><em>A</em></span> 只是相似度分数，经过 Softmax 后，每个 token 对其他 token 的关注程度变成权重。 然后再用这些权重去加权求和 <span class="math inline"><em>V</em></span>。</p>
+<h3 id="输出-o-是什么">5. 输出 <span class="math inline"><em>O</em></span> 是什么？</h3>
+<p>公式：</p>
+<p><span class="math display"><em>O</em> = <em>σ</em>(<em>A</em>)<em>V</em></span></p>
+<h2 id="循环矩阵">3.2 循环矩阵</h2>
+<p><span class="math display"><em>C</em><sub><em>i</em>, <em>j</em></sub> = <em>c</em><sub><em>j</em> − <em>i</em> (<em>m</em><em>o</em><em>d</em> <em>N</em>)</sub></span> 意思是： 矩阵中第 <span class="math inline"><em>i</em>, <em>j</em></span> 个位置的值，可以从第一行 <span class="math inline"><em>c</em></span> 中按循环索引找到。 <strong>循环矩阵乘向量</strong></p>
+<p><span class="math display">$$
+(Cx)_i=\sum_{j=0}^{N-1}C_{i,j}x_j
+$$</span> 两者相乘得到一个新的 <span class="math inline"><em>N</em></span> 维向量：</p>
+<p><span class="math display"><em>y</em> = <em>C</em><em>x</em></span></p>
+<p>其中第 <span class="math inline"><em>i</em></span> 个元素是：</p>
+<p><span class="math display">(<em>C</em><em>x</em>)<sub><em>i</em></sub></span> 第 <span class="math inline"><em>i</em></span> 行的每个元素，分别乘以 <span class="math inline"><em>x</em></span> 中对应元素，然后全部加起来。 <strong>为什么令 <span class="math inline"><em>k</em> = (<em>j</em> − <em>i</em>) <em>m</em><em>o</em><em>d</em> <em>N</em></span>？</strong> 这是一个变量替换。 目的只是把公式写成更像“循环互相关”的形式。 <span class="math display">$$
+(Cx)_i=\sum_{k=0}^{N-1}c_k\cdot x_{(i+k)\ \mathrm{mod}\ N}
+$$</span></p>
+<p>对于每个输出位置 <span class="math inline"><em>i</em></span>，它做的是：</p>
+<ul>
+<li><p>取 <span class="math inline"><em>c</em><sub>0</sub>, <em>c</em><sub>1</sub>, …, <em>c</em><sub><em>N</em> − 1</sub></span></p></li>
+<li><p>分别乘上 <span class="math inline"><em>x</em><sub><em>i</em></sub>, <em>x</em><sub><em>i</em> + 1</sub>, …</span></p></li>
+<li><p>如果超过末尾，就循环回到开头</p></li>
+<li><p>最后求和</p></li>
+</ul>
+<p>这就是一种循环方式的匹配计算。 这正是 <span class="math inline"><em>c</em></span> 与 <span class="math inline"><em>x</em></span> 的一维循环互相关定义。 <strong>互相关</strong> 互相关可以理解为： 用一个序列去和另一个序列的不同位置进行匹配，然后得到每个位置的匹配结果。 这里是“循环互相关”，所以序列首尾相接。 公式：</p>
+<p><span class="math display">$$
+(Cx)_i=\sum_{k=0}^{N-1}c_k\cdot x_{(i+k)\ \mathrm{mod}\ N}
+$$</span></p>
+<p>表示 <span class="math inline"><em>c</em></span> 在 <span class="math inline"><em>x</em></span> 上以循环方式进行匹配。 <strong>为什么说对应 depth-wise 卷积？</strong> 在深度学习中，这对应： “循环填充的一维 depth-wise 卷积”。 这里包含两个名词： depth-wise 卷积 depth-wise 卷积一般指每个通道单独做卷积，不在通道之间混合。 循环填充 循环填充是指序列或特征图边界处用另一端的内容来补齐。 <strong>为什么要用傅里叶变换</strong>？ 因此 <span class="math inline"><em>y</em> = <em>C</em><em>x</em></span> 可以由互相关定理计算。 <strong>互相关定理 (Cross-Correlation Theorem)：互相关结果的傅里叶变换等价于第一个信号傅里叶变换的共轭和第二个信号的傅里叶变换的元素乘积。</strong> 公式： <span class="math display">$$
+F_{1D}(Cx)=\overline{F_{1D}(c)}\odot F_{1D}(x)
+$$</span></p>
+<p>然后： <span class="math display">$$
+Cx=F^{-1}_{1D}\big(\overline{F_{1D}(c)}\odot F_{1D}(x)\big)
+$$</span></p>
+<ol type="1">
+<li><p><span class="math inline"><em>F</em><sub>1<em>D</em></sub></span> 是什么？ 表示一维离散傅里叶变换，也就是 1D DFT。</p></li>
+<li><p><span class="math inline"><em>F</em><sub>1<em>D</em></sub><sup> − 1</sup></span> 是什么？</p></li>
+</ol>
+<p><span class="math display"><em>F</em><sub>1<em>D</em></sub><sup> − 1</sup></span></p>
+<p>表示一维离散傅里叶逆变换。 它把频域表示再变回原来的序列表示。</p>
+<ol start="3" type="1">
+<li><p>什么是 DFT？ DFT 是 Discrete Fourier Transform，中文叫离散傅里叶变换。 在原文中，它作为一种计算工具使用。 它可以把循环互相关这种操作转化为频域中的逐元素乘法。</p></li>
+<li><p>什么是 <span class="math inline">$\overline{F_{1D}(c)}$</span>？ 上横线表示复共轭。</p></li>
+</ol>
+<p><span class="math display">$$
+\overline{F_{1D}(c)}
+$$</span></p>
+<p>意思是对 <span class="math inline"><em>c</em></span> 做一维 DFT 后，再取复共轭。</p>
+<ol start="5" type="1">
+<li>什么是复共轭？ 傅里叶变换后的结果通常是复数。 复数形如： <span class="math display"><em>a</em> + <em>b</em><em>i</em></span></li>
+</ol>
+<p>它的共轭是： <span class="math display"><em>a</em> − <em>b</em><em>i</em></span></p>
+<p>也就是虚部符号取反。 论文这里用复共轭是因为互相关定理中需要它。</p>
+<ol start="6" type="1">
+<li><span class="math inline">⊙</span> 是什么？ <span class="math display">⊙</span> 表示逐元素乘法，也叫 Hadamard 乘积。 如果有两个向量：</li>
+</ol>
+<p><span class="math display">[<em>a</em><sub>1</sub>, <em>a</em><sub>2</sub>, <em>a</em><sub>3</sub>]</span></p>
+<p>和：</p>
+<p><span class="math display">[<em>b</em><sub>1</sub>, <em>b</em><sub>2</sub>, <em>b</em><sub>3</sub>]</span></p>
+<p>逐元素乘法就是：</p>
+<p><span class="math display">[<em>a</em><sub>1</sub><em>b</em><sub>1</sub>, <em>a</em><sub>2</sub><em>b</em><sub>2</sub>, <em>a</em><sub>3</sub><em>b</em><sub>3</sub>]</span></p>
+<ol start="7" type="1">
+<li>为什么这样更高效？ 利用快速傅里叶变换算法，可以把 <span class="math inline"><em>y</em> = <em>C</em><em>x</em></span> 的计算复杂度做到： <span class="math display"><em>O</em>(<em>N</em>log <em>N</em>)</span> 这里 FFT 是 Fast Fourier Transform，快速傅里叶变换。 它是高效计算 DFT 的算法。</li>
+</ol>
+<h2 id="bccb-矩阵">3.3 BCCB 矩阵</h2>
+<p>3.2 讲的是一维循环矩阵。 3.3 把它推广到二维。 因为图像是二维的，有高度 <span class="math inline"><em>H</em></span> 和宽度 <span class="math inline"><em>W</em></span>。</p>
+<p>BCCB 的全称 <strong>带循环块的分块循环矩阵</strong></p>
+<ol type="1">
+<li><p><strong>Block Circulant</strong>：块之间是循环的</p></li>
+<li><p><strong>with Circulant Blocks</strong>：每个块内部也是循环矩阵</p></li>
+</ol>
+<p>为什么需要 BCCB？ 前面的一维循环矩阵适合处理一维序列。 但图像特征图是二维的：</p>
+<p><span class="math display"><em>H</em> × <em>W</em></span></p>
+<p>所以需要一种二维版本的循环结构。 BCCB 就是循环矩阵在二维情形下的推广。 <strong>BCCB 和二维循环互相关的关系</strong> 类似循环矩阵，BCCB 矩阵 <span class="math inline"><em>B</em></span> 也可由其第一行完全确定。 <span class="math display"><em>b</em> = [<em>c</em><sub>0</sub>, <em>c</em><sub>1</sub>, …, <em>c</em><sub><em>H</em><em>W</em> − 1</sub>]</span> 然后把 <span class="math inline"><em>b</em>, <em>x</em></span> reshape 成二维：</p>
+<p><span class="math display"><em>b̂</em>, <em>x̂</em> ∈ ℝ<sup><em>H</em> × <em>W</em></sup></span></p>
+<ol type="1">
+<li>reshape 是什么意思？ reshape 就是改变数据形状，但不改变数据本身。 比如一个长度为 <span class="math inline"><em>H</em> × <em>W</em></span> 的一维向量，可以重新排成一个 <span class="math inline"><em>H</em> × <em>W</em></span> 的二维矩阵。 原文中：</li>
+</ol>
+<ul>
+<li><p><span class="math inline"><em>b</em></span>：一维序列</p></li>
+<li><p><span class="math inline"><em>x</em></span>：一维序列 经过 reshape 后：</p></li>
+<li><p><span class="math inline"><em>b̂</em></span>：二维形式</p></li>
+<li><p><span class="math inline"><em>x̂</em></span>：二维形式</p></li>
+</ul>
+<ol start="2" type="1">
+<li><p><span class="math inline"><em>B</em><em>x</em></span> 等价于什么？ 也就是说，BCCB 矩阵乘向量，本质上就是二维版本的循环互相关。</p></li>
+<li><p>对应深度学习中的什么？ 这对应深度学习中的： “循环填充二维 depth-wise 卷积”。 意思是：</p></li>
+</ol>
+<ul>
+<li><p>是二维操作，因为处理的是 <span class="math inline"><em>H</em> × <em>W</em></span> 特征图</p></li>
+<li><p>是循环填充，因为边界位置会循环回绕</p></li>
+<li><p>是 depth-wise 卷积，因为是逐通道形式的卷积操作</p></li>
+</ul>
+<h1 id="方法">4 方法</h1>
+<h2 id="视觉-transformer-中的高效模式">4.1 视觉 Transformer 中的高效模式</h2>
+<p>自注意力机制以二次复杂度 <span class="math inline"><em>O</em>(<em>N</em><sup>2</sup>)</span> 计算每个 query 与 key 之间的两两相似性。 然而，我们发现一个有趣现象：在实践中，视觉 Transformer 倾向于学习到更加结构化且高效的注意力模式。具体而言，在图2中，我们可视化了从 DeiT（Touvron et al. 2021）模型中提取的若干注意力矩阵。这些矩阵与带循环块的分块循环矩阵（BCCB）非常相似。正如第3节所述，与 BCCB 矩阵相乘等价于二维全局卷积操作，可通过快速傅里叶变换算法在 <span class="math inline"><em>O</em>(<em>N</em>log <em>N</em>)</span> 时间内完成。这表明：尽管自注意力形式上具有二次复杂度，但它在隐式上继承了一种高效结构。</p>
+<p>为更好理解该现象，我们在图3中给出了注意力矩阵中相邻 query token（红点标记）的注意力分布。一个关键观察是：注意力分布随 query 位置移动呈现近似平移不变性，这正是由 BCCB 矩阵实现的二维全局卷积行为。这进一步验证了视觉 Transformer 学到的注意力与 BCCB 矩阵高度相似。</p>
+<p>受上述发现启发，一个关键研究问题出现： <strong>我们能否显式地对注意力矩阵施加 BCCB 结构？</strong></p>
+<p>在下一节中，我们通过 <strong>Circulant Attention（循环注意力）</strong> 回答这个问题。该新型注意力机制采用 BCCB 注意力矩阵。通过施加这种结构先验，我们希望将 BCCB 矩阵的有益性质——即 <span class="math inline"><em>O</em>(<em>N</em>log <em>N</em>)</span> 复杂度与内在平移不变性——显式编码进注意力机制，从而同时获得效率与表达能力。</p>
+<h2 id="循环注意力circulant-attention">4.2 循环注意力（Circulant Attention）</h2>
+<p>循环注意力用其最近的 BCCB 矩阵 <span class="math inline"><em>Ã</em></span> 来近似原始注意力 <span class="math inline"><em>A</em> ∈ ℝ<sup><em>N</em> × <em>N</em></sup></span>。形式化地： <span class="math display">$$
+\tilde A=\arg\min_{B\in\mathcal{B}}\|A-B\|, \tag{9}
+$$</span> 其中 <span class="math inline">ℬ</span> 表示 <span class="math inline"><em>N</em> × <em>N</em></span> 的 BCCB 矩阵子空间，<span class="math inline">∥ ⋅ ∥</span> 表示 Frobenius 范数。因此，<span class="math inline"><em>Ã</em></span> 是 <span class="math inline"><em>A</em></span> 在 BCCB 矩阵子空间中的正交投影。 <span class="math inline"><em>N</em> × <em>N</em></span> 的 BCCB 矩阵可由其第一行完全决定。记 <span class="math inline"><em>B</em><sub><em>k</em></sub></span> 为第一行在第 <span class="math inline"><em>k</em></span> 个位置为1（one-hot）的 BCCB 矩阵。易知 <span class="math inline">{<em>B</em><sub>0</sub>, ⋯, <em>B</em><sub><em>N</em> − 1</sub>}</span> 构成 BCCB 矩阵子空间的一组基。并且有： <span class="math display">$$
+\langle B_k,B_k\rangle=N,\quad \langle B_k,B_j\rangle=0,\ k\neq j, \tag{10}
+$$</span> 其中 <span class="math inline">⟨⋅, ⋅ ⟩</span> 是 Frobenius 内积（即两个矩阵逐元素乘积之和）。式(10)表明 <span class="math inline">{<em>B</em><sub>0</sub>, ⋯, <em>B</em><sub><em>N</em> − 1</sub>}</span> 是一组正交基。因此，<span class="math inline"><em>Ã</em></span> 在 BCCB 子空间中的正交投影可写为： <span class="math display">$$
+\tilde A
+=\sum_{k=0}^{N-1}\frac{\langle A,B_k\rangle}{\langle B_k,B_k\rangle}B_k
+=\frac1N\sum_{k=0}^{N-1}\langle A,B_k\rangle B_k
+=\frac1N\sum_{k=0}^{N-1}\left\langle\frac{QK^\top}{\sqrt d},B_k\right\rangle B_k.
+\tag{11}
+$$</span> 得到 BCCB 注意力矩阵 <span class="math inline"><em>Ã</em></span> 后，我们像标准自注意力一样计算输出： <span class="math display"><em>O</em> = <em>σ</em>(<em>Ã</em>)<em>V</em></span></p>
+<p><strong>高效计算算法。</strong> 若直接按投影公式计算，循环注意力仍需 <span class="math inline"><em>O</em>(<em>N</em><sup>2</sup>)</span> 复杂度。这里证明：借助二维 DFT，可在 <span class="math inline"><em>O</em>(<em>N</em>log <em>N</em>)</span> 时间内等价计算。 <span class="math inline"><em>Ã</em></span> 是 BCCB 矩阵，其整体结构由第一行决定。记该行向量为 <span class="math inline"><em>a</em></span>，则 <span class="math display">$$
+a=\frac{1}{N\sqrt d}\,[\langle QK^\top,B_0\rangle,\cdots,\langle QK^\top,B_{N-1}\rangle]. \tag{12}
+$$</span> 依据 BCCB 的性质，<span class="math inline"><em>B</em><sub><em>k</em></sub></span> 对应二维空间中的一个位移。定义 <span class="math display">$$
+\Delta h=\lfloor k/W\rfloor,\quad \Delta w=k\bmod W. \tag{13}
+$$</span> 则有 <span class="math display">$$
+a_k
+=\frac{1}{N\sqrt d}\langle QK^\top,B_k\rangle
+=\frac{1}{N\sqrt d}\sum_{h=0}^{H-1}\sum_{w=0}^{W-1}
+\langle \hat Q_{h,w},\hat K_{h+\Delta h,w+\Delta w}\rangle,
+\tag{14}
+$$</span> 其中 <span class="math inline"><em>Q̂</em>, <em>K̂</em> ∈ ℝ<sup><em>H</em> × <em>W</em> × <em>d</em></sup></span> 是 <span class="math inline"><em>Q</em>, <em>K</em> ∈ ℝ<sup><em>N</em> × <em>d</em></sup></span> 的二维重排版本，并采用循环填充（处理边界）。可以看到，<span class="math inline"><em>a</em><sub><em>k</em></sub></span> 是 <span class="math inline"><em>Q̂</em></span> 与 <span class="math inline"><em>K̂</em></span> 的循环互相关结果，这正是深度学习中的卷积概念。因此，<span class="math inline"><em>a</em></span> 可通过二维 DFT 高效计算： <span class="math display">$$
+a=\frac{1}{N\sqrt d}\Big[F^{-1}_{2D}\big(\overline{F_{2D}(Q)}\odot F_{2D}(K)\big)\Big]\cdot \mathbf{1}_{d\times1}
+=\frac{1}{N\sqrt d}(Q\circledast K)\cdot \mathbf{1}_{d\times1},
+\tag{15}
+$$</span> 其中 <span class="math inline">⊛</span> 是定义的 DFT 乘法，且 <span class="math inline"><em>Q</em> ⊛ <em>K</em> ∈ ℝ<sup><em>N</em> × <em>d</em></sup></span>。<span class="math inline"><strong>1</strong><sub><em>d</em> × 1</sub> ∈ ℝ<sup><em>d</em> × 1</sup></span> 是全1向量，对应式(14)中 <span class="math inline">⟨<em>Q̂</em><sub><em>h</em>, <em>w</em></sub>, <em>K̂</em><sub><em>h</em> + <em>Δ</em><em>h</em>, <em>w</em> + <em>Δ</em><em>w</em></sub>⟩</span> 在维度 <span class="math inline"><em>d</em></span> 上的隐式求和。 由于 <span class="math inline"><em>Ã</em></span> 是 BCCB 矩阵，且 <span class="math inline"><em>σ</em></span> 是按行的 Softmax，<span class="math inline"><em>σ</em>(<em>Ã</em>)</span> 也仍是 BCCB 矩阵，且 <span class="math inline"><em>σ</em>(<em>a</em>)</span> 是其第一行。 可高效写为： <span class="math display">$$
+O=F^{-1}_{2D}\big(\overline{F_{2D}(\sigma(a))}\odot F_{2D}(V)\big)
+=\sigma(a)\circledast V.
+\tag{16}
+$$</span> 在图1中，我们给出了所提循环注意力范式示意图。可见该设计在结构上与标准自注意力相似，关键差别在于使用 BCCB 注意力矩阵以及基于 DFT 的高效乘法。</p>
+<p><strong>复杂度分析。</strong> 利用高效算法，循环注意力总复杂度为： <span class="math display"><em>Ω</em>(<em>C</em><em>A</em>) = 2<em>N</em>(log<sub>2</sub><em>N</em>)<em>d</em> + 2<em>N</em><em>d</em> + <em>N</em>log<sub>2</sub><em>N</em> + <em>N</em>(log<sub>2</sub><em>N</em>)(<em>d</em> + 1) + 2<em>N</em><em>d</em> + <em>N</em>(log<sub>2</sub><em>N</em>)<em>d</em></span> <span class="math display">$$
+= N(\log_2N)(4d+2)+4Nd,
+\tag{17}
+$$</span> 显著优于标准自注意力： <span class="math display">$$
+\Omega(\mathrm{SA})=N^2d+N^2d=2N^2d.
+\tag{18}
+$$</span> <strong>Token 重加权模块。</strong> 在标准自注意力中，对原始注意力 <span class="math inline"><em>A</em> ∈ ℝ<sup><em>N</em> × <em>N</em></sup></span> 做按行 Softmax，保证每行和为1。但这不会约束 <span class="math inline"><em>σ</em>(<em>A</em>)</span> 的列和，因此某些 key 可在跨 query 的聚合中获得更高总注意分数。于是，不同 query 可共同强调某些 key/value，有助于区分更有信息量的 token。 但在我们的循环注意力中，<span class="math inline"><em>σ</em>(<em>Ã</em>)</span> 的分块循环结构会同时约束行和与列和都为1，从而限制其突出显著 token 的能力。为此，引入简单有效的 token 重加权。具体有两种形式： 预重加权： <span class="math display">$$
+O=\mathrm{CirAttn}(Q,K,V\odot T), \tag{19}
+$$</span> 后重加权： <span class="math display">$$
+O=\mathrm{CirAttn}(Q,K,V)\odot T, \tag{20}
+$$</span> 其中 <span class="math inline"><em>T</em> = <em>S</em><em>i</em><em>L</em><em>U</em>(<em>x</em><em>W</em><sub><em>T</em></sub>) ∈ ℝ<sup><em>N</em> × <em>d</em></sup></span> 是输入相关的 token 重加权因子，<span class="math inline"><em>C</em><em>i</em><em>r</em><em>A</em><em>t</em><em>t</em><em>n</em></span> 表示循环注意力算子。</p>
+<h2 id="实现细节">4.3 实现细节</h2>
+<p>循环注意力是一个可插拔模块，可用于多种视觉 Transformer。作为展示，我们在三类代表性结构上实现：DeiT（Touvron et al. 2021）、PVT（Wang et al. 2021）和 Swin Transformer（Liu et al. 2021）。三者分别代表全局自注意力、稀疏注意力和局部注意力。我们将这些模型中的原注意力模块替换为循环注意力。 由于本方法具有 <span class="math inline"><em>N</em>log <em>N</em></span> 复杂度，可在早期阶段直接处理高分辨率特征图而不过多增加计算开销。因此，对 Swin、PVT 这类层级模型，我们主要在前两个 stage 替换注意力。除基线改进外，我们还构建了专用模型家族 <strong>CAT（Circulant Attention Transformer）</strong>，用于与先进视觉 Transformer 对比。详细结构见附录。</p>
+<p>论文说：普通自注意力要算一个 <span class="math inline"><em>N</em> × <em>N</em></span> 的注意力矩阵（每个token和每个token都比一下），所以复杂度是 <span class="math inline"><em>O</em>(<em>N</em><sup>2</sup>)</span>，很贵。 作者观察到：模型学出来的注意力矩阵，很多时候“长得像”一种特殊矩阵 <strong>BCCB</strong>。这种矩阵可以用FFT快速算，复杂度可到 <span class="math inline"><em>O</em>(<em>N</em>log <em>N</em>)</span>。</p>
+<h3 id="推理公式">推理公式</h3>
+<p><strong>Step 1：先算普通原始注意力矩阵</strong> <span class="math display">$$
+A=\frac{QK^\top}{\sqrt d}
+$$</span> 这是和标准注意力一样的起点。 <strong>Step 2：把 <span class="math inline"><em>A</em></span> 投影到 BCCB 子空间，得到 <span class="math inline"><em>Ã</em></span></strong> <span class="math display"><em>Ã</em> = arg min<sub><em>B</em> ∈ ℬ</sub>∥<em>A</em> − <em>B</em>∥</span></p>
+<ul>
+<li><p>原始 <span class="math inline"><em>A</em></span> 不一定是 BCCB，直接 FFT 快算不了；</p></li>
+<li><p>但 <span class="math inline"><em>Ã</em></span> 是 BCCB，又尽量贴近 <span class="math inline"><em>A</em></span>；</p></li>
+<li><p>这样既保留原注意力信息，又能用 <span class="math inline"><em>O</em>(<em>N</em>log <em>N</em>)</span> 计算。 <strong>Step 3：用BCCB基向量写出这个投影（式11）</strong></p></li>
+</ul>
+<p>论文构造一组基 <span class="math inline"><em>B</em><sub>0</sub>, …, <em>B</em><sub><em>N</em> − 1</sub></span>：每个 <span class="math inline"><em>B</em><sub><em>k</em></sub></span> 是一个BCCB矩阵，其第一行是第k位为1的one-hot。 这组基是正交的（式10），所以投影可写成 <span class="math display">$$
+\tilde A=\frac1N\sum_{k=0}^{N-1}\langle A,B_k\rangle B_k
+=\frac1N\sum_{k=0}^{N-1}\left\langle\frac{QK^\top}{\sqrt d},B_k\right\rangle B_k.
+$$</span> 含义：<span class="math inline"><em>Ã</em></span> 由每个基方向上的“投影系数”加权得到。 <span class="math display">$$
+\tilde A=\frac1N\sum_{k=0}^{N-1}\langle A,B_k\rangle B_k
+$$</span></p>
+<ol type="1">
+<li>这个 <span class="math inline"><em>k</em></span> 到底是什么？ <span class="math inline"><em>k</em></span> 就是第几个基向量（基矩阵）的编号。 类似：</li>
+</ol>
+<ul>
+<li><p>一维坐标系里基是 <span class="math inline"><strong>e</strong><sub>1</sub>, <strong>e</strong><sub>2</sub>, …</span></p></li>
+<li><p>这里的“基”不是向量而是矩阵：<span class="math inline"><em>B</em><sub>0</sub>, <em>B</em><sub>1</sub>, …, <em>B</em><sub><em>N</em> − 1</sub></span> 所以 <span class="math inline"><em>k</em> = 0, 1, …, <em>N</em> − 1</span> 只是“挨个枚举每个基矩阵”。</p></li>
+</ul>
+<ol start="2" type="1">
+<li>“每个 <span class="math inline"><em>B</em><sub><em>k</em></sub></span>” 是怎么来的？ 论文定义： <span class="math inline"><em>B</em><sub><em>k</em></sub></span> 是一个 BCCB 矩阵，且它的<strong>第一行</strong>是 one-hot：第 <span class="math inline"><em>k</em></span> 个位置是1，其它是0。 然后根据 BCCB 规则，其余行列由循环结构自动确定。 所以：</li>
+</ol>
+<ul>
+<li><p><span class="math inline"><em>B</em><sub>0</sub></span>：第一行在第0位是1</p></li>
+<li><p><span class="math inline"><em>B</em><sub>1</sub></span>：第一行在第1位是1</p></li>
+<li><p>…</p></li>
+<li><p><span class="math inline"><em>B</em><sub><em>N</em> − 1</sub></span>：第一行在最后一位是1 这 <span class="math inline"><em>N</em></span> 个矩阵张成了 BCCB 子空间（可理解成“这类结构的坐标轴”）。</p></li>
+</ul>
+<ol start="3" type="1">
+<li>式子在做什么？ <span class="math display">⟨<em>A</em>, <em>B</em><sub><em>k</em></sub>⟩</span> 是“<span class="math inline"><em>A</em></span> 在第 <span class="math inline"><em>k</em></span> 个基方向上的分量大小”（投影系数）。 然后 <span class="math display">⟨<em>A</em>, <em>B</em><sub><em>k</em></sub>⟩<em>B</em><sub><em>k</em></sub></span> 表示沿第 <span class="math inline"><em>k</em></span> 个基方向重建出来的一部分。</li>
+</ol>
+<p>最后对所有 <span class="math inline"><em>k</em></span> 求和，就是把所有方向拼起来，得到投影 <span class="math inline"><em>Ã</em></span>。</p>
+<ol start="4" type="1">
+<li>为什么前面有 <span class="math inline">$\frac1N$</span>？ 因为这组基是“正交但范数不是1”的规范化方式。 在这篇里有 <span class="math display">⟨<em>B</em><sub><em>i</em></sub>, <em>B</em><sub><em>j</em></sub>⟩ = <em>N</em><em>δ</em><sub><em>i</em><em>j</em></sub></span> 所以做投影时要除以 <span class="math inline"><em>N</em></span>（如果是单位正交基就不用除）。</li>
+</ol>
+<p>整个式子就是把 <span class="math inline"><em>A</em></span> 在这 <span class="math inline"><em>N</em></span> 个基矩阵上做正交投影再重构。 <strong>Step 4：只需求 <span class="math inline"><em>Ã</em></span> 的第一行 <span class="math inline"><em>a</em></span>（因为BCCB由第一行唯一决定）</strong></p>
+<p><span class="math display">$$
+a=\frac{1}{N\sqrt d}\big[\langle QK^\top,B_0\rangle,\dots,\langle QK^\top,B_{N-1}\rangle\big].
+$$</span></p>
+<p>第k个元素 <span class="math inline"><em>a</em><sub><em>k</em></sub></span> 可写成二维位移相关（式13、14）：</p>
+<ul>
+<li><p><span class="math inline"><em>Δ</em><em>h</em> = ⌊<em>k</em>/<em>W</em>⌋, <em>Δ</em><em>w</em> = <em>k</em> mod  <em>W</em></span></p></li>
+<li><p><span class="math inline"><em>a</em><sub><em>k</em></sub></span> 是 <span class="math inline"><em>Q</em></span> 和 <span class="math inline"><em>K</em></span> 在该位移下的内积求和（循环边界） 这说明 <span class="math inline"><em>a</em><sub><em>k</em></sub></span> 本质是<strong>循环互相关</strong>结果。 <strong>Step 5：把上一步改成DFT高效算（式15）</strong> 因为是循环互相关，可用2D DFT： <span class="math display">$$
+a=\frac{1}{N\sqrt d}\Big[F^{-1}_{2D}\big(\overline{F_{2D}(Q)}\odot F_{2D}(K)\big)\Big]\cdot \mathbf{1}_{d\times1}
+$$</span> 论文记为 <span class="math display">$$
+a=\frac{1}{N\sqrt d}(Q\circledast K)\cdot \mathbf{1}_{d\times1}.
+$$</span> 含义：先频域逐元素乘，再逆变换回空间域，并在通道维 <span class="math inline"><em>d</em></span> 上求和。 <strong>Step 6：计算输出 <span class="math inline"><em>O</em></span>（式16）</strong> 有了 <span class="math inline"><em>Ã</em></span> 后，仍然按注意力形式： <span class="math display"><em>O</em> = <em>σ</em>(<em>Ã</em>)<em>V</em>.</span> 由于 <span class="math inline"><em>Ã</em></span> 是BCCB，<span class="math inline"><em>σ</em>(<em>Ã</em>)</span> 仍是BCCB，其第一行是 <span class="math inline"><em>σ</em>(<em>a</em>)</span>。 因此同样可用DFT快速算： <span class="math display">$$
+O=F^{-1}_{2D}\big(\overline{F_{2D}(\sigma(a))}\odot F_{2D}(V)\big)
+=\sigma(a)\circledast V.
+$$</span> <strong>Step 7：复杂度结论（式17、18）</strong></p></li>
+<li><p>标准自注意力：<span class="math inline"><em>Ω</em>(<em>S</em><em>A</em>) = 2<em>N</em><sup>2</sup><em>d</em></span></p></li>
+<li><p>循环注意力：<span class="math inline"><em>Ω</em>(<em>C</em><em>A</em>) = <em>N</em>(log<sub>2</sub><em>N</em>)(4<em>d</em> + 2) + 4<em>N</em><em>d</em></span></p></li>
+</ul>
+<p>所以是 <span class="math inline"><em>N</em>log <em>N</em></span> 级别，相比 <span class="math inline"><em>N</em><sup>2</sup></span> 更高效。</p>
+<ol type="1">
+<li><p>标准自注意力为什么是 <span class="math inline">2<em>N</em><sup>2</sup><em>d</em></span> 忽略 softmax、线性层，只看核心两步：</p></li>
+<li><p><span class="math inline"><em>Q</em><em>K</em><sup>⊤</sup></span>： <span class="math inline"><em>Q</em> ∈ ℝ<sup><em>N</em> × <em>d</em></sup>, <em>K</em> ∈ ℝ<sup><em>N</em> × <em>d</em></sup> ⇒ <em>K</em><sup>⊤</sup> ∈ ℝ<sup><em>d</em> × <em>N</em></sup></span> 乘法代价 <span class="math inline"> ∼ <em>N</em> ⋅ <em>N</em> ⋅ <em>d</em> = <em>N</em><sup>2</sup><em>d</em></span></p></li>
+<li><p><span class="math inline"><em>A</em><em>V</em></span>： <span class="math inline"><em>A</em> ∈ ℝ<sup><em>N</em> × <em>N</em></sup>, <em>V</em> ∈ ℝ<sup><em>N</em> × <em>d</em></sup></span> 代价 <span class="math inline"> ∼ <em>N</em> ⋅ <em>N</em> ⋅ <em>d</em> = <em>N</em><sup>2</sup><em>d</em></span></p></li>
+</ol>
+<p>要算 <span class="math display"><em>O</em> = <em>A</em><em>V</em>,  <em>A</em> ∈ ℝ<sup><em>N</em> × <em>N</em></sup>, <em>V</em> ∈ ℝ<sup><em>N</em> × <em>d</em></sup>,</span> 输出 <span class="math inline"><em>O</em> ∈ ℝ<sup><em>N</em> × <em>d</em></sup></span>。 1）先看一个元素怎么来的 <span class="math inline"><em>O</em></span> 的第 <span class="math inline"><em>i</em></span> 行第 <span class="math inline"><em>j</em></span> 列： <span class="math display">$$
+O_{ij}=\sum_{k=1}^{N}A_{ik}V_{kj}.
+$$</span></p>
+<p>这就是：</p>
+<ul>
+<li><p>把 <span class="math inline"><em>A</em></span> 的第 <span class="math inline"><em>i</em></span> 行（长度 <span class="math inline"><em>N</em></span>）</p></li>
+<li><p>和 <span class="math inline"><em>V</em></span> 的第 <span class="math inline"><em>j</em></span> 列（长度 <span class="math inline"><em>N</em></span>） 做一次点积。 一次点积长度是 <span class="math inline"><em>N</em></span>，代价约 <span class="math inline"><em>N</em></span> 次乘加。 2）这样的元素有多少个？ <span class="math inline"><em>O</em></span> 是 <span class="math inline"><em>N</em> × <em>d</em></span>，所以一共有 <span class="math inline"><em>N</em><em>d</em></span> 个元素。 每个元素要花 <span class="math inline"> ∼ <em>N</em></span> 代价。 总计： <span class="math display"><em>N</em><em>d</em> × <em>N</em> = <em>N</em><sup>2</sup><em>d</em>.</span> <strong>Step 8：Token Reweighting（补偿模块）</strong> 论文指出： 标准注意力行softmax后，列和不受限，某些key可被多query共同强调。 而BCCB结构下会更受限（行列和都为1），突出“显著token”的能力会受影响。 所以加一个重加权因子 <span class="math display"><em>T</em> = <em>S</em><em>i</em><em>L</em><em>U</em>(<em>x</em><em>W</em><sub><em>T</em></sub>) ∈ ℝ<sup><em>N</em> × <em>d</em></sup></span> 在普通 attention 里：</p></li>
+<li><p>每个 query 的一行 softmax 后和为 1（行归一）</p></li>
+<li><p>但“列”不受限，所以<strong>同一个 key/token 可以被很多 query 同时高权重引用</strong> =&gt; 显著 token 容易被“全局放大”。</p></li>
+</ul>
+<p>在你这个 CirAttn（BCCB 约束）里，权重结构更“均匀/受限”，这种“全局集中火力”能力会弱一点。 所以加一个门控 <span class="math inline"><em>T</em></span>，让模型自己学“哪些 token/channel 该放大”。</p>
+<p><span class="math inline"><em>T</em> = <em>S</em><em>i</em><em>L</em><em>U</em>(<em>x</em><em>W</em><sub><em>T</em></sub>)</span> 是什么？</p>
+<ul>
+<li><p>输入 <span class="math inline"><em>x</em></span>: <span class="math inline">[<em>N</em>, <em>d</em>]</span></p></li>
+<li><p><span class="math inline"><em>W</em><sub><em>T</em></sub></span>: <span class="math inline">[<em>d</em>, <em>d</em>]</span>（常见设定）</p></li>
+<li><p><span class="math inline"><em>x</em><em>W</em><sub><em>T</em></sub></span>: <span class="math inline">[<em>N</em>, <em>d</em>]</span></p></li>
+<li><p>SiLU 激活后还是 <span class="math inline">[<em>N</em>, <em>d</em>]</span> 所以 <span class="math inline"><em>T</em>[<em>n</em>, <em>c</em>]</span> 就是一个<strong>逐 token、逐通道的缩放系数</strong>（像音量旋钮）。</p></li>
+</ul>
+<h3 id="两种重加权">两种重加权</h3>
+<ol type="1">
+<li>前重加权（Pre-weight） <span class="math display"><em>O</em> = <em>C</em><em>i</em><em>r</em><em>A</em><em>t</em><em>t</em><em>n</em>(<em>Q</em>, <em>K</em>, <em>V</em> ⊙ <em>T</em>)</span> 代码感知：</li>
+</ol>
+<pre class="python"><code>T = silu(x @ W_T)        # [N,d]
+V2 = V * T               # [N,d] 逐元素乘
+O  = CirAttn(Q, K, V2)   # [N,d]</code></pre>
+<p>含义： 先把 <span class="math inline"><em>V</em></span> 里重要位置放大，再送进注意力混合。 =&gt; 会影响“信息如何被传播和混合”的全过程。</p>
+<ol start="2" type="1">
+<li>后重加权（Post-weight） <span class="math display"><em>O</em> = <em>C</em><em>i</em><em>r</em><em>A</em><em>t</em><em>t</em><em>n</em>(<em>Q</em>, <em>K</em>, <em>V</em>) ⊙ <em>T</em></span></li>
+</ol>
+<p>代码感知：</p>
+<pre class="python"><code>T = silu(x @ W_T)         # [N,d]
+O0 = CirAttn(Q, K, V)     # [N,d]
+O  = O0 * T               # [N,d]</code></pre>
+<p>含义： 先做完注意力，再对输出做门控。 =&gt; 不改变注意力内部混合，只在最后“调音量”。</p>
+<h1 id="实验">5 实验</h1>
+<p>在本节中，我们进行了大量实验来评估我们方法的有效性，包括 ImageNet 分类（Deng et al. 2009）、COCO 目标检测（Lin et al. 2014）以及 ADE20K 语义分割（Zhou et al. 2019）。同时还提供了可视化与分析。</p>
+<h2 id="imagenet-分类">5.1 ImageNet 分类</h2>
+<p>ImageNet-1K数据集包含 128 万张训练图像和 5 万张验证图像，共 1000 个类别。为确保公平比较，我们采用与基线模型完全一致的训练设置。具体来说，模型从头训练 300 个 epoch，使用 AdamW（Loshchilov and Hutter 2018）优化器，学习率采用余弦衰减，并在前 20 个 epoch 进行线性 warm-up。初始学习率设为 <span class="math inline">1 × 10<sup> − 3</sup></span>，权重衰减为 0.05。数据增强与正则化策略包括 RandAugment（Cubuk et al. 2020）、Mixup（Zhang et al. 2018）、CutMix（Yun et al. 2019）和随机擦除（Zhong et al. 2020）。</p>
+<p>从表 2 左侧可以看到，在三个代表性模型中将自注意力替换为循环注意力后，均带来了一致的提升。比如，CA-DeiT 优于全局自注意力基线 DeiT（Touvron et al. 2021）。这表明我们的方法不仅具有高效率，也有助于视觉 Transformer 的学习。进一步地，与稀疏注意力 PVT（Wang et al. 2021）和局部注意力 Swin Transformer（Liu et al. 2021）相比，循环注意力也展现出显著优势。我们的 CA-PVT-S 仅用 PVT-L 30% 的参数量和 40% 的 FLOPs，即可达到与 PVT-L 相当的准确率。这些结果表明循环注意力是自注意力的一个有前景的替代方案。</p>
+<p>表 2 右侧将我们的 CAT 模型与多种最新视觉 Transformer 及 Mamba 变体进行比较。可以看到，循环注意力优于高度优化的方法，验证了我们方法更强的能力。</p>
+<ul>
+<li><p><strong>参数量 (M)</strong>: 模型的参数数量，以百万（M）为单位，表示模型的复杂度。</p></li>
+<li><p><strong>FLOPs (G)</strong> 浮点运算量: 每次前向推理所需的浮点运算次数，以十亿（G）为单位，反映模型的计算需求。</p></li>
+<li><p><strong>Top-1 准确率 (%)</strong>: 在分类任务中，模型预测正确的概率，表示模型的性能。</p></li>
+</ul>
+<h2 id="目标检测">5.2 目标检测</h2>
+<p>COCO（Lin et al. 2014）目标检测与实例分割数据集包含 11.8 万张训练图像和 5000 张验证图像。我们遵循基线模型的训练与测试策略。结果见表 3。</p>
+<p>循环注意力以 <span class="math inline"><em>O</em>(<em>N</em>log <em>N</em>)</span> 复杂度提供有效全局建模，这使其非常适用于高分辨率图像建模场景。值得注意的是，CA-PVT-S 在显著更低 FLOPs 下比更大的 PVT-L 高出 1.3 box AP。这一增益比分类任务中更明显（分类任务中 CA-PVT-S 与 PVT-L 准确率相同）。这些结果突出了我们方法在高分辨率场景下的优越性。</p>
+<h2 id="语义分割">5.3 语义分割</h2>
+<p>ADE20K（Zhou et al. 2019）是一个广泛使用的语义分割基准，包含 2 万张训练图像、2000 张验证图像和 150 个语义类别。我们采用与基线模型相同的设置。与目标检测任务类似，表 4 结果表明循环注意力能够稳定提升 PVT 与 Swin 模型的性能。在计算代价和参数量相近或更低的情况下，我们观察到最高 3.7% 的 mIoU 提升。</p>
+<h2 id="分析与可视化">5.4 分析与可视化</h2>
+<p><strong>效率分析。</strong> 受益于 <span class="math inline"><em>O</em>(<em>N</em>log <em>N</em>)</span> 复杂度，我们的循环注意力相较自注意力展现出显著效率优势。如图 4(a) 所示，在 <span class="math inline">1536<sup>2</sup></span> 图像分辨率下，CA-DeiT-T 的 FLOPs 需求减少 8 倍，显示出其在高分辨率建模任务中的潜力。并且，这些理论节省直接转化为实际收益：图 4(b) 中在 <span class="math inline">1536<sup>2</sup></span> 分辨率下实现了 7 倍加速。此外，图 4(c)(d) 显示，在默认 ImageNet 分辨率 <span class="math inline">224<sup>2</sup></span> 下，我们模型在吞吐量与准确率之间取得更优折中，在性能提升的同时，推理速度最高可提升 1.5 倍。</p>
+<p><strong>可视化。</strong> 如第 3.3 节所述，BCCB 矩阵对应二维全局卷积操作。因此，可以方便地可视化并解释其等效全局卷积核。如图 5 所示，我们的模型可根据输入图像生成多样化的等效卷积核。例如，给定第一张图像，模型生成了鸟形和线状卷积核（前两个）。也存在更多关注空间模式的卷积核，如局部、全局、半平面、条带和十字形等。</p>
+<h2 id="消融研究">5.5 消融研究</h2>
+<p>我们进行消融实验以评估循环注意力各个设计组件的贡献。实验在 ImageNet-1K 上、基于 CA-DeiT 框架完成。如表 5 所示，我们从 DeiT-S 基线开始，依次加入各项设计。仅引入循环注意力会带来可忽略的 0.1% 性能下降，这表明 BCCB 模式适用于视觉 Transformer，且不会牺牲表达能力。</p>
+<p>在此基础上，我们发现该设计受益于较小 head 维度和更多 heads。将 head 维度设为 <span class="math inline"><em>d</em> = 1</span> 后，准确率提升到 80.2%，超过 DeiT-S 基线。这可归因于循环注意力分数是 <span class="math inline"><em>N</em></span> 组 query-key 对求和（见式 (14)），因此其等效 head 维度为 <span class="math inline"><em>N</em><em>d</em></span>，即使 <span class="math inline"><em>d</em> = 1</span> 也依然足够大。</p>
+<p>另外，我们研究了式 (19) 与式 (20) 中定义的两种 token 重加权方法。两种设计都能进一步提升性能，其中后重加权略优。值得注意的是，token 重加权在 DeiT-S 基线上提升有限。本文默认采用后重加权，在 DeiT-S 上达到 81.0% 准确率。这些结果验证了我们设计的有效性。</p>
+<h3 id="图表">图表</h3>
+<h4 id="table-2imagenet表头含义-中文读法">Table 2（ImageNet）表头含义 + 中文读法</h4>
+<p>表头：<code>Method | Reso | #Params | FLOPs | Top-1</code></p>
+<ul>
+<li><p><strong>Method</strong>：方法/模型名 读：<strong>Method（麦索德）/ 方法</strong></p></li>
+<li><p><strong>Reso</strong>（Resolution）：输入分辨率（如 224², 384²） 读：<strong>瑞索</strong> / 分辨率</p></li>
+<li><p><strong>#Params</strong>（Number of Parameters）：参数量 读：<strong>参数量</strong>（常说“多少 M 参数”）</p></li>
+<li><p><strong>FLOPs</strong>：浮点运算量（计算量） 读：<strong>弗洛普斯</strong></p></li>
+<li><p><strong>Top-1</strong>：Top-1 准确率（第一预测命中率） 读：<strong>托普万</strong></p></li>
+</ul>
+<h4 id="table-3coco-检测分割表头">Table 3（COCO 检测/分割）表头</h4>
+<p><code>Backbone | FLOPs | Sch. | AP^b | AP^b_50 | AP^b_75 | AP^m | AP^m_50 | AP^m_75</code></p>
+<ul>
+<li><p><strong>Backbone</strong>：骨干网络 读：<strong>拜克本</strong> / 骨干</p></li>
+<li><p><strong>Sch.</strong>（Schedule）：训练日程（如 1x/3x） 读：<strong>斯凯久</strong> / 训练策略</p></li>
+<li><p><strong>AP^b</strong>：检测框平均精度（box AP） 读：<strong>A-P box</strong></p></li>
+<li><p><strong>AP^b_50 / AP^b_75</strong>：IoU=0.50 / 0.75 时的框 AP 读：<strong>A-P box 五十 / 七十五</strong></p></li>
+<li><p><strong>AP^m</strong>：实例分割掩码 AP（mask AP） 读：<strong>A-P mask</strong></p></li>
+<li><p><strong>AP^m_50 / AP^m_75</strong>：IoU=0.50 / 0.75 时的 mask AP</p></li>
+</ul>
+<h4 id="table-4ade20k-分割表头">Table 4（ADE20K 分割）表头</h4>
+<p><code>Backbone | Method | FLOPs | #Params | mIoU</code></p>
+<ul>
+<li><strong>mIoU</strong>（mean Intersection over Union）：平均交并比 读：<strong>艾米-艾欧优</strong> / 平均交并比</li>
+</ul>
+<h4 id="table-5消融实验表头">Table 5（消融实验）表头</h4>
+<p><code>FLOPs | #Param | Acc. | Diff.</code></p>
+<ul>
+<li><p><strong>#Param</strong>：参数量（单数写法，本质同 #Params）</p></li>
+<li><p><strong>Acc.</strong>（Accuracy）：准确率 读：<strong>艾克尤若西</strong></p></li>
+<li><p><strong>Diff.</strong>（Difference）：相对差值/变化量 读：<strong>迪夫</strong></p></li>
+</ul>
+<h1 id="结论">6 结论</h1>
+<blockquote>
+<p>本文揭示了视觉 Transformer 中一个有趣的模式：其自注意力图经常呈现近似的分块循环且块内循环（BCCB）结构。</p>
+</blockquote>
+<blockquote>
+<p>这一观察直接启发了我们设计 Circulant Attention（一种新的注意力范式），它显式利用这种内在模式，在保持表达能力的同时优化计算效率。</p>
+</blockquote>
+<blockquote>
+<p>在分类、目标检测和语义分割任务上的大量实验充分证明了所提出循环注意力的有效性，并将其确立为视觉 Transformer 架构中广泛使用的自注意力的一种高效且有竞争力的替代方案。</p>
+</blockquote>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/mobilenet.html">MobileNet 精读笔记</a></div>
+<div><a href="../articles/人脸皮肤色斑检测算法综合报告.html">人脸皮肤色斑检测算法综合报告</a></div>
+<div><a href="../articles/知识蒸馏.html">知识蒸馏精读笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="记录训练、验证、指标观察和实验复盘，为后续调参与模型改进提供依据。">
+  <title>人脸色斑检测实验记录 - swilderyude</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script defer src="../assets/js/site.js"></script>
+</head>
+<body>
+  <a id="top"></a>
+  <div id="home">
+    <header id="header">
+      <div id="blogTitle">
+        <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
+        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">【SwilderYude 的研究生笔记】</a></h1>
+        <h2>道阻且长，与君共勉</h2>
+      </div>
+      <nav id="navigator" aria-label="主导航">
+        <ul id="navList">
+          <li><a class="menu" href="../index.html">首页</a></li>
+<li><a class="menu" href="../categories.html">分类</a></li>
+<li><a class="menu" href="../archive.html">归档</a></li>
+<li><a class="menu" href="../about.html">关于</a></li>
+<li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
+        </ul>
+        <div class="blogStats">随笔 27 · 分类 6 · 更新 2026-05-28</div>
+      </nav>
+    </header>
+    <div id="main">
+      <main id="mainContent">
+        <div class="forFlow">
+          
+<article class="post">
+  <h1 class="postTitle single"><span>人脸色斑检测实验记录</span></h1>
+  <div class="postDesc">posted @ 2026-04-13 swilderyude 分类: <a href="../categories.html#项目实践">项目实践</a></div>
+  <p class="postSummary">记录训练、验证、指标观察和实验复盘，为后续调参与模型改进提供依据。</p>
+  <div class="postTags"><span>实验</span> <span>结果分析</span></div>
+  <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-3"><a href="#第一步如何找问题定位诊断">第一步：如何“找问题”（定位诊断）</a></li>
+<li class="toc-level-3"><a href="#第二步如何改对症提升">第二步：如何“改”（对症提升）</a></li>
+<li class="toc-level-3"><a href="#总结排查清单checklist">💡 总结排查清单（Checklist）</a></li></ul></div>
+  <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p>实验索引：</p>
+<ul>
+<li><p>整个实验的唯一性标号：名称+开展时刻</p></li>
+<li><p>实验的各个部分的开始、完成、更新时刻，如果是涉及到更改代码的，还要附上所用代码的 commit id。 实验内容简介</p></li>
+<li><p>补充：实验环境，比如<a href="https://zhida.zhihu.com/search?content_id=147280783&amp;content_type=Article&amp;match_order=1&amp;q=tensorflow&amp;zhida_source=entity">tensorflow</a>版本、代码存放路径以及git标号。</p></li>
+</ul>
+<ol type="1">
+<li>motivation（why？目的）</li>
+</ol>
+<ul>
+<li><p>实验目的——idea、计划发现和证实的具体问题。</p></li>
+<li><p>实验背景——介绍本次实验与已完成研究的内在联系。</p></li>
+<li><p>实验预期</p></li>
+</ul>
+<ol start="2" type="1">
+<li>实验设计（how？方法、过程）</li>
+</ol>
+<ul>
+<li><p>算法设计（实验对象）</p></li>
+<li><p>Requirements 要求</p></li>
+<li><p>Architecture 模型结构图或者伪代码</p></li>
+<li><p>Design 关键代码的设计和实现（model.py）</p></li>
+<li><p>实验的具体方案<br />
+能用表格就少用文字！</p></li>
+<li><p>超参数（关键实验变量）</p></li>
+<li><p>数据集的选择及其处理（dataset.py）</p></li>
+<li><p>训练超参数（train.py）：优化器的选择及其超参数（train.py）、batch_size、epoch_num等</p></li>
+<li><p>超参数的搜索/遍历方案（实验分组）。可以使用nni等auto-ml工具。</p></li>
+<li><p>实验数据</p></li>
+<li><p>需要记录的实验数据</p></li>
+<li><p>需要关注的指标</p></li>
+<li><p>数据的输出路径</p></li>
+<li><p>实验环境</p></li>
+</ul>
+<ol start="3" type="1">
+<li>实验结果（what？）</li>
+</ol>
+<ul>
+<li><p>各个分组的结果展示</p></li>
+<li><p>记录数据（优化曲线）</p></li>
+<li><p>计算关键指标（最终test acc等）</p></li>
+<li><p>记录数据的保存路径</p></li>
+</ul>
+<ol start="4" type="1">
+<li>summary 阶段性总结（why？分析结果、总结）<br />
+从模型设计、实验设计、结果等方面进行归纳与总结，得出阶段性研究结论。</li>
+</ol>
+<ul>
+<li><p>结果分析：组间对比、与预期结果进行对比。</p></li>
+<li><p>总结：</p></li>
+<li><p>成功or失败？失败与异常结果的可能原因。通过查阅文献，回顾实验过程等，从模型设计、代码实现等分析：失败或异常的原因；提出新的可能和假设。</p></li>
+<li><p>值得关注的性质（在原本实验目的之外的）</p></li>
+</ul>
+<ol start="5" type="1">
+<li>prospect 展望（how？如何改进、提高）<br />
+在summary的基础上，进一步结合实验背景进行分析，重新审视原有科研设计、技术路线，及时调整课题研究方向。</li>
+</ol>
+<ul>
+<li>下次实验的初步设想：有必要研究的异常实验结果；需要改进的模型设计、实验设计（比如需要丰富哪一部分数据）。</li>
+</ul>
+<p><strong>实验安排</strong></p>
+<pre class="text"><code> 初步idea ----&gt; 预实验（验证和分析实验/idea的可行性） ----&gt; 修改idea ----&gt; 细化实验（参数、结构寻优）
+                                    ↑                         |
+                                    |                          |
+                                    |--------------------------|</code></pre>
+<p>预实验：</p>
+<ol type="1">
+<li><p>拆解模型。<br />
+很多模型都是各种技术拼在一起的，你把非核心的部分一个一个去掉，剩下最核心的部分，想想它是不是能work。</p></li>
+<li><p>简化模型。<br />
+这里的简化主要针对指网络结构的复杂性。比如图神经网络GNN，如果把网络结构降低到一层，就几乎等价于你把节点的邻居拿过来做了一个logistic regression。思考一下在这种简化情况下，你的模型是否直观上可以抓住数据的特征。再比如各种推荐系统里的神经网络，很多时候简化到一层就退化成了矩阵分解，所以你就想一想矩阵分解是否适用你正在考虑的新场景。</p></li>
+</ol>
+<p>简单地说，第一点是将模型进行横向拆分，第二点是将模型进行纵向简化。</p>
+<p>YOLOv8模型训练效果不好，是非常常见的工程问题。提升模型性能的核心在于<strong>“对症下药”</strong>，也就是先通过指标和可视化结果<strong>定位问题</strong>，然后再进行<strong>针对性优化</strong>。</p>
+<p>以下是排查问题和提升YOLOv8模型效果的完整方法论：</p>
+<hr />
+<h3 id="第一步如何找问题定位诊断">第一步：如何“找问题”（定位诊断）</h3>
+<p>YOLOv8每次训练完会在 <code>runs/detect/train</code> 目录下生成大量文件，这些是你找问题的最佳帮手。</p>
+<h4 id="看-results.png训练曲线图">1. 看 <code>results.png</code>（训练曲线图）</h4>
+<p>这是最重要的一张图，主要看 <strong>Loss（损失）</strong> 和 <strong>Metrics（指标如mAP）</strong>：</p>
+<ul>
+<li><p><strong>现象 A（欠拟合）：</strong> Train Loss 和 Val Loss 都很高，且 mAP 很低，曲线平缓不下降。</p>
+<ul>
+<li><em>原因：</em> 模型没学进去。可能是训练轮数（epochs）太少、学习率太低、或者模型太小（比如用了 YOLOv8n 但任务太复杂）。</li>
+</ul></li>
+<li><p><strong>现象 B（过拟合）：</strong> Train Loss 一直下降，但 Val Loss 下降到一半开始<strong>反弹上升</strong>，mAP 不再提升甚至下降。</p>
+<ul>
+<li><em>原因：</em> 模型“死记硬背”了训练集。数据量太少、背景太单一、或者模型太大（比如简单任务用了 YOLOv8x）。</li>
+</ul></li>
+<li><p><strong>现象 C：</strong> 震荡严重。</p>
+<ul>
+<li><em>原因：</em> Batch size 太小，或者学习率太高。</li>
+</ul></li>
+</ul>
+<h4 id="看-confusion_matrix.png混淆矩阵">2. 看 <code>confusion_matrix.png</code>（混淆矩阵）</h4>
+<ul>
+<li><p><strong>看对角线：</strong> 颜色越深说明该类别识别越准。</p></li>
+<li><p><strong>看背景误判（Background False Positives）：</strong> 如果最右侧一列数值很大，说明模型把很多<strong>背景误认为了目标（误检）</strong>。</p></li>
+<li><p><strong>看漏检（Background False Negatives）：</strong> 如果最下面一行数值很大，说明模型<strong>漏掉了很多真实目标（漏检）</strong>。</p></li>
+<li><p><strong>看类别混淆：</strong> 比如猫和狗交叉的格子数值大，说明模型分不清这两个相似类。</p></li>
+</ul>
+<h4 id="看-val_batch_pred.jpg-和-val_batch_labels.jpg">3. 看 <code>val_batch*_pred.jpg</code> 和 <code>val_batch*_labels.jpg</code></h4>
+<p>直接对比这两张图（预测结果 vs 真实标签）：</p>
+<ul>
+<li><p>框标偏了？</p></li>
+<li><p>小目标全漏了？</p></li>
+<li><p>密集的物体糊在一起了？</p></li>
+<li><p>一目了然能看出模型在什么场景下容易出错。</p></li>
+</ul>
+<hr />
+<h3 id="第二步如何改对症提升">第二步：如何“改”（对症提升）</h3>
+<p>根据上面找到的问题，从以下四个维度进行优化：</p>
+<h4 id="维度一数据层面最核心决定了上限">维度一：数据层面（最核心，决定了上限）</h4>
+<p>深度学习界有一句名言：“Garbage in, garbage out”（垃圾数据出垃圾模型）。<strong>70%的提升来自于处理数据。</strong></p>
+<ol type="1">
+<li><p><strong>数据量够不够？</strong> 每个类别建议至少有 <strong>200-500</strong> 个实例。如果不够，去收集数据。</p></li>
+<li><p><strong>标签质量高不高？</strong> 检查有没有漏标、错标、框太松。如果人工标注标准不统一，模型会极其困惑。</p></li>
+<li><p><strong>增加背景图片（Background Images）：</strong></p>
+<ul>
+<li><p><em>解决问题：</em> 误检率高（把背景看成目标）。</p></li>
+<li><p><em>方法：</em> 在训练集中加入 <strong>0%~10% 的纯背景图片</strong>（没有任何标注框，只有一个空的 <code>.txt</code> 文件）。这能强迫模型学习“什么不是目标”。</p></li>
+</ul></li>
+<li><p><strong>类别不平衡：</strong> 如果类别A有10000个，类别B只有100个，类别B肯定检测不好。</p>
+<ul>
+<li><em>方法：</em> 减少A的数据，或增加/复制B的数据，或者使用数据增强针对B单独扩充。</li>
+</ul></li>
+<li><p><strong>场景覆盖度：</strong> 如果你训练的都是白天的数据，测试时用晚上的数据肯定不行。需确保训练集涵盖了实际应用中的光照、角度、遮挡等情况。</p></li>
+</ol>
+<h4 id="维度二超参数调优hyperparameters">维度二：超参数调优（Hyperparameters）</h4>
+<p>可以通过修改训练参数来提升效果：</p>
+<ol type="1">
+<li><p><strong>输入分辨率 (<code>imgsz</code>)：</strong></p>
+<ul>
+<li>默认是 640。如果你的检测目标<strong>很小</strong>，将其提高到 <code>imgsz=1024</code> 或 <code>1280</code>（注意显存需求会大幅增加）。</li>
+</ul></li>
+<li><p><strong>训练轮数 (<code>epochs</code>)：</strong></p>
+<ul>
+<li>如果 loss 还在降就停了，说明没训练完。把 epochs 加大（如 300 或 500），配合开启早停（YOLOv8默认开启 <code>patience=50</code>）。</li>
+</ul></li>
+<li><p><strong>批次大小 (<code>batch</code>)：</strong></p>
+<ul>
+<li>在显存允许的范围内<strong>尽量设大</strong>（如 16, 32, 64）。如果显存小只能设 2 或 4，模型震荡会很大。</li>
+</ul></li>
+<li><p><strong>数据增强（Data Augmentation）：</strong></p>
+<ul>
+<li><p>YOLOv8 默认自带 Mosaic（马赛克增强）、Mixup 等。</p></li>
+<li><p>如果目标对<strong>颜色</strong>敏感（比如识别红绿灯），可以适当调低 HSV 增强参数（<code>hsv_h</code>, <code>hsv_s</code>, <code>hsv_v</code>）。</p></li>
+<li><p><em>注意：</em> YOLOv8 默认会在最后 10 个 epoch 关闭 Mosaic（<code>close_mosaic=10</code>），这很重要，不要关掉这个特性，它能让模型在最后阶段适应真实图片分布。</p></li>
+</ul></li>
+</ol>
+<h4 id="维度三模型选择与架构">维度三：模型选择与架构</h4>
+<ol type="1">
+<li><p><strong>换模型大小：</strong> YOLOv8 有 <code>n, s, m, l, x</code> 五个版本。</p>
+<ul>
+<li><p>效果不好且速度有余：从 <code>v8n</code> 升级到 <code>v8s</code> 或 <code>v8m</code>。</p></li>
+<li><p>严重过拟合：从大模型降级到小模型。</p></li>
+</ul></li>
+<li><p><strong>针对小目标（Small Objects）：</strong></p>
+<ul>
+<li>如果图片很大，目标像素极小（如无人机航拍），可以考虑使用 <strong>SAHI（切片辅助超推理）</strong> 结合 YOLOv8 进行切片训练和推理。</li>
+</ul></li>
+</ol>
+<h4 id="维度四推理阶段的调整">维度四：推理阶段的调整</h4>
+<p>有时候模型其实训练得挺好，只是你测试/推理的姿势不对：</p>
+<ol type="1">
+<li><p><strong>置信度阈值 (<code>conf</code>)：</strong></p>
+<ul>
+<li><p>如果<strong>漏检</strong>多（召回率低），调低 <code>conf</code>（比如从默认的 0.25 降到 0.15）。</p></li>
+<li><p>如果<strong>误检</strong>多（精确率低），调高 <code>conf</code>（比如调到 0.4 或 0.5）。</p></li>
+</ul></li>
+<li><p><strong>IoU 阈值 (<code>iou</code>)：</strong></p>
+<ul>
+<li>对于密集的物体（如人群、货架商品），如果发现两个靠在一起的物体只框出了一个，尝试降低 NMS 的 <code>iou</code> 阈值（比如从 0.7 降到 0.45）。</li>
+</ul></li>
+</ol>
+<hr />
+<h3 id="总结排查清单checklist">💡 总结排查清单（Checklist）</h3>
+<p>遇到模型效果不好时，按顺序问自己这几个问题：</p>
+<ol type="1">
+<li><p><input type="checkbox" disabled="" />
+<strong>评估指标：</strong> 是误检多，还是漏检多？是小目标检测不到，还是某一个类别极差？</p></li>
+<li><p><input type="checkbox" disabled="" />
+<strong>数据检查：</strong> 数据集有标错的吗？场景丰富吗？正负样本均衡吗？</p></li>
+<li><p><input type="checkbox" disabled="" />
+<strong>图片大小：</strong> 训练的 <code>imgsz</code> 是否太小导致目标特征丢失？</p></li>
+<li><p><input type="checkbox" disabled="" />
+<strong>过/欠拟合：</strong> 训练日志里的 Validation Loss 是在平稳下降还是反弹上升了？</p></li>
+<li><p><input type="checkbox" disabled="" />
+<strong>负样本：</strong> 有没有放入适当的纯背景图片来降低误检？</p></li>
+</ol>
+<p><strong>新手最常见的坑：</strong> 疯狂调学习率等代码参数，其实 90% 的原因是<strong>标注框画得太随意（没贴合物体边缘）</strong>或者<strong>数据太单一</strong>。去回看并清洗一遍你的数据集，通常会有立竿见影的奇效。</p>
+
+  </div>
+  <section class="recommend">
+    <h2>推荐阅读</h2>
+    <div><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></div>
+<div><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></div>
+<div><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></div>
+<div><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></div>
+<div><a href="../articles/修改.html">检测与分割双模型协同方案</a></div>
+<div><a href="../articles/优化计划.html">人脸色斑检测优化计划</a></div>
+<div><a href="../articles/超市识别项目.html">超市识别项目：视频预处理、标注与 YOLO 训练</a></div>
+<div><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></div>
+<div><a href="../articles/标注规范.html">人脸色斑检测标注规范</a></div>
+<div><a href="../articles/数据集.html">人脸色斑检测数据集整理笔记</a></div>
+  </section>
+</article>
+
+        </div>
+      </main>
+      <aside id="sideBar">
+        <div id="sideBarMain">
+          
+<section class="catList">
+  <h3 class="catListTitle">公告</h3>
+  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p><a href="https://github.com/swilderyude">GitHub: swilderyude</a></p>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">随笔分类</h3>
+  <ul><li><a class="" href="../categories.html#ai-基础">AI 基础 (4)</a></li>
+<li><a class="" href="../categories.html#工具与环境">工具与环境 (6)</a></li>
+<li><a class="" href="../categories.html#文献精读">文献精读 (4)</a></li>
+<li><a class="" href="../categories.html#科研方法">科研方法 (1)</a></li>
+<li><a class="" href="../categories.html#计算机视觉">计算机视觉 (3)</a></li>
+<li><a class="" href="../categories.html#项目实践">项目实践 (9)</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">推荐阅读</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/yolo理论.html">YOLO 理论笔记：从 YOLOv1 到 YOLOv8</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">最新随笔</h3>
+  <ul><li><a href="../articles/人脸色斑检测项目.html">人脸色斑检测项目：从数据处理到 SDK 封装</a></li>
+<li><a href="../articles/科研大队长.html">科研入门路线：论文、代码与组合创新</a></li>
+<li><a href="../articles/训练结果.html">人脸色斑检测训练结果</a></li>
+<li><a href="../articles/pytorch.html">PyTorch 入门笔记：Dataset 与 Dataloader</a></li>
+<li><a href="../articles/动手学深度学习.html">动手学深度学习笔记</a></li>
+<li><a href="../articles/loom.html">Obsidian DataLoom 使用笔记</a></li>
+<li><a href="../articles/sdk运行.html">斑点检测 SDK 封装记录</a></li>
+<li><a href="../articles/python学习.html">Python 学习笔记</a></li></ul>
+</section>
+<section class="catList">
+  <h3 class="catListTitle">标签云</h3>
+  <div class="tagCloud"><a href="../archive.html?tag=YOLO">YOLO</a>
+<a href="../archive.html?tag=论文写作">论文写作</a>
+<a href="../archive.html?tag=深度学习">深度学习</a>
+<a href="../archive.html?tag=Python">Python</a>
+<a href="../archive.html?tag=分割">分割</a>
+<a href="../archive.html?tag=计算机视觉">计算机视觉</a>
+<a href="../archive.html?tag=标注">标注</a>
+<a href="../archive.html?tag=图像处理">图像处理</a>
+<a href="../archive.html?tag=小目标检测">小目标检测</a>
+<a href="../archive.html?tag=医学图像">医学图像</a>
+<a href="../archive.html?tag=工程化">工程化</a>
+<a href="../archive.html?tag=科研">科研</a>
+<a href="../archive.html?tag=读代码">读代码</a>
+<a href="../archive.html?tag=训练">训练</a>
+<a href="../archive.html?tag=指标">指标</a>
+<a href="../archive.html?tag=PyTorch">PyTorch</a>
+<a href="../archive.html?tag=Dataset">Dataset</a>
+<a href="../archive.html?tag=动手实践">动手实践</a></div>
+</section>
+
+        </div>
+      </aside>
+    </div>
+    <footer id="footer">
+      <span>Powered by GitHub Pages</span>
+      <a href="#top">返回顶部</a>
+    </footer>
+  </div>
+</body>
+</html>
