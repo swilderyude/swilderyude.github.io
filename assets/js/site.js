@@ -21,7 +21,7 @@
           <li>
             <time>${article.date}</time>
             <a href="${article.url}">${article.title}</a>
-            <span>${article.category}</span>
+            <span>${article.folder || article.category || ""}</span>
           </li>
         `,
       )
@@ -50,4 +50,23 @@
       render(tag);
     }
   }
+})();
+
+(() => {
+  const openHashFolder = () => {
+    if (!window.location.hash) return;
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    const target = document.getElementById(id);
+    if (!target || target.tagName !== "DETAILS") return;
+
+    let current = target;
+    while (current) {
+      if (current.tagName === "DETAILS") current.open = true;
+      current = current.parentElement ? current.parentElement.closest("details") : null;
+    }
+    target.scrollIntoView({ block: "start" });
+  };
+
+  window.addEventListener("hashchange", openHashFolder);
+  openHashFolder();
 })();

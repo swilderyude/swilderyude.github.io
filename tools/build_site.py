@@ -32,6 +32,30 @@ SITE = {
     "base_url": "https://swilderyude.github.io",
 }
 
+FOLDER_DESCRIPTIONS = {
+    "人脸色斑检测": "项目主线：数据、标注、训练、结果分析、优化和 SDK 交付。",
+    "YOLO相关": "目标检测理论、训练实践和场景项目记录。",
+    "人工智能": "Python、PyTorch、统计学习和深度学习基础。",
+    "计算机视觉": "图像处理、OpenCV 和视觉任务基础。",
+    "精读论文": "论文精读、模型结构、注意力机制和模型压缩。",
+    "工具": "Git、Linux、LaTeX 等科研与工程工具。",
+    "科研": "读论文、做实验、写论文和研究生阶段科研方法。",
+    "AI基础": "服务器、训练环境和 AI 学习底座。",
+    "根目录笔记": "尚未归入子目录的零散但有价值的笔记。",
+}
+
+FOLDER_ORDER = {
+    "人脸色斑检测": 0,
+    "YOLO相关": 1,
+    "人工智能": 2,
+    "计算机视觉": 3,
+    "精读论文": 4,
+    "科研": 5,
+    "工具": 6,
+    "AI基础": 7,
+    "根目录笔记": 8,
+}
+
 
 @dataclass(frozen=True)
 class ArticleConfig:
@@ -278,6 +302,24 @@ def page_slug(article: ArticleConfig) -> str:
     return slugify(stem if stem.lower() not in {"readme", "未命名"} else article.title)
 
 
+def display_folder_parts_from_source(source: str) -> list[str]:
+    parts = list(Path(source).parts[:-1])
+    if parts and parts[0] == "CS自学":
+        parts = parts[1:]
+    return parts or ["根目录笔记"]
+
+
+def folder_label(parts: Iterable[str], include_root: bool = True) -> str:
+    pieces = list(parts)
+    if include_root:
+        pieces = ["CS自学", *pieces]
+    return " / ".join(pieces)
+
+
+def top_folder_names_from_configs() -> set[str]:
+    return {display_folder_parts_from_source(cfg.source)[0] for cfg in ARTICLES}
+
+
 def html_escape(text: str) -> str:
     return html.escape(text, quote=True)
 
@@ -509,9 +551,14 @@ def article_html(article: ArticleConfig) -> dict:
     body, toc = add_heading_ids(clean_html(body))
     date = article.date or mtime_date(src)
     slug = page_slug(article)
+    display_parts = display_folder_parts_from_source(article.source)
     return {
         "slug": slug,
         "source": article.source,
+        "file_name": Path(article.source).name,
+        "folder_parts": list(Path(article.source).parts[:-1]),
+        "display_folder_parts": display_parts,
+        "folder_label": folder_label(display_parts),
         "title": article.title,
         "category": article.category,
         "summary": article.summary,
@@ -529,7 +576,7 @@ def layout(title: str, active: str, main: str, sidebar: str, description: str = 
     desc = html_escape(description or SITE["subtitle"])
     nav = [
         ("首页", "index.html", "home"),
-        ("分类", "categories.html", "categories"),
+        ("目录", "categories.html", "categories"),
         ("归档", "archive.html", "archive"),
         ("关于", "about.html", "about"),
         ("GitHub", SITE["github"], "github"),
@@ -561,7 +608,7 @@ def layout(title: str, active: str, main: str, sidebar: str, description: str = 
         <ul id="navList">
           {nav_html}
         </ul>
-        <div class="blogStats">随笔 {len(ARTICLES)} · 分类 6 · 更新 {datetime.now().strftime("%Y-%m-%d")}</div>
+        <div class="blogStats">随笔 {len(ARTICLES)} · 文件夹 {len(top_folder_names_from_configs())} · 更新 {datetime.now().strftime("%Y-%m-%d")}</div>
       </nav>
     </header>
     <div id="main">
@@ -586,12 +633,136 @@ def layout(title: str, active: str, main: str, sidebar: str, description: str = 
 """
 
 
+def folder_sort_key(name: str) -> tuple[int, str]:
+    return (FOLDER_ORDER.get(name, 99), name)
+
+
+def make_folder_node(name: str, path: list[str]) -> dict:
+    return {"name": name, "path": path, "children": {}, "articles": []}
+
+
+def build_folder_tree(articles: list[dict]) -> dict:
+    root = make_folder_node("CS自学", [])
+    for article in articles:
+        node = root
+        for part in article["display_folder_parts"]:
+            if part not in node["children"]:
+                node["children"][part] = make_folder_node(part, [*node["path"], part])
+            node = node["children"][part]
+        node["articles"].append(article)
+    return root
+
+
+def folder_article_count(node: dict) -> int:
+    return len(node["articles"]) + sum(folder_article_count(child) for child in node["children"].values())
+
+
+def folder_child_count(node: dict) -> int:
+    return len(node["children"])
+
+
+def folder_anchor(parts: Iterable[str]) -> str:
+    return f"folder-{slugify('/'.join(parts))}"
+
+
+def folder_article_item(article: dict, prefix: str = "") -> str:
+    tags = "".join(f"<span>{html_escape(tag)}</span>" for tag in article["tags"][:3])
+    return f"""
+<li class="folder-article">
+  <a href="{prefix}{article["url"]}">{html_escape(article["title"])}</a>
+  <time>{article["date"]}</time>
+  <div class="miniTags">{tags}</div>
+</li>
+"""
+
+
+def render_folder_node(node: dict, prefix: str = "", top: bool = False) -> str:
+    children = sorted(node["children"].values(), key=lambda child: folder_sort_key(child["name"]))
+    direct_articles = sorted(node["articles"], key=lambda a: a["date"], reverse=True)
+    count = folder_article_count(node)
+    child_count = folder_child_count(node)
+    article_word = f"{count} 篇笔记"
+    child_word = f"{child_count} 个子目录" if child_count else "无子目录"
+    path_label = folder_label(node["path"])
+    description = FOLDER_DESCRIPTIONS.get(node["name"], "按原始文件夹保留的一组研究笔记。")
+
+    direct_html = ""
+    if direct_articles:
+        direct_html = f"""
+<div class="folder-section">
+  <div class="folder-section-title">当前目录</div>
+  <ul class="folder-article-list">
+    {"".join(folder_article_item(article, prefix) for article in direct_articles)}
+  </ul>
+</div>
+"""
+
+    children_html = ""
+    if children:
+        children_html = f"""
+<div class="subfolder-stack">
+  {"".join(render_folder_node(child, prefix, top=False) for child in children)}
+</div>
+"""
+
+    classes = "folder-card" if top else "folder-node"
+    anchor = folder_anchor(node["path"])
+    return f"""
+<details id="{anchor}" class="{classes}">
+  <summary>
+    <span class="folderIcon" aria-hidden="true"></span>
+    <span class="folderSummaryText">
+      <strong>{html_escape(node["name"])}</strong>
+      <small>{html_escape(description)}</small>
+    </span>
+    <span class="folderMeta">{article_word} · {child_word}</span>
+  </summary>
+  <div class="folderBody">
+    <div class="folderPath">路径：{html_escape(path_label)}</div>
+    {direct_html}
+    {children_html}
+  </div>
+</details>
+"""
+
+
+def folder_overview_html(articles: list[dict], prefix: str = "", title: str = "研究生阶段笔记目录", intro: str = "") -> str:
+    tree = build_folder_tree(articles)
+    top_nodes = sorted(tree["children"].values(), key=lambda node: folder_sort_key(node["name"]))
+    newest = max((a["date"] for a in articles), default="")
+    intro_text = intro or "首页按原始文件夹组织，只展示目录入口；展开文件夹后再进入具体笔记。"
+    folder_cards = "\n".join(render_folder_node(node, prefix=prefix, top=True) for node in top_nodes)
+    return f"""
+<section class="directoryIntro">
+  <div>
+    <p class="directoryEyebrow">文件夹视图</p>
+    <h2>{html_escape(title)}</h2>
+    <p>{html_escape(intro_text)}</p>
+  </div>
+  <dl class="directoryStats">
+    <div><dt>{len(top_nodes)}</dt><dd>一级文件夹</dd></div>
+    <div><dt>{len(articles)}</dt><dd>公开笔记</dd></div>
+    <div><dt>{html_escape(newest)}</dt><dd>最近更新</dd></div>
+  </dl>
+</section>
+<section class="folderExplorer" aria-label="文件夹目录">
+  {folder_cards}
+</section>
+"""
+
+
+def sidebar_folder_links(articles: list[dict], prefix: str = "") -> str:
+    tree = build_folder_tree(articles)
+    items = []
+    for node in sorted(tree["children"].values(), key=lambda child: folder_sort_key(child["name"])):
+        items.append(
+            f'<li><a href="{prefix}categories.html#{folder_anchor(node["path"])}">{html_escape(node["name"])} '
+            f'<span>{folder_article_count(node)}</span></a></li>'
+        )
+    return "\n".join(items)
+
+
 def sidebar_html(articles: list[dict], current_category: str | None = None, prefix: str = "") -> str:
-    categories = Counter(a["category"] for a in articles)
-    category_items = "\n".join(
-        f'<li><a class="{"current" if cat == current_category else ""}" href="{prefix}categories.html#{slugify(cat)}">{html_escape(cat)} ({count})</a></li>'
-        for cat, count in sorted(categories.items())
-    )
     latest = "\n".join(
         f'<li><a href="{prefix}{a["url"]}">{html_escape(a["title"])}</a></li>'
         for a in sorted(articles, key=lambda x: x["date"], reverse=True)[:8]
@@ -609,12 +780,12 @@ def sidebar_html(articles: list[dict], current_category: str | None = None, pref
     return f"""
 <section class="catList">
   <h3 class="catListTitle">公告</h3>
-  <p>这里整理研究生阶段的课程实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
+  <p>这里按原始文件夹整理研究生阶段的项目实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
   <p><a href="{SITE["github"]}">GitHub: {SITE["author"]}</a></p>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">随笔分类</h3>
-  <ul>{category_items}</ul>
+  <h3 class="catListTitle">文件夹目录</h3>
+  <ul class="folderSideList">{sidebar_folder_links(articles, prefix)}</ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">推荐阅读</h3>
@@ -648,15 +819,11 @@ def post_card(article: dict) -> str:
 
 
 def build_index(articles: list[dict]) -> None:
-    ordered = sorted(articles, key=lambda a: (not a["pinned"], a["date"]), reverse=False)
-    pinned = [a for a in articles if a["pinned"]]
-    rest = [a for a in sorted(articles, key=lambda x: x["date"], reverse=True) if not a["pinned"]]
-    main = """
-<section class="introBox">
-  <h2>研究生阶段笔记目录</h2>
-  <p>按博客园式文章流整理：置顶放主线，下面按时间发布项目、论文、AI 基础和工具笔记。</p>
-</section>
-""" + "\n".join(post_card(a) for a in [*pinned, *rest])
+    main = folder_overview_html(
+        articles,
+        title="研究生阶段笔记目录",
+        intro="先从文件夹进入，再展开查看具体目录和文章；首页不再直接铺开所有笔记。",
+    )
     (DIST / "index.html").write_text(layout("首页", "home", main, sidebar_html(articles), "研究生阶段学习和科研笔记"), encoding="utf-8")
 
 
@@ -674,10 +841,13 @@ def article_page(article: dict, articles: list[dict]) -> str:
         if a["slug"] != article["slug"] and (a["pinned"] or a["category"] == article["category"])
     )
     tags = " ".join(f'<span>{html_escape(tag)}</span>' for tag in article["tags"])
+    folder_path = html_escape(article["folder_label"])
+    folder_href = f'../categories.html#{folder_anchor(article["display_folder_parts"][:1])}'
     return f"""
 <article class="post">
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="{folder_href}">{html_escape(article["display_folder_parts"][0])}</a><span>/</span><strong>{html_escape(article["title"])}</strong></div>
   <h1 class="postTitle single"><span>{html_escape(article["title"])}</span></h1>
-  <div class="postDesc">posted @ {article["date"]} {html_escape(SITE["author"])} 分类: <a href="../categories.html#{slugify(article["category"])}">{html_escape(article["category"])}</a></div>
+  <div class="postDesc">posted @ {article["date"]} {html_escape(SITE["author"])} 文件夹: <a href="{folder_href}">{folder_path}</a></div>
   <p class="postSummary">{html_escape(article["summary"])}</p>
   <div class="postTags">{tags}</div>
   {toc}
@@ -712,25 +882,36 @@ def build_articles(articles: list[dict]) -> None:
 
 
 def build_categories(articles: list[dict]) -> None:
-    grouped: dict[str, list[dict]] = defaultdict(list)
-    for a in articles:
-        grouped[a["category"]].append(a)
-    sections = []
-    for cat, items in sorted(grouped.items()):
-        cards = "\n".join(post_card(a) for a in sorted(items, key=lambda x: x["date"], reverse=True))
-        sections.append(f'<section id="{slugify(cat)}" class="category-section"><h2>{html_escape(cat)}</h2>{cards}</section>')
-    main = "\n".join(sections)
-    (DIST / "categories.html").write_text(layout("分类", "categories", main, sidebar_html(articles), "文章分类"), encoding="utf-8")
+    main = folder_overview_html(
+        articles,
+        title="全部文件夹",
+        intro="这里保留从本地笔记映射过来的目录结构，点开文件夹即可看到下一级目录和文章。",
+    )
+    (DIST / "categories.html").write_text(layout("目录", "categories", main, sidebar_html(articles), "文件夹目录"), encoding="utf-8")
 
 
 def build_archive(articles: list[dict]) -> None:
     rows = "\n".join(
-        f'<li id="{a["date"]}"><time>{a["date"]}</time><a href="{a["url"]}">{html_escape(a["title"])}</a><span>{html_escape(a["category"])}</span></li>'
+        f'<li id="{a["date"]}"><time>{a["date"]}</time><a href="{a["url"]}">{html_escape(a["title"])}</a><span>{html_escape(a["display_folder_parts"][0])}</span></li>'
         for a in sorted(articles, key=lambda x: x["date"], reverse=True)
     )
     tags = Counter(tag for a in articles for tag in a["tags"])
     tag_list = "\n".join(f'<button class="tag-filter" data-tag="{html_escape(tag)}">{html_escape(tag)} <span>{count}</span></button>' for tag, count in tags.most_common())
-    data = html_escape(json.dumps([{k: a[k] for k in ("title", "url", "date", "category", "tags")} for a in articles], ensure_ascii=False))
+    data = html_escape(
+        json.dumps(
+            [
+                {
+                    "title": a["title"],
+                    "url": a["url"],
+                    "date": a["date"],
+                    "folder": a["display_folder_parts"][0],
+                    "tags": a["tags"],
+                }
+                for a in articles
+            ],
+            ensure_ascii=False,
+        )
+    )
     main = f"""
 <section class="archive">
   <h2>归档</h2>
@@ -742,14 +923,14 @@ def build_archive(articles: list[dict]) -> None:
 
 
 def build_about(articles: list[dict]) -> None:
-    counts = Counter(a["category"] for a in articles)
-    rows = "\n".join(f"<tr><td>{html_escape(cat)}</td><td>{count}</td></tr>" for cat, count in sorted(counts.items()))
+    counts = Counter(a["display_folder_parts"][0] for a in articles)
+    rows = "\n".join(f"<tr><td>{html_escape(cat)}</td><td>{count}</td></tr>" for cat, count in sorted(counts.items(), key=lambda item: folder_sort_key(item[0])))
     main = f"""
 <section class="about">
   <h2>关于这个博客</h2>
   <p>这是 swilderyude 的研究生阶段学习与科研笔记站点，托管在 GitHub Pages。内容来自本地 Markdown 笔记，经过筛选、分类和静态化生成。</p>
-  <p>当前主要栏目包括项目实践、文献精读、计算机视觉、AI 基础、科研方法、工具与环境。大体风格参考博客园的文章流和侧栏结构，但站点实现、样式与内容组织都重新制作。</p>
-  <div class="table-wrap"><table><thead><tr><th>分类</th><th>文章数</th></tr></thead><tbody>{rows}</tbody></table></div>
+  <p>当前改为文件夹式浏览：先看总目录，再展开子目录进入具体笔记；文章页保留博客园式标题、正文、目录和侧栏。</p>
+  <div class="table-wrap"><table><thead><tr><th>文件夹</th><th>文章数</th></tr></thead><tbody>{rows}</tbody></table></div>
   <p>GitHub：<a href="{SITE["github"]}">{SITE["github"]}</a></p>
 </section>
 """
@@ -763,6 +944,7 @@ def build_search_index(articles: list[dict]) -> None:
             "url": a["url"],
             "date": a["date"],
             "category": a["category"],
+            "folder": a["folder_label"],
             "summary": a["summary"],
             "tags": a["tags"],
         }
