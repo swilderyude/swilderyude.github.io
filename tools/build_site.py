@@ -22,14 +22,18 @@ DIST = ROOT
 ARTICLES_DIR = DIST / "articles"
 ASSETS_DIR = DIST / "assets"
 MEDIA_DIR = ASSETS_DIR / "media"
+SITE_ASSET_DIR = ASSETS_DIR / "site"
+SITE_IMAGE_SOURCE = SOURCE / "微信图片_20260528231942_115_26.jpg"
 
 SITE = {
-    "title": "【SwilderYude 的研究生笔记】",
+    "title": "墨玉",
     "subtitle": "道阻且长，与君共勉",
-    "author": "swilderyude",
+    "author": "墨玉",
     "github": "https://github.com/swilderyude",
     "repo": "https://github.com/swilderyude/swilderyude.github.io",
     "base_url": "https://swilderyude.github.io",
+    "cover": "assets/site/moyu-cover.webp",
+    "avatar": "assets/site/moyu-avatar.webp",
 }
 
 FOLDER_DESCRIPTIONS = {
@@ -393,6 +397,29 @@ def copy_image(src: Path) -> str:
     return f"assets/media/{out_name}"
 
 
+def copy_site_assets() -> None:
+    SITE_ASSET_DIR.mkdir(parents=True, exist_ok=True)
+    cover = SITE_ASSET_DIR / "moyu-cover.webp"
+    avatar = SITE_ASSET_DIR / "moyu-avatar.webp"
+
+    if not SITE_IMAGE_SOURCE.exists():
+        return
+
+    try:
+        from PIL import Image, ImageOps
+
+        img = Image.open(SITE_IMAGE_SOURCE).convert("RGB")
+        cover_img = img.copy()
+        cover_img.thumbnail((1400, 1400))
+        cover_img.save(cover, "WEBP", quality=82, method=6)
+
+        resample = getattr(getattr(Image, "Resampling", Image), "LANCZOS")
+        avatar_img = ImageOps.fit(img, (360, 360), method=resample, centering=(0.5, 0.45))
+        avatar_img.save(avatar, "WEBP", quality=84, method=6)
+    except Exception:
+        shutil.copy2(SITE_IMAGE_SOURCE, SITE_ASSET_DIR / SITE_IMAGE_SOURCE.name)
+
+
 def convert_obsidian_links(markdown: str, article: ArticleConfig, article_path: Path) -> str:
     def replace_image(match: re.Match[str]) -> str:
         target = match.group(1).strip()
@@ -572,13 +599,13 @@ def article_html(article: ArticleConfig) -> dict:
     }
 
 
-def layout(title: str, active: str, main: str, sidebar: str, description: str = "") -> str:
+def layout(title: str, active: str, main: str, sidebar: str, description: str = "", prefix: str = "") -> str:
     desc = html_escape(description or SITE["subtitle"])
     nav = [
-        ("首页", "index.html", "home"),
-        ("目录", "categories.html", "categories"),
-        ("归档", "archive.html", "archive"),
-        ("关于", "about.html", "about"),
+        ("首页", f"{prefix}index.html", "home"),
+        ("目录", f"{prefix}categories.html", "categories"),
+        ("归档", f"{prefix}archive.html", "archive"),
+        ("关于", f"{prefix}about.html", "about"),
         ("GitHub", SITE["github"], "github"),
     ]
     nav_html = "\n".join(
@@ -592,17 +619,19 @@ def layout(title: str, active: str, main: str, sidebar: str, description: str = 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{desc}">
   <title>{html_escape(title)} - {html_escape(SITE["author"])}</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-  <script defer src="assets/js/site.js"></script>
+  <link rel="stylesheet" href="{prefix}assets/css/style.css">
+  <script defer src="{prefix}assets/js/site.js"></script>
 </head>
-<body>
+<body class="page-{active or "article"}">
   <a id="top"></a>
   <div id="home">
     <header id="header">
       <div id="blogTitle">
-        <a id="lnkBlogLogo" href="index.html" aria-label="返回主页"><span id="blogLogo">S</span></a>
-        <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="index.html">{html_escape(SITE["title"])}</a></h1>
-        <h2>{html_escape(SITE["subtitle"])}</h2>
+        <a id="lnkBlogLogo" href="{prefix}index.html" aria-label="返回主页"><img id="blogLogo" src="{prefix}{SITE["avatar"]}" alt=""></a>
+        <div class="brandText">
+          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="{prefix}index.html">{html_escape(SITE["title"])}</a></h1>
+          <h2>{html_escape(SITE["subtitle"])}</h2>
+        </div>
       </div>
       <nav id="navigator" aria-label="主导航">
         <ul id="navList">
@@ -676,7 +705,7 @@ def folder_article_item(article: dict, prefix: str = "") -> str:
 """
 
 
-def render_folder_node(node: dict, prefix: str = "", top: bool = False) -> str:
+def render_folder_node(node: dict, prefix: str = "", top: bool = False, index: str = "") -> str:
     children = sorted(node["children"].values(), key=lambda child: folder_sort_key(child["name"]))
     direct_articles = sorted(node["articles"], key=lambda a: a["date"], reverse=True)
     count = folder_article_count(node)
@@ -699,18 +728,23 @@ def render_folder_node(node: dict, prefix: str = "", top: bool = False) -> str:
 
     children_html = ""
     if children:
+        child_nodes = "".join(
+            render_folder_node(child, prefix, top=False, index=f"{index}.{i}" if index else str(i))
+            for i, child in enumerate(children, 1)
+        )
         children_html = f"""
 <div class="subfolder-stack">
-  {"".join(render_folder_node(child, prefix, top=False) for child in children)}
+  {child_nodes}
 </div>
 """
 
     classes = "folder-card" if top else "folder-node"
     anchor = folder_anchor(node["path"])
+    index_html = html_escape(index or "00")
     return f"""
 <details id="{anchor}" class="{classes}">
   <summary>
-    <span class="folderIcon" aria-hidden="true"></span>
+    <span class="folderIndex" aria-hidden="true">{index_html}</span>
     <span class="folderSummaryText">
       <strong>{html_escape(node["name"])}</strong>
       <small>{html_escape(description)}</small>
@@ -731,7 +765,7 @@ def folder_overview_html(articles: list[dict], prefix: str = "", title: str = "�
     top_nodes = sorted(tree["children"].values(), key=lambda node: folder_sort_key(node["name"]))
     newest = max((a["date"] for a in articles), default="")
     intro_text = intro or "首页按原始文件夹组织，只展示目录入口；展开文件夹后再进入具体笔记。"
-    folder_cards = "\n".join(render_folder_node(node, prefix=prefix, top=True) for node in top_nodes)
+    folder_cards = "\n".join(render_folder_node(node, prefix=prefix, top=True, index=f"{i:02d}") for i, node in enumerate(top_nodes, 1))
     return f"""
 <section class="directoryIntro">
   <div>
@@ -751,6 +785,25 @@ def folder_overview_html(articles: list[dict], prefix: str = "", title: str = "�
 """
 
 
+def home_hero_html(articles: list[dict]) -> str:
+    newest = max((a["date"] for a in articles), default="")
+    return f"""
+<section class="homeHero" style='--hero-image: url("{SITE["cover"]}")'>
+  <div class="heroShade"></div>
+  <div class="heroContent">
+    <p class="heroKicker">墨玉的研究生笔记</p>
+    <h2>在代码、论文和实验之间，慢慢打磨一块墨玉。</h2>
+    <p>整理研究生阶段的项目实践、论文精读、AI 基础和工程工具，把零散笔记收束成可以持续回看的知识目录。</p>
+    <dl class="heroStats">
+      <div><dt>{len(articles)}</dt><dd>公开笔记</dd></div>
+      <div><dt>{len(top_folder_names_from_configs())}</dt><dd>文件夹</dd></div>
+      <div><dt>{html_escape(newest)}</dt><dd>最近更新</dd></div>
+    </dl>
+  </div>
+</section>
+"""
+
+
 def sidebar_folder_links(articles: list[dict], prefix: str = "") -> str:
     tree = build_folder_tree(articles)
     items = []
@@ -764,13 +817,12 @@ def sidebar_folder_links(articles: list[dict], prefix: str = "") -> str:
 
 def sidebar_html(articles: list[dict], current_category: str | None = None, prefix: str = "") -> str:
     latest = "\n".join(
-        f'<li><a href="{prefix}{a["url"]}">{html_escape(a["title"])}</a></li>'
-        for a in sorted(articles, key=lambda x: x["date"], reverse=True)[:8]
+        f'<li><span>{i:02d}</span><a href="{prefix}{a["url"]}">{html_escape(a["title"])}</a></li>'
+        for i, a in enumerate(sorted(articles, key=lambda x: x["date"], reverse=True)[:6], 1)
     )
     recommended = "\n".join(
-        f'<li><a href="{prefix}{a["url"]}">{html_escape(a["title"])}</a></li>'
-        for a in articles
-        if a["pinned"]
+        f'<li><span>{i:02d}</span><a href="{prefix}{a["url"]}">{html_escape(a["title"])}</a></li>'
+        for i, a in enumerate([a for a in articles if a["pinned"]], 1)
     )
     tags = Counter(tag for a in articles for tag in a["tags"])
     tag_cloud = "\n".join(
@@ -778,22 +830,23 @@ def sidebar_html(articles: list[dict], current_category: str | None = None, pref
         for tag, _ in tags.most_common(18)
     )
     return f"""
-<section class="catList">
-  <h3 class="catListTitle">公告</h3>
-  <p>这里按原始文件夹整理研究生阶段的项目实践、科研方法、论文精读、计算机视觉和工程工具笔记。</p>
-  <p><a href="{SITE["github"]}">GitHub: {SITE["author"]}</a></p>
+<section class="profileCard">
+  <img src="{prefix}{SITE["avatar"]}" alt="墨玉头像">
+  <h3>墨玉</h3>
+  <p>把研究生阶段的项目、论文和工具笔记，整理成一份可以慢慢翻的知识目录。</p>
+  <a href="{SITE["github"]}">GitHub / swilderyude</a>
 </section>
 <section class="catList">
   <h3 class="catListTitle">文件夹目录</h3>
   <ul class="folderSideList">{sidebar_folder_links(articles, prefix)}</ul>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">推荐阅读</h3>
-  <ul>{recommended}</ul>
+  <h3 class="catListTitle">主线笔记</h3>
+  <ul class="rankList">{recommended}</ul>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">最新随笔</h3>
-  <ul>{latest}</ul>
+  <h3 class="catListTitle">最近更新</h3>
+  <ul class="rankList">{latest}</ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">标签云</h3>
@@ -819,12 +872,12 @@ def post_card(article: dict) -> str:
 
 
 def build_index(articles: list[dict]) -> None:
-    main = folder_overview_html(
+    main = home_hero_html(articles) + folder_overview_html(
         articles,
-        title="研究生阶段笔记目录",
-        intro="先从文件夹进入，再展开查看具体目录和文章；首页不再直接铺开所有笔记。",
+        title="从文件夹进入笔记",
+        intro="按本地 Markdown 的目录结构整理，先看一级文件夹，再展开子目录进入具体笔记。",
     )
-    (DIST / "index.html").write_text(layout("首页", "home", main, sidebar_html(articles), "研究生阶段学习和科研笔记"), encoding="utf-8")
+    (DIST / "index.html").write_text(layout("首页", "home", main, sidebar_html(articles), "墨玉的研究生阶段学习和科研笔记"), encoding="utf-8")
 
 
 def article_page(article: dict, articles: list[dict]) -> str:
@@ -867,17 +920,7 @@ def build_articles(articles: list[dict]) -> None:
     article_sidebar = sidebar_html(articles, prefix="../")
     for article in articles:
         body = article_page(article, articles)
-        page = layout(article["title"], "", body, article_sidebar, article["summary"])
-        page = page.replace('href="assets/css/style.css"', 'href="../assets/css/style.css"')
-        page = page.replace('src="assets/js/site.js"', 'src="../assets/js/site.js"')
-        page = page.replace('href="index.html"', 'href="../index.html"')
-        page = page.replace('href="categories.html"', 'href="../categories.html"')
-        page = page.replace('href="archive.html"', 'href="../archive.html"')
-        page = page.replace('href="about.html"', 'href="../about.html"')
-        page = page.replace('href="categories.html#', 'href="../categories.html#')
-        page = page.replace('href="archive.html#', 'href="../archive.html#')
-        page = page.replace('href="archive.html?', 'href="../archive.html?')
-        page = page.replace(f'href="{SITE["github"]}"', f'href="{SITE["github"]}"')
+        page = layout(article["title"], "", body, article_sidebar, article["summary"], prefix="../")
         (ARTICLES_DIR / f"{article['slug']}.html").write_text(page, encoding="utf-8")
 
 
@@ -928,8 +971,8 @@ def build_about(articles: list[dict]) -> None:
     main = f"""
 <section class="about">
   <h2>关于这个博客</h2>
-  <p>这是 swilderyude 的研究生阶段学习与科研笔记站点，托管在 GitHub Pages。内容来自本地 Markdown 笔记，经过筛选、分类和静态化生成。</p>
-  <p>当前改为文件夹式浏览：先看总目录，再展开子目录进入具体笔记；文章页保留博客园式标题、正文、目录和侧栏。</p>
+  <p>这是墨玉的研究生阶段学习与科研笔记站点，托管在 GitHub Pages。内容来自本地 Markdown 笔记，经过筛选、分类和静态化生成。</p>
+  <p>站点按文件夹浏览：先看总目录，再展开子目录进入具体笔记；文章页保留目录、正文、推荐阅读和侧栏索引。</p>
   <div class="table-wrap"><table><thead><tr><th>文件夹</th><th>文章数</th></tr></thead><tbody>{rows}</tbody></table></div>
   <p>GitHub：<a href="{SITE["github"]}">{SITE["github"]}</a></p>
 </section>
@@ -970,6 +1013,7 @@ def main() -> None:
     clean_output()
     (ASSETS_DIR / "css").mkdir(parents=True, exist_ok=True)
     (ASSETS_DIR / "js").mkdir(parents=True, exist_ok=True)
+    copy_site_assets()
     articles = [article_html(cfg) for cfg in ARTICLES]
     # Sort once for stable sidebars and stats.
     articles = sorted(articles, key=lambda a: a["date"], reverse=True)
@@ -981,7 +1025,7 @@ def main() -> None:
     build_search_index(articles)
     (DIST / ".nojekyll").write_text("", encoding="utf-8")
     (DIST / "README.md").write_text(
-        "# swilderyude.github.io\n\nGitHub Pages blog generated from research-stage notes.\n",
+        "# 墨玉\n\nGitHub Pages blog generated from research-stage notes.\n",
         encoding="utf-8",
     )
     print(f"Built {len(articles)} articles into {DIST}")
