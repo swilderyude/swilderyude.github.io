@@ -28,7 +28,7 @@ SITE = {
     "subtitle": "道阻且长，与君共勉",
     "author": "swilderyude",
     "github": "https://github.com/swilderyude",
-    "repo": "https://github.com/swilderyude/swilderyuede.github.io",
+    "repo": "https://github.com/swilderyude/swilderyude.github.io",
     "base_url": "https://swilderyude.github.io",
 }
 
@@ -799,7 +799,7 @@ def main() -> None:
     build_search_index(articles)
     (DIST / ".nojekyll").write_text("", encoding="utf-8")
     (DIST / "README.md").write_text(
-        "# swilderyuede.github.io\n\nGitHub Pages blog generated from research-stage notes.\n",
+        "# swilderyude.github.io\n\nGitHub Pages blog generated from research-stage notes.\n",
         encoding="utf-8",
     )
     print(f"Built {len(articles)} articles into {DIST}")
