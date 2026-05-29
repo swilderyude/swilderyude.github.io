@@ -22,7 +22,7 @@
       <nav id="navigator" aria-label="主导航">
         <ul id="navList">
           <li><a class="menu" href="../index.html">首页</a></li>
-<li><a class="menu" href="../categories.html">目录</a></li>
+<li><a class="menu" href="../categories.html">分区</a></li>
 <li><a class="menu" href="../archive.html">归档</a></li>
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#潜渊">潜渊</a><span>/</span><strong>MobileNet 精读笔记</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../sections/qian-yuan.html">潜渊</a><span>/</span><strong>MobileNet 精读笔记</strong></div>
   <h1 class="postTitle single"><span>MobileNet 精读笔记</span></h1>
-  <div class="postDesc">posted @ 2026-04-01 墨玉 分区: <a href="../categories.html#潜渊">潜渊</a></div>
+  <div class="postDesc">posted @ 2026-04-01 墨玉 分区: <a href="../sections/qian-yuan.html">潜渊</a></div>
   <p class="postSummary">整理轻量化网络 MobileNet 系列的核心结构、深度可分离卷积和移动端部署思想。</p>
   <div class="postTags"><span>MobileNet</span> <span>轻量化网络</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#深度可分离卷积">深度可分离卷积</a></li>
@@ -57,102 +57,36 @@
 <li class="toc-level-1"><a href="#v1-3总结">v1-3总结</a></li>
 <li class="toc-level-1"><a href="#mobilenet-v4">MobileNet V4</a></li></ul></div>
   <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
-    <p>谷歌轻量化卷积神经网络 MobileNet V1 Mobilenets: Efficient convolutional neural networks for mobile vision applications CVPR 2017 轻量化网络广泛用于无人机驾驶，移动端，物联网的边缘计算和人工智能算法部署，MobileNet成为很多轻量化</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260119122339.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260119192930.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260119193102.png</div>
+    <p>谷歌轻量化卷积神经网络 MobileNet V1 Mobilenets: Efficient convolutional neural networks for mobile vision applications CVPR 2017 轻量化网络广泛用于无人机驾驶，移动端，物联网的边缘计算和人工智能算法部署，MobileNet成为很多轻量化 <img src="../assets/media/pasted-image-20260119122339-331e56b8a9.webp" alt="Pasted image 20260119122339.png" /> <img src="../assets/media/pasted-image-20260119192930-1e27546278.webp" alt="Pasted image 20260119192930.png" /> <img src="../assets/media/pasted-image-20260119193102-b7098fb18c.webp" alt="Pasted image 20260119193102.png" /></p>
 <h2 id="深度可分离卷积">深度可分离卷积</h2>
-<p>基于深度可分离卷积来对卷积层进行优化和改进，从而降低参数量，减少计算量，加速运算，使网络更加轻量化。</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260119202810.png 一般卷积是一个多通道的卷积核在一个多通道的输入里面滑动，把每次滑动位置的卷积核的权重和原始输入的对应像素相乘求和，把这个相乘求和的值，填在右边生成的feature map上面，那输入有几个通道，卷积核有几个通道，比如第一层RGB三个通道，第一层的卷积核也应该有三个通道来对应RGB3个输入通道。 滑动的区域是感受也，把感受也里的像素和卷积核的像素对应位置相乘求和，把数量积的结果填在右边，一个卷积核生成一个feature map</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120130950.png 卷积核都是三通道，输入也是三通道。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120133840.png 卷积核在里面滑动，在输入的tensor里滑动，每滑动一次就是卷积一次，每一次卷积是卷积核的权重和原始输入的像素和对应位置相乘求和。 生成的feature作为下一次网络的输入，仍然是相乘求和。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120140641.png 深度可分离卷积，输入三个通道，分别用三个卷积核对这三个通道进行处理，输出三个feature map叠起来输入下一层。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120140929.png 下一步处理就是用1X1卷积来对跨通道的信息来处理。1X1卷积的作用就是跨层的信息融合。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120141228.png 先深度可分离depth wise卷积，再1X1卷积，即point wise卷积，或者叫点卷积，逐点卷积。 depth wise处理的是长宽方向的空间信息，他不关心跨通道信息，而point wise只关心跨通道信息，它不关心床宽方向的信息。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120141614.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120144355.png 先depth wise，每一个通道用自己通道卷积核处理，在用point wise卷积来对跨通道的信息处理，就是整个的基本模块。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120151653.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120151805.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260120154826.png 深度可分离卷积是分组卷积的特例。</div>
-<blockquote>
-<p>图片未发布：Pasted image 20260120161012.png Group Convolution是一个卷积核不再处理所有的通道，而是只处理一部分通道，以往是一个卷积核处理所有通道。depthwise可以看作是Group的极速。 分组卷积在论文里是<strong>Cardinality</strong>参数，分组卷积的组数，可以大大提升性能。</p>
-</blockquote>
-<div class="image-placeholder">图片未发布：Pasted image 20260121150927.png 分离卷积分为空间可分离卷积和深度可分离卷积。空间可分离卷积就是非对称卷积，但其轻量化效果不如深度可分离卷积。</div>
+<p>基于深度可分离卷积来对卷积层进行优化和改进，从而降低参数量，减少计算量，加速运算，使网络更加轻量化。 <img src="../assets/media/pasted-image-20260119202810-001ee38744.webp" alt="Pasted image 20260119202810.png" /> 一般卷积是一个多通道的卷积核在一个多通道的输入里面滑动，把每次滑动位置的卷积核的权重和原始输入的对应像素相乘求和，把这个相乘求和的值，填在右边生成的feature map上面，那输入有几个通道，卷积核有几个通道，比如第一层RGB三个通道，第一层的卷积核也应该有三个通道来对应RGB3个输入通道。 滑动的区域是感受也，把感受也里的像素和卷积核的像素对应位置相乘求和，把数量积的结果填在右边，一个卷积核生成一个feature map <img src="../assets/media/pasted-image-20260120130950-cc14f59916.webp" alt="Pasted image 20260120130950.png" /> 卷积核都是三通道，输入也是三通道。 <img src="../assets/media/pasted-image-20260120133840-d463748238.webp" alt="Pasted image 20260120133840.png" /> 卷积核在里面滑动，在输入的tensor里滑动，每滑动一次就是卷积一次，每一次卷积是卷积核的权重和原始输入的像素和对应位置相乘求和。 生成的feature作为下一次网络的输入，仍然是相乘求和。 <img src="../assets/media/pasted-image-20260120140641-3efee62932.webp" alt="Pasted image 20260120140641.png" /> 深度可分离卷积，输入三个通道，分别用三个卷积核对这三个通道进行处理，输出三个feature map叠起来输入下一层。 <img src="../assets/media/pasted-image-20260120140929-3a47b64761.webp" alt="Pasted image 20260120140929.png" /> 下一步处理就是用1X1卷积来对跨通道的信息来处理。1X1卷积的作用就是跨层的信息融合。 <img src="../assets/media/pasted-image-20260120141228-5bbbb98d75.webp" alt="Pasted image 20260120141228.png" /> 先深度可分离depth wise卷积，再1X1卷积，即point wise卷积，或者叫点卷积，逐点卷积。 depth wise处理的是长宽方向的空间信息，他不关心跨通道信息，而point wise只关心跨通道信息，它不关心床宽方向的信息。 <img src="../assets/media/pasted-image-20260120141614-3b5f9f8f7c.webp" alt="Pasted image 20260120141614.png" /> <img src="../assets/media/pasted-image-20260120144355-412bf72b06.webp" alt="Pasted image 20260120144355.png" /> 先depth wise，每一个通道用自己通道卷积核处理，在用point wise卷积来对跨通道的信息处理，就是整个的基本模块。 <img src="../assets/media/pasted-image-20260120151653-9bcacdd6bd.webp" alt="Pasted image 20260120151653.png" /> <img src="../assets/media/pasted-image-20260120151805-b96439b6e7.webp" alt="Pasted image 20260120151805.png" /> <img src="../assets/media/pasted-image-20260120154826-07db2891af.webp" alt="Pasted image 20260120154826.png" /> 深度可分离卷积是分组卷积的特例。 <img src="../assets/media/pasted-image-20260120161012-c68de55c24.webp" alt="Pasted image 20260120161012.png" /> Group Convolution是一个卷积核不再处理所有的通道，而是只处理一部分通道，以往是一个卷积核处理所有通道。depthwise可以看作是Group的极速。 分组卷积在论文里是<strong>Cardinality</strong>参数，分组卷积的组数，可以大大提升性能。 <img src="../assets/media/pasted-image-20260121150927-210ef1c606.webp" alt="Pasted image 20260121150927.png" /> 分离卷积分为空间可分离卷积和深度可分离卷积。空间可分离卷积就是非对称卷积，但其轻量化效果不如深度可分离卷积。</p>
 <h2 id="深度可分离卷积参数量计算量分析">深度可分离卷积参数量、计算量分析</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20260121153854.png 一次卷积就是卷积核的长宽乘卷积核的通道。参数量是卷积核的长宽，通道，卷积核个数。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121154024.png M通道，Df长宽 引入两个控制网络大小的超参数，a是宽度参数，卷积核个数，第二个是分辨率参数，控制输入图像的尺寸进而能够控制中间层feature map大小</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121165429.png 标准卷积的计算量放到分母上，深度可分离卷积在分子。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121175750.png 计算量和参数量变小。</div>
+<p><img src="../assets/media/pasted-image-20260121153854-078d789c9c.webp" alt="Pasted image 20260121153854.png" /> 一次卷积就是卷积核的长宽乘卷积核的通道。参数量是卷积核的长宽，通道，卷积核个数。 <img src="../assets/media/pasted-image-20260121154024-25954243d1.webp" alt="Pasted image 20260121154024.png" /> M通道，Df长宽 引入两个控制网络大小的超参数，a是宽度参数，卷积核个数，第二个是分辨率参数，控制输入图像的尺寸进而能够控制中间层feature map大小 <img src="../assets/media/pasted-image-20260121165429-6d556f3d8d.webp" alt="Pasted image 20260121165429.png" /> 标准卷积的计算量放到分母上，深度可分离卷积在分子。 <img src="../assets/media/pasted-image-20260121175750-c403398fa8.webp" alt="Pasted image 20260121175750.png" /> 计算量和参数量变小。</p>
 <h2 id="mobilenet-v1-网络结构">MobileNet V1 网络结构</h2>
-<p>若干个深度可分离模块堆叠起来。</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260121180935.png relu激活。 网络结构：</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121181043.png 首先是一个常规的卷积，然后就是深度可分离卷积模块，先depth wise再point wise。 输入是图像，输出是1000个类别的概率。 avg pool全局平均池化，FC全连接层，再进行softmax归一化。</div>
+<p>若干个深度可分离模块堆叠起来。 <img src="../assets/media/pasted-image-20260121180935-7642f5dd03.webp" alt="Pasted image 20260121180935.png" /> relu激活。 网络结构： <img src="../assets/media/pasted-image-20260121181043-755a7062c8.webp" alt="Pasted image 20260121181043.png" /> 首先是一个常规的卷积，然后就是深度可分离卷积模块，先depth wise再point wise。 输入是图像，输出是1000个类别的概率。 avg pool全局平均池化，FC全连接层，再进行softmax归一化。</p>
 <h2 id="mobilenet-v1计算性能分析">MobileNet V1计算性能分析</h2>
-<p>为了其易于部署，让计算机能高效运行，所以分析计算性能。</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260121182924.png 为什么1X1卷积比较好加速？</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121183138.png 卷积的过程就是粉色和黄色向量点乘，逐元素相乘求和，将结果填在红色区。 1X1卷积作用：能够起到跨层通信，引入额外的非线性进行降维或升维。 卷积在代码要循环，我们希望是是并行的。 高效原因： 引入im2col，把卷积运算变成矩阵乘法计算。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121183621.png 每一次卷积的输入变为列向量，四次卷积的输入变为四列的矩阵。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121191613.png 卷积核为行向量，与矩阵每一列相乘，做数量积，实现把卷积运算变为矩阵运算。 矩阵运算借助GEMM库进行高度的优化和加速</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121192122.png 传统卷积需要im2col，但1X1卷积天生就是一个向量，不需要经过这一步，因此能够更高效的计算。 MobileNet里1X1卷积占了90%的计算量，所以这个网络很快。</div>
+<p>为了其易于部署，让计算机能高效运行，所以分析计算性能。 <img src="../assets/media/pasted-image-20260121182924-57669f1db5.webp" alt="Pasted image 20260121182924.png" /> 为什么1X1卷积比较好加速？ <img src="../assets/media/pasted-image-20260121183138-f0cb0dca65.webp" alt="Pasted image 20260121183138.png" /> 卷积的过程就是粉色和黄色向量点乘，逐元素相乘求和，将结果填在红色区。 1X1卷积作用：能够起到跨层通信，引入额外的非线性进行降维或升维。 卷积在代码要循环，我们希望是是并行的。 高效原因： 引入im2col，把卷积运算变成矩阵乘法计算。 <img src="../assets/media/pasted-image-20260121183621-290178e3cc.webp" alt="Pasted image 20260121183621.png" /> 每一次卷积的输入变为列向量，四次卷积的输入变为四列的矩阵。 <img src="../assets/media/pasted-image-20260121191613-cb56640c84.webp" alt="Pasted image 20260121191613.png" /> 卷积核为行向量，与矩阵每一列相乘，做数量积，实现把卷积运算变为矩阵运算。 矩阵运算借助GEMM库进行高度的优化和加速 <img src="../assets/media/pasted-image-20260121192122-47d983eea1.webp" alt="Pasted image 20260121192122.png" /> 传统卷积需要im2col，但1X1卷积天生就是一个向量，不需要经过这一步，因此能够更高效的计算。 MobileNet里1X1卷积占了90%的计算量，所以这个网络很快。</p>
 <h2 id="mobilenet-v1实验结果分析">MobileNet V1实验结果分析</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20260121192634.png 既和标准的卷积进行了比较，准确率一样的情况下，计算量和权重数量级减少。 第一个参数降低，准确率极速降低；第二个参数量降低时，准确率平滑降低。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121193314.png 计算量越大的网络性能会越高，但越增大会有边际效应递减的现象。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121193623.png 在人脸属性识别，目标检测，以图搜地的视觉任务上证明该网络的强大。 MobileNet已经成为SSD的骨干网络。</div>
+<p><img src="../assets/media/pasted-image-20260121192634-372ae7e3ea.webp" alt="Pasted image 20260121192634.png" /> 既和标准的卷积进行了比较，准确率一样的情况下，计算量和权重数量级减少。 第一个参数降低，准确率极速降低；第二个参数量降低时，准确率平滑降低。 <img src="../assets/media/pasted-image-20260121193314-5603487bd0.webp" alt="Pasted image 20260121193314.png" /> 计算量越大的网络性能会越高，但越增大会有边际效应递减的现象。 <img src="../assets/media/pasted-image-20260121193623-b342a85e61.webp" alt="Pasted image 20260121193623.png" /> 在人脸属性识别，目标检测，以图搜地的视觉任务上证明该网络的强大。 MobileNet已经成为SSD的骨干网络。</p>
 <h2 id="mobilenet-v1-keras代码实战">MobileNet V1 Keras代码实战</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20260121194552.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121195313.png Keras GitHub地址。 限制ReLU激活函数的大小不能超过6，因为它在低精度的浮点运算中，ReLU6能有更好的性能。比如只用8个bit表示一个权重，用低比特数低精度来表示的话ReLU6是比较好的。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121200056.png 网络是由常规卷积和深度卷积堆叠起来的。不再用池化层而是用步长为2的下采样层， Keras是封装的库。</div>
+<p><img src="../assets/media/pasted-image-20260121194552-0e4d50dd70.webp" alt="Pasted image 20260121194552.png" /> <img src="../assets/media/pasted-image-20260121195313-c1e1199e08.webp" alt="Pasted image 20260121195313.png" /> Keras GitHub地址。 限制ReLU激活函数的大小不能超过6，因为它在低精度的浮点运算中，ReLU6能有更好的性能。比如只用8个bit表示一个权重，用低比特数低精度来表示的话ReLU6是比较好的。 <img src="../assets/media/pasted-image-20260121200056-9da2008520.webp" alt="Pasted image 20260121200056.png" /> 网络是由常规卷积和深度卷积堆叠起来的。不再用池化层而是用步长为2的下采样层， Keras是封装的库。</p>
 <h1 id="mobilenet-v2">MobileNet V2</h1>
-<p>谷歌轻量化卷积神经网络mobile net v2，该论文首先提出了一系列哲学层面的设计原则和直觉，适用于各种场景的计算和智能需求。 谷歌论文的特点是先提出哲学层面的设计原则和直觉 轻量化网络应用场景广泛，需要丰富的技术站支持，如FPGA、边缘计算等</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260121210322.png relu激活函数会把所有小于0的参数都抹零，前向传播的张量为0，反向传播的梯度也为0。 低精度的浮点数表示，用16/8非常少的比特数来表示浮点数，表示的范围非常有限。</div>
+<p>谷歌轻量化卷积神经网络mobile net v2，该论文首先提出了一系列哲学层面的设计原则和直觉，适用于各种场景的计算和智能需求。 谷歌论文的特点是先提出哲学层面的设计原则和直觉 轻量化网络应用场景广泛，需要丰富的技术站支持，如FPGA、边缘计算等 <img src="../assets/media/pasted-image-20260121210322-ea0f2c33ac.webp" alt="Pasted image 20260121210322.png" /> relu激活函数会把所有小于0的参数都抹零，前向传播的张量为0，反向传播的梯度也为0。 低精度的浮点数表示，用16/8非常少的比特数来表示浮点数，表示的范围非常有限。</p>
 <h2 id="mobilenet-v2inverted-residuals-and-linear-bottlenecks">MobileNet V2：Inverted Residuals and Linear Bottlenecks</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20260121210917.png v2先用1X1卷积升维，最后1X1卷积降维用线性激活函数</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121211031.png 前三步升维降维后加了一个残差链接，shortcut链接的是两边比较低维的张量。 左边是步长为1的正常模块，右边是步长为2的下采样模块。 下采样的话维度不匹配，逐元素的对应位置求和，不匹配的话没办法求和。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121212750.png ResNet深度残差网络相比5点不同，1升维降维，2卷积，3激活函数，4ResNet全是非线性激活，5残差链接的位置，一个链接两个高维。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121213116.png relu6激活函数在大于6时会限制在6 relu6在低精度浮点数的情况下有比较好的表示性能。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121214949.png 举个例子：</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121215153.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121215642.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121215743.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121215843.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121220134.png 是由16个bottleneck堆叠而成。</div>
+<p><img src="../assets/media/pasted-image-20260121210917-d3bb14782f.webp" alt="Pasted image 20260121210917.png" /> v2先用1X1卷积升维，最后1X1卷积降维用线性激活函数 <img src="../assets/media/pasted-image-20260121211031-553fac7d10.webp" alt="Pasted image 20260121211031.png" /> 前三步升维降维后加了一个残差链接，shortcut链接的是两边比较低维的张量。 左边是步长为1的正常模块，右边是步长为2的下采样模块。 下采样的话维度不匹配，逐元素的对应位置求和，不匹配的话没办法求和。 <img src="../assets/media/pasted-image-20260121212750-9b74fc74eb.webp" alt="Pasted image 20260121212750.png" /> ResNet深度残差网络相比5点不同，1升维降维，2卷积，3激活函数，4ResNet全是非线性激活，5残差链接的位置，一个链接两个高维。 <img src="../assets/media/pasted-image-20260121213116-e4dce9fd9c.webp" alt="Pasted image 20260121213116.png" /> relu6激活函数在大于6时会限制在6 relu6在低精度浮点数的情况下有比较好的表示性能。 <img src="../assets/media/pasted-image-20260121214949-5dd0daa7a0.webp" alt="Pasted image 20260121214949.png" /> 举个例子： <img src="../assets/media/pasted-image-20260121215153-ad2239d47c.webp" alt="Pasted image 20260121215153.png" /> <img src="../assets/media/pasted-image-20260121215642-40209970e0.webp" alt="Pasted image 20260121215642.png" /> <img src="../assets/media/pasted-image-20260121215743-16676af4a2.webp" alt="Pasted image 20260121215743.png" /> <img src="../assets/media/pasted-image-20260121215843-6f5ab95c8a.webp" alt="Pasted image 20260121215843.png" /> <img src="../assets/media/pasted-image-20260121220134-e5a18e97dc.webp" alt="Pasted image 20260121220134.png" /> 是由16个bottleneck堆叠而成。</p>
 <h2 id="mobilenet-v2-实验">MobileNet V2 实验</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20260121222136.png 验证了降维用线性激活函数，这样能更早的收敛，且性能更好。 横轴为训练的步长，纵轴为准确率。 残差链接两个低维的&gt;高维&gt;不连</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121223346.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121223418.png 性能最好，推断速度最快，参数量和计算量很少。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121223541.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121223622.png</div>
-<p>计算机视觉任务中的目标检测和语义分割，以及如何通过优化网络结构和数学原理来降低计算量和参数量，同时保持性能。 单阶段目标检测SSD框架改进，SSD可以从骨干网络提取的不同层的特征中进行目标检测，构建一个模型SSD Lite，使用MobileNet v1或v2作为骨干网络，同时SSD预测层的卷积从常规卷积换为深度可分离卷积，所以计算量和参数量大大减少了。</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260121224542.png 使用MobileNet v2和Deeplab v3进行语义分割，进行对照实验</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260121231258.png 调节不同的下采样的倍数，ASPP，加多尺度预测和左右视频翻转，一系列对照实验。</div>
+<p><img src="../assets/media/pasted-image-20260121222136-26757f9c9f.webp" alt="Pasted image 20260121222136.png" /> 验证了降维用线性激活函数，这样能更早的收敛，且性能更好。 横轴为训练的步长，纵轴为准确率。 残差链接两个低维的&gt;高维&gt;不连 <img src="../assets/media/pasted-image-20260121223346-e84f39b673.webp" alt="Pasted image 20260121223346.png" /> <img src="../assets/media/pasted-image-20260121223418-cd7088d5c3.webp" alt="Pasted image 20260121223418.png" /> 性能最好，推断速度最快，参数量和计算量很少。 <img src="../assets/media/pasted-image-20260121223541-f111fe212f.webp" alt="Pasted image 20260121223541.png" /> <img src="../assets/media/pasted-image-20260121223622-288a995a43.webp" alt="Pasted image 20260121223622.png" /></p>
+<p>计算机视觉任务中的目标检测和语义分割，以及如何通过优化网络结构和数学原理来降低计算量和参数量，同时保持性能。 单阶段目标检测SSD框架改进，SSD可以从骨干网络提取的不同层的特征中进行目标检测，构建一个模型SSD Lite，使用MobileNet v1或v2作为骨干网络，同时SSD预测层的卷积从常规卷积换为深度可分离卷积，所以计算量和参数量大大减少了。 <img src="../assets/media/pasted-image-20260121224542-6b7fb05607.webp" alt="Pasted image 20260121224542.png" /> 使用MobileNet v2和Deeplab v3进行语义分割，进行对照实验 <img src="../assets/media/pasted-image-20260121231258-38e9b2e53c.webp" alt="Pasted image 20260121231258.png" /> 调节不同的下采样的倍数，ASPP，加多尺度预测和左右视频翻转，一系列对照实验。</p>
 <h2 id="inverted-升维的数学原理">Inverted 升维的数学原理</h2>
-<p>升维是否能保留信息，是否可逆，是否会因为relu的参与导致信息丢失。</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260122000456.png 低维会造成信息丢失。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122000645.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122000855.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122000952.png 训练前后不丢失信息。</div>
+<p>升维是否能保留信息，是否可逆，是否会因为relu的参与导致信息丢失。 <img src="../assets/media/pasted-image-20260122000456-1e2c3690c9.webp" alt="Pasted image 20260122000456.png" /> 低维会造成信息丢失。 <img src="../assets/media/pasted-image-20260122000645-590f967111.webp" alt="Pasted image 20260122000645.png" /> <img src="../assets/media/pasted-image-20260122000855-df9fa3b1a0.webp" alt="Pasted image 20260122000855.png" /> <img src="../assets/media/pasted-image-20260122000952-c9a15d8eda.webp" alt="Pasted image 20260122000952.png" /> 训练前后不丢失信息。</p>
 <h2 id="mobilenet-v2-keras代码实战">MobileNet V2 Keras代码实战</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20260122001155.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122001222.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122001345.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122001535.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122001607.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122001627.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122001659.png</div>
+<p><img src="../assets/media/pasted-image-20260122001155-9d6d3b0f6f.webp" alt="Pasted image 20260122001155.png" /> <img src="../assets/media/pasted-image-20260122001222-b66915a6b6.webp" alt="Pasted image 20260122001222.png" /> <img src="../assets/media/pasted-image-20260122001345-dfdd289bac.webp" alt="Pasted image 20260122001345.png" /> <img src="../assets/media/pasted-image-20260122001535-21680b7770.webp" alt="Pasted image 20260122001535.png" /> <img src="../assets/media/pasted-image-20260122001607-154b5244e1.webp" alt="Pasted image 20260122001607.png" /> <img src="../assets/media/pasted-image-20260122001627-133c632145.webp" alt="Pasted image 20260122001627.png" /> <img src="../assets/media/pasted-image-20260122001659-3eaa0e830f.webp" alt="Pasted image 20260122001659.png" /></p>
 <h1 id="mobilenet-v3">MobileNet V3</h1>
-<p>V3包括MobileNetV3-Large和MobileNetV3-Small两个版本，以满足不同的计算需求。按照论文给出的实验结果，V3-Large比V2的ImageNet准确率提高3.2%，速度快20%。在COCO数据集上，V3-Large与V2的准确率相当，但是速度快25%。</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260122123841.png 蓝色代表v3large宽度系数调整版（1），宽度系数越大，意味着模型的参数越多，计算量越大，准确率越来越高。 紫色虚线对应分辨率调整版（2） 重点看v3与v2的不同 latency在手机上推理所需要的时间</div>
+<p>V3包括MobileNetV3-Large和MobileNetV3-Small两个版本，以满足不同的计算需求。按照论文给出的实验结果，V3-Large比V2的ImageNet准确率提高3.2%，速度快20%。在COCO数据集上，V3-Large与V2的准确率相当，但是速度快25%。 <img src="../assets/media/pasted-image-20260122123841-3f40d0b31c.webp" alt="Pasted image 20260122123841.png" /> 蓝色代表v3large宽度系数调整版（1），宽度系数越大，意味着模型的参数越多，计算量越大，准确率越来越高。 紫色虚线对应分辨率调整版（2） 重点看v3与v2的不同 latency在手机上推理所需要的时间</p>
 <h2 id="改进">改进</h2>
-<p>为了取得准确率和推理速度的完美平衡，V3模型主要做了以下四方面技术改进。 （1）采用增加了SE机制的Bottleneck（反向线性残差）模块结构。 在V2采用的反向线性残差块基础上增加SE模块，提升模块学习效率。V3版反向线性残差块的结构如图2.20所示。NL表示非线性激活函数。</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260122131838.png SE模块是对特征层采取全局平均池化，第一个FC全连接，第二个全连接（H-睡个毛函数），再乘以这个主分支往下传过来的特征层，得到新的输出。 多了一个SE模块进行变换。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122132659.png SE主分支往下走，另一个分支，再相乘。 用例子演示SE逻辑。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122132920.png （2）采用h-swish 替代MobileNetV2 中的ReLU6 激活函数，提升模型推理速度。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122133212.png 图2.22对比了 h-sigmoid 与 sigmoid 的函数曲线，表明h-sigmoid 可以取得与 sigmoid相当的效果。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122133249.png 直线状态机算量大大降低。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122133431.png 推理速度加快。 （3）采用更为精细的 NAS 搜索方法建立基准模型。 论文中介绍首先采用 NAS全局搜索确定模块的最优结构，论文中称这个操作为Platform-Aware NAS for Blockwise Search。然后做模块内的分层搜索确定最优卷积核数量，论文中称力 NetAdapt for Layerwise Search。 v2中卷积核数量都是3X3的，v3不同 （4）进一步优化模型的输入 Stage 与输出 Stage 的结构，在不降低准确率的前提下，降低计算量，提升速度。 MobileNetV2 的第一个卷积层采用32个过滤器，MobileNetV3減少为16个，降低计算量的同时仍然能够保持准确率。 对于最后一个 Stage 的优化方案如图2.24所示。对比基于 NAS 得到的原始结构，在不损失模型准确率的前提下，优化后的结构舍弃了其中比较耗费计算力的三个层。</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260122133724.png</div>
+<p>为了取得准确率和推理速度的完美平衡，V3模型主要做了以下四方面技术改进。 （1）采用增加了SE机制的Bottleneck（反向线性残差）模块结构。 在V2采用的反向线性残差块基础上增加SE模块，提升模块学习效率。V3版反向线性残差块的结构如图2.20所示。NL表示非线性激活函数。 <img src="../assets/media/pasted-image-20260122131838-043288bd9e.webp" alt="Pasted image 20260122131838.png" /> SE模块是对特征层采取全局平均池化，第一个FC全连接，第二个全连接（H-睡个毛函数），再乘以这个主分支往下传过来的特征层，得到新的输出。 多了一个SE模块进行变换。 <img src="../assets/media/pasted-image-20260122132659-0898188a5b.webp" alt="Pasted image 20260122132659.png" /> SE主分支往下走，另一个分支，再相乘。 用例子演示SE逻辑。 <img src="../assets/media/pasted-image-20260122132920-bf3eab4a39.webp" alt="Pasted image 20260122132920.png" /> （2）采用h-swish 替代MobileNetV2 中的ReLU6 激活函数，提升模型推理速度。 <img src="../assets/media/pasted-image-20260122133212-97a3436055.webp" alt="Pasted image 20260122133212.png" /> 图2.22对比了 h-sigmoid 与 sigmoid 的函数曲线，表明h-sigmoid 可以取得与 sigmoid相当的效果。 <img src="../assets/media/pasted-image-20260122133249-4ea52bc47e.webp" alt="Pasted image 20260122133249.png" /> 直线状态机算量大大降低。 <img src="../assets/media/pasted-image-20260122133431-e8a15d40f8.webp" alt="Pasted image 20260122133431.png" /> 推理速度加快。 （3）采用更为精细的 NAS 搜索方法建立基准模型。 论文中介绍首先采用 NAS全局搜索确定模块的最优结构，论文中称这个操作为Platform-Aware NAS for Blockwise Search。然后做模块内的分层搜索确定最优卷积核数量，论文中称力 NetAdapt for Layerwise Search。 v2中卷积核数量都是3X3的，v3不同 （4）进一步优化模型的输入 Stage 与输出 Stage 的结构，在不降低准确率的前提下，降低计算量，提升速度。 MobileNetV2 的第一个卷积层采用32个过滤器，MobileNetV3減少为16个，降低计算量的同时仍然能够保持准确率。 对于最后一个 Stage 的优化方案如图2.24所示。对比基于 NAS 得到的原始结构，在不损失模型准确率的前提下，优化后的结构舍弃了其中比较耗费计算力的三个层。 <img src="../assets/media/pasted-image-20260122133724-0d24304a48.webp" alt="Pasted image 20260122133724.png" /></p>
 <h2 id="模型结构">模型结构</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20260122133915.png out：输出通道数，NL：非线性激活函数，S：operate步长 MobileNetv3 large版预训练权重文件 https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet</div>
+<p><img src="../assets/media/pasted-image-20260122133915-722aaae7d6.webp" alt="Pasted image 20260122133915.png" /> out：输出通道数，NL：非线性激活函数，S：operate步长 MobileNetv3 large版预训练权重文件 https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet</p>
 <h1 id="v1-3总结">v1-3总结</h1>
 <p>MobileNetV1有两个创新点： （1） 采用深度可分离卷积（Depthwise Separable Convolution）取代标准卷积（Standard Convolution），降低计算量。 （2）采用a、p两个超参数，调节模型的宽度（卷积核个数）和图像分辦率，控制模型规模，满足不同应用需求。 正如论文题目所声称的那样，MobileNetV2其主要技术改进有两点： （1） 采用反向残差结构 （Inverted residuals） （2） 采用线性瓶颈层 （Linear Bottlenecks） 即反向线性残差结构。 为了取得准确率和推理速度的完美平衡，V3与V2相比，模型主要做了以下四方面技术改进。 （1）采用增加了SE机制的Bottleneck模块结构。 （2）采用h-swish替代MobileNetV2中的ReLU6激活函数，提升模型推理速度。 （3）采用更为精细的NAS搜索方法建立基准模型。 （4）进一步优化模型的输入Stage与输出Stage的结构，在不降低准确率的前提下，降低计算量，提升速度。</p>
 <h1 id="mobilenet-v4">MobileNet V4</h1>
@@ -182,10 +116,10 @@
 </section>
 <section class="catList">
   <h3 class="catListTitle">潮汐分区</h3>
-  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
-<li><a href="../categories.html#造船">造船<span>11</span></a></li>
-<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
-<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
+  <ul class="sectionSideList"><li><a href="../sections/shi-bei.html">拾贝<span>12</span></a></li>
+<li><a href="../sections/zao-chuan.html">造船<span>11</span></a></li>
+<li><a href="../sections/qian-yuan.html">潜渊<span>4</span></a></li>
+<li><a href="../sections/piao-liu-ping.html">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

@@ -300,6 +300,156 @@ a:hover {
   box-shadow: var(--shadow);
 }
 
+.homeTideIntro {
+  max-width: 720px;
+  margin: 0 0 18px;
+}
+
+.homeTideIntro h2,
+.sectionPageHero h2 {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+.homeTideIntro p,
+.sectionPageHero p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.homeTideGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.homeTideCard {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 16px;
+  min-height: 188px;
+  overflow: hidden;
+  padding: 22px;
+  color: var(--ink);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.54)),
+    linear-gradient(135deg, rgba(123, 216, 208, 0.18), rgba(236, 231, 255, 0.28));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 46px rgba(42, 82, 92, 0.1);
+  backdrop-filter: blur(18px);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.homeTideCard::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--aqua), var(--lilac), var(--coral));
+  content: "";
+}
+
+.homeTideCard:nth-child(2)::after {
+  background: linear-gradient(90deg, #78d8a7, var(--sun), var(--aqua));
+}
+
+.homeTideCard:nth-child(3)::after {
+  background: linear-gradient(90deg, #9eb8ff, var(--aqua), #b8ead7);
+}
+
+.homeTideCard:nth-child(4)::after {
+  background: linear-gradient(90deg, #c9bbff, #f2c3dd, #a9e6df);
+}
+
+.homeTideCard:hover {
+  color: var(--ink);
+  border-color: rgba(31, 143, 137, 0.28);
+  box-shadow: 0 22px 64px rgba(42, 82, 92, 0.16);
+  text-decoration: none;
+  transform: translateY(-3px);
+}
+
+.homeTideNo {
+  color: rgba(24, 35, 37, 0.2);
+  font-family: var(--serif);
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.homeTideText {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 7px;
+}
+
+.homeTideText small {
+  color: #188c86;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.homeTideText strong {
+  font-family: var(--serif);
+  font-size: 34px;
+  line-height: 1.12;
+}
+
+.homeTideText em {
+  color: var(--muted);
+  font-style: normal;
+  line-height: 1.65;
+}
+
+.homeTideMeta {
+  grid-column: 2;
+  align-self: end;
+  color: rgba(24, 35, 37, 0.48);
+  font-size: 13px;
+}
+
+.sectionPageHero {
+  margin-bottom: 18px;
+  padding: 30px;
+  background:
+    linear-gradient(135deg, rgba(123, 216, 208, 0.22), rgba(255, 255, 255, 0.6)),
+    rgba(255, 255, 255, 0.74);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.sectionPageHero dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: 22px 0 0;
+}
+
+.sectionPageHero dt,
+.sectionPageHero dd {
+  margin: 0;
+}
+
+.sectionPageHero dt {
+  font-family: var(--serif);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.sectionPageHero dd {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .tideIntro,
 .archive,
 .about,
@@ -341,6 +491,10 @@ a:hover {
   gap: 16px;
 }
 
+.tideBoard.single {
+  grid-template-columns: 1fr;
+}
+
 .tideSection {
   min-width: 0;
   padding: 20px;
@@ -353,7 +507,7 @@ a:hover {
 
 .sectionHeader {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr);
+  grid-template-columns: 58px minmax(0, 1fr) auto;
   gap: 14px;
   align-items: center;
 }
@@ -389,6 +543,25 @@ a:hover {
 .sectionHeader small,
 .sectionDesc {
   color: var(--muted);
+}
+
+.sectionEnter {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  color: #117a76;
+  background: rgba(123, 216, 208, 0.2);
+  border: 1px solid rgba(31, 143, 137, 0.16);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.sectionEnter:hover {
+  background: rgba(123, 216, 208, 0.3);
+  text-decoration: none;
 }
 
 .sectionDesc {
@@ -901,6 +1074,7 @@ th {
     width: min(330px, 100%);
   }
 
+  .homeTideGrid,
   .tideBoard {
     grid-template-columns: 1fr;
   }
@@ -935,8 +1109,27 @@ th {
     font-size: 16px;
   }
 
+  .homeTideCard {
+    grid-template-columns: 46px minmax(0, 1fr);
+    min-height: 170px;
+    padding: 18px;
+  }
+
+  .homeTideNo {
+    font-size: 30px;
+  }
+
+  .homeTideText strong {
+    font-size: 28px;
+  }
+
+  .homeTideMeta {
+    grid-column: 1 / -1;
+  }
+
   .tideIntro,
   .tideSection,
+  .sectionPageHero,
   .archive,
   .about,
   .post {
@@ -945,6 +1138,11 @@ th {
 
   .sectionHeader {
     grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .sectionEnter {
+    grid-column: 2;
+    justify-self: start;
   }
 
   .sectionIndex {

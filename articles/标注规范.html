@@ -22,7 +22,7 @@
       <nav id="navigator" aria-label="主导航">
         <ul id="navList">
           <li><a class="menu" href="../index.html">首页</a></li>
-<li><a class="menu" href="../categories.html">目录</a></li>
+<li><a class="menu" href="../categories.html">分区</a></li>
 <li><a class="menu" href="../archive.html">归档</a></li>
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#造船">造船</a><span>/</span><strong>人脸色斑检测标注规范</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../sections/zao-chuan.html">造船</a><span>/</span><strong>人脸色斑检测标注规范</strong></div>
   <h1 class="postTitle single"><span>人脸色斑检测标注规范</span></h1>
-  <div class="postDesc">posted @ 2026-03-17 墨玉 分区: <a href="../categories.html#造船">造船</a></div>
+  <div class="postDesc">posted @ 2026-03-17 墨玉 分区: <a href="../sections/zao-chuan.html">造船</a></div>
   <p class="postSummary">记录色斑、痘痣等类别的标注边界、质量控制和一致性要求。</p>
   <div class="postTags"><span>标注</span> <span>规范</span> <span>数据质量</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#类别定义与基础标注规则">1.类别定义与基础标注规则</a></li>
@@ -62,9 +62,8 @@
 <p>斑 <strong>颜色</strong>： 浅褐色、黄褐色、咖啡色。 <strong>特征</strong>： 边界模糊、不规则。通常是成片出现（如雀斑）或大面积出现（如黄褐斑）。 <strong>立体感</strong>： 绝对平整，完全没有凸起。 <strong>判定技巧</strong>： 边缘像水彩画晕染开的、颜色比痣浅、形状不规则的，归为“斑”。</p>
 <h4 id="注意事项">注意事项：</h4>
 <ol type="1">
-<li>对于斑点是这种一片式的，标注这些脸上干净的，明显的，容易标注的斑点。</li>
+<li>对于斑点是这种一片式的，标注这些脸上干净的，明显的，容易标注的斑点。 <img src="../assets/media/pasted-image-20260316001714-a47284665d.webp" alt="Pasted image 20260316001714.png" /></li>
 </ol>
-<div class="image-placeholder">图片未发布：Pasted image 20260316001714.png</div>
 <h3 id="acne">1.2acne</h3>
 <p>痘 <strong>颜色</strong>： 鲜红色、暗红色、淡粉色，或者带有黄白色的脓头。 <strong>特征</strong>： 伴有炎症反应（周围皮肤发红发亮）。 <strong>立体感</strong>： 明显的凸起。在侧光下会有阴影。 <strong>判定技巧</strong>： 只要是红色系且中心有隆起的，全部归为“痘”。</p>
 <h3 id="mole">1.3mole</h3>
@@ -74,16 +73,11 @@
 <h2 id="易混淆情况">2.易混淆情况</h2>
 <h3 id="区分斑和痣">2.1区分斑和痣</h3>
 <ol type="1">
-<li>按照边缘规则与否进行区分，绿色为斑，红色为痣。</li>
+<li><p>按照边缘规则与否进行区分，绿色为斑，红色为痣。 <img src="../assets/media/pasted-image-20260316004240-38402d3c7b.webp" alt="Pasted image 20260316004240.png" /></p></li>
+<li><p>按照颜色均为深黑色或墨灰色，按照边界特征，下方那个点边缘非常锐利、清晰，上方那个点虽然边缘稍显模糊，但中心色核非常深且圆。按照视觉厚度二者均凸起，红色框均为痣。 <img src="../assets/media/pasted-image-20260316004521-3ccd00bdad.webp" alt="Pasted image 20260316004521.png" /></p></li>
 </ol>
-<div class="image-placeholder">图片未发布：Pasted image 20260316004240.png</div>
-<ol start="2" type="1">
-<li>按照颜色均为深黑色或墨灰色，按照边界特征，下方那个点边缘非常锐利、清晰，上方那个点虽然边缘稍显模糊，但中心色核非常深且圆。按照视觉厚度二者均凸起，红色框均为痣。</li>
-</ol>
-<div class="image-placeholder">图片未发布：Pasted image 20260316004521.png</div>
 <h3 id="不在这三类中">2.2不在这三类中</h3>
-<p>此类为痘坑，无需标注</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260316003849.png</div>
+<p>此类为痘坑，无需标注 <img src="../assets/media/pasted-image-20260316003849-4fd903835a.webp" alt="Pasted image 20260316003849.png" /></p>
 <h2 id="不需要标注但保留的图片">3.不需要标注但保留的图片</h2>
 <p>图中无标注三类但不能删除。 这些图仍会用于模型训练中的背景学习。</p>
 
@@ -116,10 +110,10 @@
 </section>
 <section class="catList">
   <h3 class="catListTitle">潮汐分区</h3>
-  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
-<li><a href="../categories.html#造船">造船<span>11</span></a></li>
-<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
-<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
+  <ul class="sectionSideList"><li><a href="../sections/shi-bei.html">拾贝<span>12</span></a></li>
+<li><a href="../sections/zao-chuan.html">造船<span>11</span></a></li>
+<li><a href="../sections/qian-yuan.html">潜渊<span>4</span></a></li>
+<li><a href="../sections/piao-liu-ping.html">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

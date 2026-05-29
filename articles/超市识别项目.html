@@ -22,7 +22,7 @@
       <nav id="navigator" aria-label="主导航">
         <ul id="navList">
           <li><a class="menu" href="../index.html">首页</a></li>
-<li><a class="menu" href="../categories.html">目录</a></li>
+<li><a class="menu" href="../categories.html">分区</a></li>
 <li><a class="menu" href="../archive.html">归档</a></li>
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#造船">造船</a><span>/</span><strong>超市识别项目：视频预处理、标注与 YOLO 训练</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../sections/zao-chuan.html">造船</a><span>/</span><strong>超市识别项目：视频预处理、标注与 YOLO 训练</strong></div>
   <h1 class="postTitle single"><span>超市识别项目：视频预处理、标注与 YOLO 训练</span></h1>
-  <div class="postDesc">posted @ 2026-04-16 墨玉 分区: <a href="../categories.html#造船">造船</a></div>
+  <div class="postDesc">posted @ 2026-04-16 墨玉 分区: <a href="../sections/zao-chuan.html">造船</a></div>
   <p class="postSummary">记录自助收银/人工柜台场景下的视频处理、数据标注、YOLO 训练、目标追踪和状态机理解过程。</p>
   <div class="postTags"><span>项目</span> <span>YOLO</span> <span>目标追踪</span> <span>状态机</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#安装anaconda">安装anaconda</a></li>
@@ -105,8 +105,7 @@
 <h2 id="下载yolov5">下载yolov5</h2>
 <p><code>git clone https://github.com/ultralytics/yolov5.git ~/yolov5</code></p>
 <h2 id="配置pycharm">配置pycharm</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20250917183103.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20250917184205.png</div>
+<p><img src="../assets/media/pasted-image-20250917183103-0599a77b78.webp" alt="Pasted image 20250917183103.png" /> <img src="../assets/media/pasted-image-20250917184205-dca490c7fe.webp" alt="Pasted image 20250917184205.png" /></p>
 <h1 id="视频预处理记录">视频预处理记录</h1>
 <h2 id="视频筛选和分割">视频筛选和分割</h2>
 <p>下载好的视频，首先筛选出有用的部分，从八点半到二十二点半，脚本如下：</p>
@@ -621,11 +620,9 @@ for video_file in video_files:
 1. 从银色置物台范围内有手或东西进入开始。[视频预处理记录](https://ncn43upzlite.feishu.cn/docx/DJ3sdxU6PoUs3rx4yJdcvTcPnRe#share-MWOcd2pm4oYTfGx3S5ccL1zjnQb)
 
 2. 到置物台范围内付款结束或者所有内容离开置物台为止。（只要你认为在某一时间节点之后没有值得注意的数据）[视频预处理记录](https://ncn43upzlite.feishu.cn/docx/DJ3sdxU6PoUs3rx4yJdcvTcPnRe#share-ROOgdFb2rolgkwxRYnXceHrJndc)
-
-&gt; 图片未发布：Pasted image 20251024191715.png
+![Pasted image 20251024191715.png](../assets/media/pasted-image-20251024191715-6c757deb9f.webp)
 这个场景中，上一个人刚刚结束扫码（左侧车子），下一个人正准备开始扫码。
-
-&gt; 图片未发布：Pasted image 20251024192103.png
+![Pasted image 20251024192103.png](../assets/media/pasted-image-20251024192103-026027bc2e.webp)
 这个场景中，这个女生扫完码之后直接拎着东西就走了。事实上她扫码扫了很长时间，意思那个玉米没打标签，等营业员等了很久，但是中间部分不需要做处理，全部保留，我们会在标记的时候筛选有用的信息。
 
   对于人工柜台：
@@ -635,17 +632,13 @@ for video_file in video_files:
 2. 到车辆的一大半离开画面结束。（这里判断车辆位置的任务会交给后处理步骤去完成，因此现在不必考虑车子到哪里就停止标注）[视频预处理记录](https://ncn43upzlite.feishu.cn/docx/DJ3sdxU6PoUs3rx4yJdcvTcPnRe#share-CDF8dILifodwtIxOnUGcl9tUnsb)
 
 3. 注意：视频中出现的一种黑色的可以拉的篮子也需考虑，将它作为正常的推车对待。
-
-&gt; 图片未发布：Pasted image 20251024192126.png
+![Pasted image 20251024192126.png](../assets/media/pasted-image-20251024192126-b0fa880524.webp)
 这个小车其实是排在前一个小车后面的，因此这里可以不需要单独裁剪，贴出这个图只是示例起始点。
-
-&gt; 图片未发布：Pasted image 20251024192905.png
+![Pasted image 20251024192905.png](../assets/media/pasted-image-20251024192905-3009fb5ffd.webp)
 这里这个老人就是左边那辆车的推车手，他的车有一大半都离开监控区域了，接下来的数据已经无法作为模型的参考了，所以这一条可以在这里停止。
-
-&gt; 图片未发布：Pasted image 20251024192934.png
+![Pasted image 20251024192934.png](../assets/media/pasted-image-20251024192934-20c31074e5.webp)
 这一家人在车子推进来之前就在柜台前面站了很久，但是车子还没有推进来，因此前面的数据对我们没有作用，当车子的一大半进入画面之后在开始计算。
-
-&gt; 图片未发布：Pasted image 20251024192948.png
+![Pasted image 20251024192948.png](../assets/media/pasted-image-20251024192948-8ba5863e22.webp)
 这里穿黑衣服的老人刚刚把车拉出去，车的一大半仍留在画面内但是下一秒就几乎看不见了，所以这里可以裁剪一下。下一个老奶奶没有推车子进来，不用管她。
 
 ### 视频抽帧脚本
@@ -813,25 +806,14 @@ python setup.py install --user</code></pre></details>
 <li><p>点击<code>open dir</code>，打开你保存数据照片的文件夹<code>extracted_frames</code>。</p></li>
 <li><p>打开之后页面中会显示当前文件夹第一张图片，切换标注格式到YOLO（默认这个按钮是VOC）。</p></li>
 <li><p>接下来开始标注，可以参考标注快捷键，打开自动保存之类的。</p></li>
-<li><p>标注的框框可以大一点，确保小推车可以完整地被包括在框内，哪怕框到一些别的东西也没事。</p></li>
-</ol>
-<div class="image-placeholder">图片未发布：Pasted image 20251024193731.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20251024193738.png</div>
-<ol start="8" type="1">
+<li><p>标注的框框可以大一点，确保小推车可以完整地被包括在框内，哪怕框到一些别的东西也没事。 <img src="../assets/media/pasted-image-20251024193731-3ac3ffa8f3.webp" alt="Pasted image 20251024193731.png" /> <img src="../assets/media/pasted-image-20251024193738-dc2d972cc7.webp" alt="Pasted image 20251024193738.png" /></p></li>
 <li><p>第一个图片标完之后会弹出来一个框框让你选择保存路径，在当前文件夹下新建一个label文件夹。</p></li>
 <li><p>优质数据，车子全空了但是还留了个白色袋子。</p></li>
-<li><p>如果画面中出现两个车子，两个都要标，同理三个也要标。</p></li>
-</ol>
-<div class="image-placeholder">图片未发布：Pasted image 20251024194909.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20251024194916.png</div>
-<ol start="11" type="1">
+<li><p>如果画面中出现两个车子，两个都要标，同理三个也要标。 <img src="../assets/media/pasted-image-20251024194909-b71efae178.webp" alt="Pasted image 20251024194909.png" /> <img src="../assets/media/pasted-image-20251024194916-a523766799.webp" alt="Pasted image 20251024194916.png" /></p></li>
 <li><p>这是一个好数据，但是前面出现过两次了，这个第三次出现就把他删掉（快捷键<code>ctrl+shift+d</code>）。</p></li>
 <li><p>发现前面漏了一个小车的数据。</p></li>
-<li><p>这里被遮挡的特别严重就不标了。</p></li>
+<li><p>这里被遮挡的特别严重就不标了。 <img src="../assets/media/pasted-image-20251024194953-fd7b75e013.webp" alt="Pasted image 20251024194953.png" /> <img src="../assets/media/pasted-image-20251024194959-2c4b0e7a00.webp" alt="Pasted image 20251024194959.png" /> <img src="../assets/media/pasted-image-20251024195004-1a3d35f0d1.webp" alt="Pasted image 20251024195004.png" /></p></li>
 </ol>
-<div class="image-placeholder">图片未发布：Pasted image 20251024194953.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20251024194959.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20251024195004.png</div>
 <h3 id="自助收银">自助收银</h3>
 <p>这里分的三类的名称分别为： 手持货物：object 手持手机：phone 空手操作：hand</p>
 <ol type="1">
@@ -937,10 +919,7 @@ dataset/
 <li><p>图片移到 <code>images/train</code> / <code>images/val</code>，标注移到 <code>labels/train</code> / <code>labels/val</code>。<code>classes.txt</code> 保留在根目录。</p></li>
 </ol>
 <h4 id="训练和调参过程">训练和调参过程</h4>
-<p>当前目录结构如下：</p>
-<blockquote>
-<p>图片未发布：Pasted image 20251012160135.png 配置 <code>data.yaml</code>，用于给模型指向数据集。</p>
-</blockquote>
+<p>当前目录结构如下： <img src="../assets/media/pasted-image-20251012160135-a51a63b771.webp" alt="Pasted image 20251012160135.png" /> 配置 <code>data.yaml</code>，用于给模型指向数据集。</p>
 <p>```YAML title:“data” # dataset/data.yaml</p>
 <h1 id="数据集根目录">数据集根目录</h1>
 <p>path: ~/Desktop/自助收银</p>
@@ -1882,10 +1861,10 @@ Region of Interest
 </section>
 <section class="catList">
   <h3 class="catListTitle">潮汐分区</h3>
-  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
-<li><a href="../categories.html#造船">造船<span>11</span></a></li>
-<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
-<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
+  <ul class="sectionSideList"><li><a href="../sections/shi-bei.html">拾贝<span>12</span></a></li>
+<li><a href="../sections/zao-chuan.html">造船<span>11</span></a></li>
+<li><a href="../sections/qian-yuan.html">潜渊<span>4</span></a></li>
+<li><a href="../sections/piao-liu-ping.html">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

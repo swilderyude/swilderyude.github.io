@@ -22,7 +22,7 @@
       <nav id="navigator" aria-label="主导航">
         <ul id="navList">
           <li><a class="menu" href="../index.html">首页</a></li>
-<li><a class="menu" href="../categories.html">目录</a></li>
+<li><a class="menu" href="../categories.html">分区</a></li>
 <li><a class="menu" href="../archive.html">归档</a></li>
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#造船">造船</a><span>/</span><strong>人脸色斑检测优化计划</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../sections/zao-chuan.html">造船</a><span>/</span><strong>人脸色斑检测优化计划</strong></div>
   <h1 class="postTitle single"><span>人脸色斑检测优化计划</span></h1>
-  <div class="postDesc">posted @ 2026-05-12 墨玉 分区: <a href="../categories.html#造船">造船</a></div>
+  <div class="postDesc">posted @ 2026-05-12 墨玉 分区: <a href="../sections/zao-chuan.html">造船</a></div>
   <p class="postSummary">围绕小目标检测、分割模型、切图推理、损失函数和多任务管线整理后续优化方向。</p>
   <div class="postTags"><span>优化</span> <span>小目标</span> <span>分割</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#一问题对应优化方案">一、问题对应优化方案</a></li>
@@ -89,9 +89,7 @@
 <p>当前问题表现是色斑密集时只能识别部分区域，大量小斑点无法识别，痘痘/色斑密集时识别数量明显不足。</p>
 <h3 id="当前核心问题">当前核心问题</h3>
 <p>对于密集色斑图片，目前无法明确，最终需要展示怎样的检测效果。 例如，是倾向于更加精细的识别效果；还是更偏向整体区域展示；或者以区域化方式进行识别。 不同方式对应的检测精度、检测框数量、展示效果、模型训练难度都会存在明显差异。</p>
-<p>目前的内容是，对于色斑密集图片，需由需求方明确确认<strong>最终期望的色斑识别效果</strong>。 例图：</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260512193830.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260512193850.png 建议直接在测试图片上标注，希望怎样框选、希望框到什么程度、是否需要每个点单独识别。 便于后续统一标注标准，统一训练方向，避免重复调整。</div>
+<p>目前的内容是，对于色斑密集图片，需由需求方明确确认<strong>最终期望的色斑识别效果</strong>。 例图： <img src="../assets/media/pasted-image-20260512193830-bf3dc2f593.webp" alt="Pasted image 20260512193830.png" /> <img src="../assets/media/pasted-image-20260512193850-7aeb4d3163.webp" alt="Pasted image 20260512193850.png" /> 建议直接在测试图片上标注，希望怎样框选、希望框到什么程度、是否需要每个点单独识别。 便于后续统一标注标准，统一训练方向，避免重复调整。</p>
 <h3 id="标注示例需求">标注示例需求</h3>
 <p>建议提供色斑标注示例图。 明确哪些需要框、哪些不需要框、密集区域如何处理、连续区域如何处理。</p>
 <h3 id="漏检问题处理方案">漏检问题处理方案</h3>
@@ -151,10 +149,10 @@
 </section>
 <section class="catList">
   <h3 class="catListTitle">潮汐分区</h3>
-  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
-<li><a href="../categories.html#造船">造船<span>11</span></a></li>
-<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
-<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
+  <ul class="sectionSideList"><li><a href="../sections/shi-bei.html">拾贝<span>12</span></a></li>
+<li><a href="../sections/zao-chuan.html">造船<span>11</span></a></li>
+<li><a href="../sections/qian-yuan.html">潜渊<span>4</span></a></li>
+<li><a href="../sections/piao-liu-ping.html">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path(os.environ.get("MOYU_SOURCE", ROOT.parent / "moyu")).expanduser().resolve()
 DIST = ROOT
 ARTICLES_DIR = DIST / "articles"
+SECTIONS_DIR = DIST / "sections"
 ASSETS_DIR = DIST / "assets"
 MEDIA_DIR = ASSETS_DIR / "media"
 SITE_ASSET_DIR = ASSETS_DIR / "site"
@@ -39,27 +40,37 @@ SITE = {
 TIDE_SECTIONS = {
     "拾贝": {
         "en": "Shells",
+        "label": "学习记录",
         "motto": "学习记录，零散捡到的都算。",
         "desc": "AI 基础、计算机视觉、工具与日常学习笔记，都先收进这一篮贝壳里。",
     },
     "造船": {
         "en": "Shipyard",
+        "label": "项目记录",
         "motto": "项目记录，从龙骨到下水。",
         "desc": "把项目推进中的数据、标注、训练、封装、复盘按时间留下来。",
     },
     "潜渊": {
         "en": "Deep Dive",
+        "label": "科研记录",
         "motto": "科研记录，往深处去。",
         "desc": "论文精读、科研方法和模型机制理解，放在更深的水域里慢慢看。",
     },
     "漂流瓶": {
         "en": "Drift Bottle",
+        "label": "思想感悟",
         "motto": "思想感悟，写给海，不一定有人捡。",
         "desc": "暂时还没有投出的瓶子，等某天潮水把它带来。",
     },
 }
 
 SECTION_ORDER = ("拾贝", "造船", "潜渊", "漂流瓶")
+SECTION_SLUGS = {
+    "拾贝": "shi-bei",
+    "造船": "zao-chuan",
+    "潜渊": "qian-yuan",
+    "漂流瓶": "piao-liu-ping",
+}
 
 
 @dataclass(frozen=True)
@@ -307,6 +318,14 @@ def page_slug(article: ArticleConfig) -> str:
     return slugify(stem if stem.lower() not in {"readme", "未命名"} else article.title)
 
 
+def section_slug(section: str) -> str:
+    return SECTION_SLUGS.get(section, slugify(section))
+
+
+def section_url(section: str, prefix: str = "") -> str:
+    return f"{prefix}sections/{section_slug(section)}.html"
+
+
 def display_folder_parts_from_source(source: str) -> list[str]:
     parts = list(Path(source).parts[:-1])
     if parts and parts[0] == "CS自学":
@@ -370,10 +389,7 @@ def find_image(article_path: Path, name: str) -> Path | None:
 
 
 def image_is_safe(article: ArticleConfig, image_path: Path) -> bool:
-    if not article.include_images:
-        return False
-    normalized = str(image_path)
-    if "人脸色斑检测" in normalized or "医院" in normalized:
+    if image_path.name.startswith("._"):
         return False
     return image_path.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 
@@ -634,7 +650,7 @@ def layout(title: str, active: str, main: str, sidebar: str, description: str = 
     desc = html_escape(description or SITE["subtitle"])
     nav = [
         ("首页", f"{prefix}index.html", "home"),
-        ("目录", f"{prefix}categories.html", "categories"),
+        ("分区", f"{prefix}categories.html", "categories"),
         ("归档", f"{prefix}archive.html", "archive"),
         ("关于", f"{prefix}about.html", "about"),
         ("GitHub", SITE["github"], "github"),
@@ -823,7 +839,7 @@ def home_hero_html(articles: list[dict]) -> str:
   <div class="heroContent">
     <p class="heroKicker">Tide Logs</p>
     <h2>潮汐日志</h2>
-    <p class="heroLead">一名学习者的潮汐记录。把学习、项目、科研与偶然漂来的念头，按潮水的节律慢慢写下。</p>
+    <p class="heroLead">一名学习者的潮汐记录。</p>
     <blockquote class="dailyQuote">
       <span data-daily-quote>潮平两岸阔，风正一帆悬。</span>
     </blockquote>
@@ -849,6 +865,38 @@ def group_by_tide_section(articles: list[dict]) -> dict[str, list[dict]]:
     return grouped
 
 
+def home_section_cards_html(articles: list[dict], prefix: str = "") -> str:
+    grouped = group_by_tide_section(articles)
+    cards = []
+    for index, section in enumerate(SECTION_ORDER, 1):
+        meta = TIDE_SECTIONS[section]
+        count = len(grouped.get(section, []))
+        latest = max((item["date"] for item in grouped.get(section, [])), default="待潮")
+        cards.append(
+            f"""
+<a class="homeTideCard" href="{section_url(section, prefix)}" aria-label="进入{html_escape(section)}分区">
+  <span class="homeTideNo">{index:02d}</span>
+  <span class="homeTideText">
+    <small>{html_escape(meta["en"])} · {html_escape(meta["label"])}</small>
+    <strong>{html_escape(section)}</strong>
+    <em>{html_escape(meta["motto"])}</em>
+  </span>
+  <span class="homeTideMeta">{count} 篇 · {html_escape(latest)}</span>
+</a>
+"""
+        )
+    return f"""
+<section class="homeTideIntro">
+  <p class="sectionEyebrow">Tide Sections</p>
+  <h2>四片海域</h2>
+  <p>先靠岸，再读信。每个入口只保留分区气质，进入后才展开目录。</p>
+</section>
+<section class="homeTideGrid" aria-label="潮汐分区">
+  {"".join(cards)}
+</section>
+"""
+
+
 def tide_article_link(article: dict, prefix: str = "", index: int = 1) -> str:
     tags = "".join(f"<span>{html_escape(tag)}</span>" for tag in article["tags"][:2])
     return f"""
@@ -866,27 +914,38 @@ def tide_article_link(article: dict, prefix: str = "", index: int = 1) -> str:
 """
 
 
-def tide_sections_html(articles: list[dict], prefix: str = "", title: str = "潮汐目录", intro: str = "") -> str:
+def tide_sections_html(
+    articles: list[dict],
+    prefix: str = "",
+    title: str = "潮汐目录",
+    intro: str = "",
+    sections: Iterable[str] = SECTION_ORDER,
+) -> str:
     grouped = group_by_tide_section(articles)
     intro_text = intro or "每一段学习都像潮水留下的纹理，按它靠岸的方式归入不同海域。"
     cards = []
-    for section_index, section in enumerate(SECTION_ORDER, 1):
+    selected_sections = tuple(sections)
+    for section_index, section in enumerate(selected_sections, 1):
         meta = TIDE_SECTIONS[section]
         items = grouped.get(section, [])
         if items:
             article_list = "\n".join(tide_article_link(article, prefix, i) for i, article in enumerate(items, 1))
         else:
             article_list = '<li class="emptyBottle">潮水还没有送来新的瓶子。</li>'
+        enter_link = ""
+        if len(selected_sections) > 1:
+            enter_link = f'<a class="sectionEnter" href="{section_url(section, prefix)}">进入{html_escape(section)}</a>'
         cards.append(
             f"""
 <section id="{slugify(section)}" class="tideSection">
   <div class="sectionHeader">
     <span class="sectionIndex">{section_index:02d}</span>
     <div>
-      <p>{html_escape(meta["en"])}</p>
+      <p>{html_escape(meta["en"])} · {html_escape(meta["label"])}</p>
       <h3>{html_escape(section)}</h3>
       <small>{html_escape(meta["motto"])}</small>
     </div>
+    {enter_link}
   </div>
   <p class="sectionDesc">{html_escape(meta["desc"])}</p>
   <ul class="sectionArticles">{article_list}</ul>
@@ -899,7 +958,7 @@ def tide_sections_html(articles: list[dict], prefix: str = "", title: str = "潮
   <h2>{html_escape(title)}</h2>
   <p>{html_escape(intro_text)}</p>
 </section>
-<div class="tideBoard">
+<div class="tideBoard{' single' if len(selected_sections) == 1 else ''}">
   {"".join(cards)}
 </div>
 """
@@ -908,7 +967,7 @@ def tide_sections_html(articles: list[dict], prefix: str = "", title: str = "潮
 def sidebar_section_links(articles: list[dict], prefix: str = "") -> str:
     grouped = group_by_tide_section(articles)
     return "\n".join(
-        f'<li><a href="{prefix}categories.html#{slugify(section)}">{html_escape(section)}<span>{len(grouped.get(section, []))}</span></a></li>'
+        f'<li><a href="{section_url(section, prefix)}">{html_escape(section)}<span>{len(grouped.get(section, []))}</span></a></li>'
         for section in SECTION_ORDER
     )
 
@@ -970,11 +1029,7 @@ def post_card(article: dict) -> str:
 
 
 def build_index(articles: list[dict]) -> None:
-    main = home_hero_html(articles) + tide_sections_html(
-        articles,
-        title="潮汐目录",
-        intro="不摊开成冷冰冰的清单，而按学习时的潮汐归港：拾贝、造船、潜渊，以及尚未投出的漂流瓶。",
-    )
+    main = home_hero_html(articles) + home_section_cards_html(articles)
     (DIST / "index.html").write_text(layout("首页", "home", main, sidebar_html(articles), "潮汐日志，一名学习者的潮汐记录"), encoding="utf-8")
 
 
@@ -992,12 +1047,12 @@ def article_page(article: dict, articles: list[dict]) -> str:
         if a["slug"] != article["slug"] and (a["pinned"] or a["category"] == article["category"])
     )
     tags = " ".join(f'<span>{html_escape(tag)}</span>' for tag in article["tags"])
-    section_href = f'../categories.html#{slugify(article["section"])}'
+    section_href = section_url(article["section"], "../")
     return f"""
 <article class="post">
   <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="{section_href}">{html_escape(article["section"])}</a><span>/</span><strong>{html_escape(article["title"])}</strong></div>
   <h1 class="postTitle single"><span>{html_escape(article["title"])}</span></h1>
-  <div class="postDesc">posted @ {article["date"]} {html_escape(SITE["author"])} 分区: <a href="../categories.html#{slugify(article["section"])}">{html_escape(article["section"])}</a></div>
+  <div class="postDesc">posted @ {article["date"]} {html_escape(SITE["author"])} 分区: <a href="{section_href}">{html_escape(article["section"])}</a></div>
   <p class="postSummary">{html_escape(article["summary"])}</p>
   <div class="postTags">{tags}</div>
   {toc}
@@ -1028,6 +1083,41 @@ def build_categories(articles: list[dict]) -> None:
         intro="拾贝、造船、潜渊、漂流瓶：让笔记按它们的气质靠岸。",
     )
     (DIST / "categories.html").write_text(layout("目录", "categories", main, sidebar_html(articles), "潮汐目录"), encoding="utf-8")
+
+
+def build_sections(articles: list[dict]) -> None:
+    SECTIONS_DIR.mkdir(exist_ok=True)
+    grouped = group_by_tide_section(articles)
+    for section in SECTION_ORDER:
+        meta = TIDE_SECTIONS[section]
+        count = len(grouped.get(section, []))
+        latest = max((item["date"] for item in grouped.get(section, [])), default="待潮")
+        main = f"""
+<section class="sectionPageHero">
+  <p class="sectionEyebrow">{html_escape(meta["en"])} · {html_escape(meta["label"])}</p>
+  <h2>{html_escape(section)}</h2>
+  <p>{html_escape(meta["motto"])}</p>
+  <dl>
+    <div><dt>{count}</dt><dd>篇记录</dd></div>
+    <div><dt>{html_escape(latest)}</dt><dd>最近更新</dd></div>
+  </dl>
+</section>
+""" + tide_sections_html(
+            articles,
+            prefix="../",
+            title=f"{section}目录",
+            intro=meta["desc"],
+            sections=(section,),
+        )
+        page = layout(
+            f"{section} · {meta['label']}",
+            "categories",
+            main,
+            sidebar_html(articles, prefix="../"),
+            meta["desc"],
+            prefix="../",
+        )
+        (SECTIONS_DIR / f"{section_slug(section)}.html").write_text(page, encoding="utf-8")
 
 
 def build_archive(articles: list[dict]) -> None:
@@ -1099,7 +1189,7 @@ def clean_output() -> None:
         path = DIST / name
         if path.exists():
             path.unlink()
-    for path in [ARTICLES_DIR, MEDIA_DIR]:
+    for path in [ARTICLES_DIR, SECTIONS_DIR, MEDIA_DIR]:
         if path.exists():
             shutil.rmtree(path)
     search_index = ASSETS_DIR / "search-index.json"
@@ -1117,6 +1207,7 @@ def main() -> None:
     articles = sorted(articles, key=lambda a: a["date"], reverse=True)
     build_index(articles)
     build_articles(articles)
+    build_sections(articles)
     build_categories(articles)
     build_archive(articles)
     build_about(articles)

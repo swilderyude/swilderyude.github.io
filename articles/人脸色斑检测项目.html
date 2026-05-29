@@ -22,7 +22,7 @@
       <nav id="navigator" aria-label="主导航">
         <ul id="navList">
           <li><a class="menu" href="../index.html">首页</a></li>
-<li><a class="menu" href="../categories.html">目录</a></li>
+<li><a class="menu" href="../categories.html">分区</a></li>
 <li><a class="menu" href="../archive.html">归档</a></li>
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#造船">造船</a><span>/</span><strong>人脸色斑检测项目：从数据处理到 SDK 封装</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../sections/zao-chuan.html">造船</a><span>/</span><strong>人脸色斑检测项目：从数据处理到 SDK 封装</strong></div>
   <h1 class="postTitle single"><span>人脸色斑检测项目：从数据处理到 SDK 封装</span></h1>
-  <div class="postDesc">posted @ 2026-05-28 墨玉 分区: <a href="../categories.html#造船">造船</a></div>
+  <div class="postDesc">posted @ 2026-05-28 墨玉 分区: <a href="../sections/zao-chuan.html">造船</a></div>
   <p class="postSummary">围绕人脸色斑检测任务，整理数据匿名化、数据集结构、YOLO 训练、结果融合与 SDK 对接的完整工程记录。</p>
   <div class="postTags"><span>YOLO</span> <span>小目标检测</span> <span>医学图像</span> <span>工程化</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#数据预处理">数据预处理</a></li>
@@ -1296,9 +1296,8 @@ names: [&#39;spot&#39;]</code></pre></details>
 <p>斑 <strong>颜色</strong>： 浅褐色、黄褐色、咖啡色。 <strong>特征</strong>： 边界模糊、不规则。通常是成片出现（如雀斑）或大面积出现（如黄褐斑）。 <strong>立体感</strong>： 绝对平整，完全没有凸起。 <strong>判定技巧</strong>： 边缘像水彩画晕染开的、颜色比痣浅、形状不规则的，归为“斑”。</p>
 <p><strong>注意事项</strong>：</p>
 <ol type="1">
-<li>对于斑点是这种一片式的，标注这些脸上干净的，明显的，容易标注的斑点。</li>
+<li>对于斑点是这种一片式的，标注这些脸上干净的，明显的，容易标注的斑点。 <img src="../assets/media/pasted-image-20260316001714-a47284665d.webp" alt="Pasted image 20260316001714.png" /></li>
 </ol>
-<div class="image-placeholder">图片未发布：Pasted image 20260316001714.png</div>
 <h6 id="acne-1">1.2acne</h6>
 <p>痘 <strong>颜色</strong>： 鲜红色、暗红色、淡粉色，或者带有黄白色的脓头。 <strong>特征</strong>： 伴有炎症反应（周围皮肤发红发亮）。 <strong>立体感</strong>： 明显的凸起。在侧光下会有阴影。 <strong>判定技巧</strong>： 只要是红色系且中心有隆起的，全部归为“痘”。</p>
 <h6 id="mole">1.3mole</h6>
@@ -1308,16 +1307,11 @@ names: [&#39;spot&#39;]</code></pre></details>
 <h5 id="易混淆情况">2.易混淆情况</h5>
 <h6 id="区分斑和痣">2.1区分斑和痣</h6>
 <ol type="1">
-<li>按照边缘规则与否进行区分，绿色为斑，红色为痣。</li>
+<li><p>按照边缘规则与否进行区分，绿色为斑，红色为痣。 <img src="../assets/media/pasted-image-20260316004240-38402d3c7b.webp" alt="Pasted image 20260316004240.png" /></p></li>
+<li><p>按照颜色均为深黑色或墨灰色，按照边界特征，下方那个点边缘非常锐利、清晰，上方那个点虽然边缘稍显模糊，但中心色核非常深且圆。按照视觉厚度二者均凸起，红色框均为痣。 <img src="../assets/media/pasted-image-20260316004521-3ccd00bdad.webp" alt="Pasted image 20260316004521.png" /></p></li>
 </ol>
-<div class="image-placeholder">图片未发布：Pasted image 20260316004240.png</div>
-<ol start="2" type="1">
-<li>按照颜色均为深黑色或墨灰色，按照边界特征，下方那个点边缘非常锐利、清晰，上方那个点虽然边缘稍显模糊，但中心色核非常深且圆。按照视觉厚度二者均凸起，红色框均为痣。</li>
-</ol>
-<div class="image-placeholder">图片未发布：Pasted image 20260316004521.png</div>
 <h6 id="不在这三类中">2.2不在这三类中</h6>
-<p>此类为痘坑，无需标注</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260316003849.png</div>
+<p>此类为痘坑，无需标注 <img src="../assets/media/pasted-image-20260316003849-4fd903835a.webp" alt="Pasted image 20260316003849.png" /></p>
 <h5 id="不需要标注但保留的图片">3.不需要标注但保留的图片</h5>
 <p>图中无标注三类但不能删除。 这些图仍会用于模型训练中的背景学习。</p>
 <h5 id="不正经建议">4.不正经建议</h5>
@@ -1869,7 +1863,7 @@ weight_decay=0.0005</code></pre></details>
 <details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>1536
 1920
 
-&gt; 图片未发布：Pasted image 20260428184539.png
+![Pasted image 20260428184539.png](../assets/media/pasted-image-20260428184539-37f0e23172.webp)
 即使分辨率处理加到1980，效果还是很差，所以应该还是切图训练。
 
 ```python title:&quot;cut.py&quot;
@@ -2524,10 +2518,7 @@ print(f&quot;Micro Recall:    {micro_r:.4f}&quot;)</code></pre></details>
 <p>皮肤区域过滤 ↓ 单类病灶检测提高召回 ↓ 局部分类器区分斑/痘/痣 ↓ 斑类区域用分割模型处理 ↓ 后处理规则过滤</p>
 <h2 id="app">app</h2>
 <h2 id="sdk">SDK</h2>
-<p>SOFTWARE DEVELOPMENT KIT，软件开发工具包 SDK 是芯片厂商提供的一整套软件开发工具与基础代码，用来帮助开发者快速完成从系统启动、驱动适配到应用开发的全过程。</p>
-<div class="image-placeholder">图片未发布：Pasted image 20260526202620.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260527123229.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20260527124240.png</div>
+<p>SOFTWARE DEVELOPMENT KIT，软件开发工具包 SDK 是芯片厂商提供的一整套软件开发工具与基础代码，用来帮助开发者快速完成从系统启动、驱动适配到应用开发的全过程。 <img src="../assets/media/pasted-image-20260526202620-1a046ef62d.webp" alt="Pasted image 20260526202620.png" /> <img src="../assets/media/pasted-image-20260527123229-4b08ed5f43.webp" alt="Pasted image 20260527123229.png" /> <img src="../assets/media/pasted-image-20260527124240-84e4be95e3.webp" alt="Pasted image 20260527124240.png" /></p>
 
   </div>
   <section class="recommend">
@@ -2558,10 +2549,10 @@ print(f&quot;Micro Recall:    {micro_r:.4f}&quot;)</code></pre></details>
 </section>
 <section class="catList">
   <h3 class="catListTitle">潮汐分区</h3>
-  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
-<li><a href="../categories.html#造船">造船<span>11</span></a></li>
-<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
-<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
+  <ul class="sectionSideList"><li><a href="../sections/shi-bei.html">拾贝<span>12</span></a></li>
+<li><a href="../sections/zao-chuan.html">造船<span>11</span></a></li>
+<li><a href="../sections/qian-yuan.html">潜渊<span>4</span></a></li>
+<li><a href="../sections/piao-liu-ping.html">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

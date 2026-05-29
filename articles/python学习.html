@@ -22,7 +22,7 @@
       <nav id="navigator" aria-label="主导航">
         <ul id="navList">
           <li><a class="menu" href="../index.html">首页</a></li>
-<li><a class="menu" href="../categories.html">目录</a></li>
+<li><a class="menu" href="../categories.html">分区</a></li>
 <li><a class="menu" href="../archive.html">归档</a></li>
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#拾贝">拾贝</a><span>/</span><strong>Python 学习笔记</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../sections/shi-bei.html">拾贝</a><span>/</span><strong>Python 学习笔记</strong></div>
   <h1 class="postTitle single"><span>Python 学习笔记</span></h1>
-  <div class="postDesc">posted @ 2026-05-27 墨玉 分区: <a href="../categories.html#拾贝">拾贝</a></div>
+  <div class="postDesc">posted @ 2026-05-27 墨玉 分区: <a href="../sections/shi-bei.html">拾贝</a></div>
   <p class="postSummary">整理 Python 语法、常用库、文件处理和编程基础，作为后续深度学习实践的底座。</p>
   <div class="postTags"><span>Python</span> <span>编程基础</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#缩进">缩进</a></li>
@@ -137,8 +137,7 @@
 <h2 id="命名">命名</h2>
 <p>命名规则使用大小写字母，数字和下划线的组合，但首字母只能是大小写字母或下划线，不能使用空格。 中文等非字母符号也可以作为名字。 下划线命名法： 1.字母全部小写 2.不同单词用下划线分隔</p>
 <h2 id="保留字">保留字</h2>
-<p>33个关键字</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250723203803.png 保留字in是一个二元关系操作，它用来判断左侧内容是否在右侧内容的集合中。 保留字import用来引用外部库。 保留字def用于定义函数。def定义的函数未经调用不能执行，需要通过函数名调用。</div>
+<p>33个关键字 <img src="../assets/media/pasted-image-20250723203803-57c6c94fad.webp" alt="Pasted image 20250723203803.png" /> 保留字in是一个二元关系操作，它用来判断左侧内容是否在右侧内容的集合中。 保留字import用来引用外部库。 保留字def用于定义函数。def定义的函数未经调用不能执行，需要通过函数名调用。</p>
 <h2 id="print">print</h2>
 <p>print（）函数可以用来输出空行 def定义的函数未经调用不能执行，需要通过函数名调用。</p>
 <details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>print(&quot;Dad!!!&quot;)</code></pre></details>
@@ -150,16 +149,11 @@ if __name__ ** &quot;__main__&quot;:
     cook()</code></pre></details>
 <h2 id="格式化字符串">格式化字符串</h2>
 <h3 id="三引号">三引号</h3>
-<p>Python会把新的一行当成内容的换行</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250725154636.png</div>
+<p>Python会把新的一行当成内容的换行 <img src="../assets/media/pasted-image-20250725154636-f9d87809a7.webp" alt="Pasted image 20250725154636.png" /></p>
 <h3 id="format方法">format方法</h3>
-<p>根据位置放参</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250901200414.png 根据关键词放参</div>
-<div class="image-placeholder">图片未发布：Pasted image 20250901200654.png</div>
+<p>根据位置放参 <img src="../assets/media/pasted-image-20250901200414-302eda629e.webp" alt="Pasted image 20250901200414.png" /> 根据关键词放参 <img src="../assets/media/pasted-image-20250901200654-31cd38f98d.webp" alt="Pasted image 20250901200654.png" /></p>
 <h3 id="f-字符串">f-字符串</h3>
-<p>变量会直接求值添加到字符串内。</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250901200827.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20250901200954.png</div>
+<p>变量会直接求值添加到字符串内。 <img src="../assets/media/pasted-image-20250901200827-733a6cd8fd.webp" alt="Pasted image 20250901200827.png" /> <img src="../assets/media/pasted-image-20250901200954-8d3ed49585.webp" alt="Pasted image 20250901200954.png" /></p>
 <blockquote>
 <p><code>:.2f</code>是指数字会保留两位小数。</p>
 </blockquote>
@@ -214,14 +208,11 @@ from&lt;库名&gt;import*</code></pre></details>
 <h2 id="dry">DRY</h2>
 <p>软件开发原则：Don’t Repeat Yourself. 函数</p>
 <h2 id="引入模块">引入模块</h2>
-<p>求中位数</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250901202434.png statistics–数学统计函数 引入见库函数引入</div>
+<p>求中位数 <img src="../assets/media/pasted-image-20250901202434-d120017bc9.webp" alt="Pasted image 20250901202434.png" /> statistics–数学统计函数 引入见库函数引入</p>
 <h2 id="高阶函数">高阶函数</h2>
-<p>把函数作为参数的函数 作为参数的函数是直接用函数名传入，不能带（），带（）就是函数调用后返回的结果 可以把格式化函数也作为高阶函数的参数传入</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250908193423.png</div>
+<p>把函数作为参数的函数 作为参数的函数是直接用函数名传入，不能带（），带（）就是函数调用后返回的结果 可以把格式化函数也作为高阶函数的参数传入 <img src="../assets/media/pasted-image-20250908193423-e5edcced89.webp" alt="Pasted image 20250908193423.png" /></p>
 <h3 id="匿名函数">匿名函数</h3>
-<p>Lambda</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250908193804.png</div>
+<p>Lambda <img src="../assets/media/pasted-image-20250908193804-0876b0fae9.webp" alt="Pasted image 20250908193804.png" /></p>
 <details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>(lambda num1, num2: num1 + num2)(2, 3)</code></pre></details>
 <p>局限性： <code>:</code>后只能有一个语句/表达式</p>
 <h1 id="类型">类型</h1>
@@ -278,7 +269,9 @@ print(text[5:2:-1])    # &quot;noh&quot; - 从索引5到索引2反向取
 text = &quot;HelloWorld&quot;
 print(text[::2])  # &quot;Hlool&quot; - 每隔一个字符取一个</code></pre></details>
 <h2 id="方法和函数">方法和函数</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20250803172007.png</div>
+<figure>
+<img src="../assets/media/pasted-image-20250803172007-ea27b24806.webp" alt="Pasted image 20250803172007.png" /><figcaption aria-hidden="true">Pasted image 20250803172007.png</figcaption>
+</figure>
 <h1 id="分支">分支</h1>
 <h2 id="简单分支">简单分支</h2>
 <p>if语句格式</p>
@@ -413,23 +406,16 @@ finally:
 <h1 id="布尔表达式">布尔表达式</h1>
 <p>逻辑运算 布尔操作符：not，and，or（顺序高阶） 德摩根定律，not放入表达式后，and和or运算符之间发生变化。 not（a and b）** not a or not b not（a or b）** not a and not b</p>
 <h1 id="面向对象编程">面向对象编程</h1>
-<p>OOP Object-Oriented Programming 类是对象的模版，对象是类的实例 对象的属性和方法</p>
-<blockquote>
-<p>图片未发布：Pasted image 20250901204823.png <code>init</code>构造函数，规定</p>
-</blockquote>
-<div class="image-placeholder">图片未发布：Pasted image 20250901204850.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20250901210329.png</div>
+<p>OOP Object-Oriented Programming 类是对象的模版，对象是类的实例 对象的属性和方法 <img src="../assets/media/pasted-image-20250901204823-97a6e815ec.webp" alt="Pasted image 20250901204823.png" /> <code>init</code>构造函数，规定 <img src="../assets/media/pasted-image-20250901204850-3f69edc1dc.webp" alt="Pasted image 20250901204850.png" /> <img src="../assets/media/pasted-image-20250901210329-2b6a66424e.webp" alt="Pasted image 20250901210329.png" /></p>
 <h2 id="特性">特性</h2>
 <h3 id="封装">封装</h3>
 <p>写类的人将内部实现细节隐藏，使用类的人只通过外部接口（方法）访问和使用。</p>
 <h3 id="继承">继承</h3>
-<p>父子类</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250901211908.png</div>
+<p>父子类 <img src="../assets/media/pasted-image-20250901211908-2e211eb7f2.webp" alt="Pasted image 20250901211908.png" /></p>
 <h3 id="多态">多态</h3>
 <p>子类方法不同，在不同字类里分别定义，但父类可直接执行方法，对象会自己表现不同。</p>
 <h2 id="实例">实例</h2>
-<div class="image-placeholder">图片未发布：Pasted image 20250901211400.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20250901211448.png</div>
+<p><img src="../assets/media/pasted-image-20250901211400-638ac276d9.webp" alt="Pasted image 20250901211400.png" /> <img src="../assets/media/pasted-image-20250901211448-defcfe27bf.webp" alt="Pasted image 20250901211448.png" /></p>
 <h1 id="文件">文件</h1>
 <p>储存在外部介质上的数据或信息集合。 有序的数据序列。 绝对路径：/home/data 相对路径： <code>.</code>当前所在的目录 <code>..</code>上一层的父目录 <code>../..</code>更上一次 <code>./data</code>下一层子目录 <code>./</code>可以省略，在同一目录下可以直接使用文件名</p>
 <h2 id="文件的基础">文件的基础</h2>
@@ -530,16 +516,12 @@ class TestMyAdder(unittest.TestCase): # TestMyAdder是unittest.TestCase的子类
         self.assertEqual(my_adder (5, 3), 8)
     def test_negative_with_positive(self):
         self.assertEqual(my_adder (-5, 3), -2)</code></pre></details>
-<p><code>python -m unittest</code>这个库就会自动搜寻所有继承了unittest库里TestCase类的子类,运行它们所有以test_开头的方法,然后展示测试结果，共运行了几个测试。每个点都代表一个测试通过，没有通过是F</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250908181506.png</div>
-<div class="image-placeholder">图片未发布：Pasted image 20250908181829.png</div>
+<p><code>python -m unittest</code>这个库就会自动搜寻所有继承了unittest库里TestCase类的子类,运行它们所有以test_开头的方法,然后展示测试结果，共运行了几个测试。每个点都代表一个测试通过，没有通过是F <img src="../assets/media/pasted-image-20250908181506-eb6e0aa023.webp" alt="Pasted image 20250908181506.png" /> <img src="../assets/media/pasted-image-20250908181829-113360531e.webp" alt="Pasted image 20250908181829.png" /></p>
 <h4 id="测试方法">测试方法</h4>
-<div class="image-placeholder">图片未发布：Pasted image 20250908182256.png assertTrue可以代替这些所有方法</div>
+<p><img src="../assets/media/pasted-image-20250908182256-94d5d06b5e.webp" alt="Pasted image 20250908182256.png" /> assertTrue可以代替这些所有方法</p>
 <details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>assertTrue(2 not in [1, 3 - 1])
 assertNotin(2, [1, 3 - 1])</code></pre></details>
-<p>测试类</p>
-<div class="image-placeholder">图片未发布：Pasted image 20250908190439.png 利用TestCase类里的setUp方法</div>
-<div class="image-placeholder">图片未发布：Pasted image 20250908190749.png</div>
+<p>测试类 <img src="../assets/media/pasted-image-20250908190439-5da1c134fb.webp" alt="Pasted image 20250908190439.png" /> 利用TestCase类里的setUp方法 <img src="../assets/media/pasted-image-20250908190749-5b9d35e9cb.webp" alt="Pasted image 20250908190749.png" /></p>
 <h1 id="常用">常用</h1>
 <h2 id="random">random</h2>
 <details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>random.randint(a, b)</code></pre></details>
@@ -686,10 +668,7 @@ score = np.array([[80, 89, 86, 67, 79],
 score</code></pre></details>
 <p>机器学习的最大特点就是大量的数据运算，那么如果没有一个快速的解决方案，那可能现在python也在机 器学习领域达不到好的效果。 Numpy专门针对ndarray的操作和运算进行了设计，所以数组的存储效率和输入输出性能远优于Python中 的嵌套列表，数组越大，Numpy的优势就越明显。 <strong>思考：ndarray为什么可以这么快？</strong></p>
 <ol type="1">
-<li>内存块风格</li>
-</ol>
-<div class="image-placeholder">图片未发布：Pasted image 20260317171851.png 从图中我们可以看出ndarray在存储数据的时候，数据与数据的地址都是连续的，这样就给使得批量操作数 组元素时速度更快。 这是因为ndarray中的所有元素的类型都是相同的，而Python列表中的元素类型是任意的，所以ndarray在 存储元素时内存可以连续，而python原生list就只能通过寻址方式找到下一个元素，这虽然也导致了在通用 性能方面Numpy的ndarray不及Python原生list，但在科学计算中，Numpy的ndarray就可以省掉很多循环 语句，代码使用方面比Python原生list简单的多。</div>
-<ol start="2" type="1">
+<li><p>内存块风格 <img src="../assets/media/pasted-image-20260317171851-1e361595b8.webp" alt="Pasted image 20260317171851.png" /> 从图中我们可以看出ndarray在存储数据的时候，数据与数据的地址都是连续的，这样就给使得批量操作数 组元素时速度更快。 这是因为ndarray中的所有元素的类型都是相同的，而Python列表中的元素类型是任意的，所以ndarray在 存储元素时内存可以连续，而python原生list就只能通过寻址方式找到下一个元素，这虽然也导致了在通用 性能方面Numpy的ndarray不及Python原生list，但在科学计算中，Numpy的ndarray就可以省掉很多循环 语句，代码使用方面比Python原生list简单的多。</p></li>
 <li><p>ndarray支持并行化运算（向量化运算）</p></li>
 <li><p>效率远高于纯Python代码 Numpy底层使用C语言编写，内部解除了GIL（全局解释器锁），其对数组的操作速度不受Python解释器的 限制，所以，其效率远高于纯Python代码。</p></li>
 </ol>
@@ -1363,10 +1342,10 @@ data.close = 1</code></pre></details>
 </section>
 <section class="catList">
   <h3 class="catListTitle">潮汐分区</h3>
-  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
-<li><a href="../categories.html#造船">造船<span>11</span></a></li>
-<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
-<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
+  <ul class="sectionSideList"><li><a href="../sections/shi-bei.html">拾贝<span>12</span></a></li>
+<li><a href="../sections/zao-chuan.html">造船<span>11</span></a></li>
+<li><a href="../sections/qian-yuan.html">潜渊<span>4</span></a></li>
+<li><a href="../sections/piao-liu-ping.html">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

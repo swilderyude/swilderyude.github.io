@@ -22,7 +22,7 @@
       <nav id="navigator" aria-label="主导航">
         <ul id="navList">
           <li><a class="menu" href="../index.html">首页</a></li>
-<li><a class="menu" href="../categories.html">目录</a></li>
+<li><a class="menu" href="../categories.html">分区</a></li>
 <li><a class="menu" href="../archive.html">归档</a></li>
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#拾贝">拾贝</a><span>/</span><strong>YOLO 理论笔记：从 YOLOv1 到 YOLOv8</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../sections/shi-bei.html">拾贝</a><span>/</span><strong>YOLO 理论笔记：从 YOLOv1 到 YOLOv8</strong></div>
   <h1 class="postTitle single"><span>YOLO 理论笔记：从 YOLOv1 到 YOLOv8</span></h1>
-  <div class="postDesc">posted @ 2026-04-08 墨玉 分区: <a href="../categories.html#拾贝">拾贝</a></div>
+  <div class="postDesc">posted @ 2026-04-08 墨玉 分区: <a href="../sections/shi-bei.html">拾贝</a></div>
   <p class="postSummary">梳理目标检测基本任务、YOLO 的网格预测、Anchor、NMS、损失函数和多尺度训练等核心概念。</p>
   <div class="postTags"><span>YOLO</span> <span>目标检测</span> <span>计算机视觉</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#yolo-简史">YOLO 简史</a></li>
@@ -231,7 +231,9 @@ if torch.backends.mps.is_available():
 else:
     print(&quot;❌ MPS不可用&quot;)</code></pre></details>
 <h1 id="训练">训练</h1>
-<div class="image-placeholder">图片未发布：Pasted image 20260402161012.png</div>
+<figure>
+<img src="../assets/media/pasted-image-20260402161012-cf28db85aa.webp" alt="Pasted image 20260402161012.png" /><figcaption aria-hidden="true">Pasted image 20260402161012.png</figcaption>
+</figure>
 <ol type="1">
 <li><p><strong><code>train.py</code> (训练)</strong> 用于加载数据集、配置模型参数，并开始漫长的训练过程。</p></li>
 <li><p><strong><code>val.py</code> (验证)</strong> 专门在验证集上跑一遍，计算出精准的 mAP、Precision、Recall 等指标。 训练完后，用来客观评价 <code>best.pt</code> 的性能。</p></li>
@@ -267,10 +269,10 @@ else:
 </section>
 <section class="catList">
   <h3 class="catListTitle">潮汐分区</h3>
-  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
-<li><a href="../categories.html#造船">造船<span>11</span></a></li>
-<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
-<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
+  <ul class="sectionSideList"><li><a href="../sections/shi-bei.html">拾贝<span>12</span></a></li>
+<li><a href="../sections/zao-chuan.html">造船<span>11</span></a></li>
+<li><a href="../sections/qian-yuan.html">潜渊<span>4</span></a></li>
+<li><a href="../sections/piao-liu-ping.html">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>
