@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="整理数据集结构、标注格式、训练/验证划分和数据管理中的注意事项。">
-  <title>人脸色斑检测数据集整理笔记 - 墨玉</title>
+  <title>人脸色斑检测数据集整理笔记 - 潮汐日志</title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <script defer src="../assets/js/site.js"></script>
 </head>
@@ -15,8 +15,8 @@
       <div id="blogTitle">
         <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><img id="blogLogo" src="../assets/site/moyu-avatar.webp" alt=""></a>
         <div class="brandText">
-          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">墨玉</a></h1>
-          <h2>道阻且长，与君共勉</h2>
+          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">潮汐日志</a></h1>
+          <h2>Tide Logs · 一名学习者的潮汐记录</h2>
         </div>
       </div>
       <nav id="navigator" aria-label="主导航">
@@ -27,7 +27,7 @@
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
         </ul>
-        <div class="blogStats">随笔 27 · 文件夹 9 · 更新 2026-05-28</div>
+        <div class="blogStats">日志 27 · 分区 4 · 今日潮汐</div>
       </nav>
     </header>
     <div id="main">
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测</a><span>/</span><strong>人脸色斑检测数据集整理笔记</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#造船">造船</a><span>/</span><strong>人脸色斑检测数据集整理笔记</strong></div>
   <h1 class="postTitle single"><span>人脸色斑检测数据集整理笔记</span></h1>
-  <div class="postDesc">posted @ 2026-03-09 墨玉 文件夹: <a href="../categories.html#folder-人脸色斑检测">CS自学 / 人脸色斑检测 / 数据集</a></div>
+  <div class="postDesc">posted @ 2026-03-09 墨玉 分区: <a href="../categories.html#造船">造船</a></div>
   <p class="postSummary">整理数据集结构、标注格式、训练/验证划分和数据管理中的注意事项。</p>
   <div class="postTags"><span>数据集</span> <span>标注</span> <span>YOLO</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#标签分类">标签分类</a></li>
@@ -57,7 +57,7 @@
 <p>多个数据集合并。 文件夹层级合并</p>
 <p>```python title:“merge.py” import os import shutil</p>
 <p>def merge_all_datasets(): # 最终合并到的目标文件夹 target_root = ‘data’ # 需要识别的标准子集 target_splits = [‘train’, ‘valid’, ‘test’]</p>
-<pre><code># 统计数据
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># 统计数据
 stats = {&#39;images&#39;: 0, &#39;json&#39;: 0, &#39;labels&#39;: 0, &#39;skipped&#39;: 0}
 
 print(&quot;开始深度扫描并合并所有数据集...&quot;)
@@ -116,9 +116,9 @@ print(f&quot;成功合并图片: {stats[&#39;images&#39;]} 张&quot;)
 print(f&quot;成功合并 JSON: {stats[&#39;json&#39;]} 个&quot;)
 print(f&quot;成功合并 TXT 标签: {stats[&#39;labels&#39;]} 个&quot;)
 print(f&quot;因同名跳过文件: {stats[&#39;skipped&#39;]} 个 (已去重)&quot;)
-print(&quot;=&quot;*40)</code></pre>
+print(&quot;=&quot;*40)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: merge_all_datasets()</p>
-<pre><code>
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>
 #### 问题
 
 1. 有的图片显示全部人脸，但有的只是局部。
@@ -140,10 +140,10 @@ txt文件不是utf-8，但文件确实是utf-8的格式。
 # 删除所有隐藏的 AppleDouble 文件 (以 ._ 开头的文件) 
 dot_clean . 
 # 删除所有的 .DS_Store 文件 
-find . -name &quot;.DS_Store&quot; -depth -exec rm {} \;</code></pre>
+find . -name &quot;.DS_Store&quot; -depth -exec rm {} \;</code></pre></details>
 <p>```python title:“delete.py” import os import shutil</p>
 <p>def deep_clean_hidden_files(start_path=‘.’): deleted_files_count = 0 deleted_dirs_count = 0</p>
-<pre><code>print(f&quot;开始从 {os.path.abspath(start_path)} 递归清理隐藏文件...\n&quot;)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>print(f&quot;开始从 {os.path.abspath(start_path)} 递归清理隐藏文件...\n&quot;)
 
 # os.walk 会遍历目录下所有的文件夹和文件
 # topdown=False 表示先处理子目录中的文件，再处理父目录，这样更安全
@@ -175,9 +175,9 @@ for root, dirs, files in os.walk(start_path, topdown=False):
 print(&quot;-&quot; * 40)
 print(f&quot;清理完成！&quot;)
 print(f&quot;共删除隐藏文件: {deleted_files_count} 个&quot;)
-print(f&quot;共删除隐藏目录: {deleted_dirs_count} 个&quot;)</code></pre>
+print(f&quot;共删除隐藏目录: {deleted_dirs_count} 个&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: # 确认提示（防止误删） confirm = input(“该操作将递归删除当前目录下所有以 ‘.’ 开头的文件和文件夹。确认继续吗？(y/n):”) if confirm.lower() ** ‘y’: deep_clean_hidden_files() else: print(“操作已取消。”)</p>
-<pre><code>
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>
 ### 多类
 
 采用的数量：8824
@@ -301,14 +301,14 @@ def process_full_dataset():
     print(f&quot;当前类别顺序: 0:spot, 1:acne, 2:mole&quot;)
 
 if __name__ ** &quot;__main__&quot;:
-    process_full_dataset()</code></pre>
+    process_full_dataset()</code></pre></details>
 <p>修改data.yaml文件</p>
-<pre class="bash"><code>nc: 3 
-names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>nc: 3 
+names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre></details>
 <p>仅有train文件，将其分为常规三类。</p>
 <p>```python title:“split.py” import os import random import shutil</p>
 <p>def split_train_dataset(train_ratio=0.7, valid_ratio=0.2): # 1. 定义路径 base_train_img = os.path.join(‘train’, ‘images’) base_train_lab = os.path.join(‘train’, ‘labels’)</p>
-<pre><code>if not os.path.exists(base_train_img) or not os.path.exists(base_train_lab):
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>if not os.path.exists(base_train_img) or not os.path.exists(base_train_lab):
     print(&quot;错误：找不到 &#39;train/images&#39; 或 &#39;train/labels&#39; 文件夹！&quot;)
     return
 
@@ -368,9 +368,9 @@ print(&quot;-&quot; * 30)
 print(f&quot;拆分完成！&quot;)
 print(f&quot;Train (保留): {len(train_list)} 张&quot;)
 print(f&quot;Valid (移动): {len(valid_list)} 张&quot;)
-print(f&quot;Test  (移动): {len(test_list)} 张&quot;)</code></pre>
+print(f&quot;Test  (移动): {len(test_list)} 张&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: split_train_dataset()</p>
-<pre><code>
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>
 
 7.Acne 4类 （blackheads  dark spot  fore  papules） 1159张
 [7](https://universe.roboflow.com/new-workspace-ii6dw/acne-gsoza)
@@ -482,17 +482,17 @@ def process_and_clean_dataset():
     print(&quot;\n所有任务已执行完毕！&quot;)
 
 if __name__ ** &quot;__main__&quot;:
-    process_and_clean_dataset()</code></pre>
+    process_and_clean_dataset()</code></pre></details>
 <p>class类为了使acne为1，前面加一个placeholder占位。 data.yaml也进行占位。</p>
-<pre class="bash"><code>nc: 2
-names: [&#39;placeholder&#39;, &#39;acne&#39;]</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>nc: 2
+names: [&#39;placeholder&#39;, &#39;acne&#39;]</code></pre></details>
 <p>14.acne 3类（hyperpigmentation  inflamed  noninflamed） 921张 <a href="https://universe.roboflow.com/acneagent/acne-c5qud">14</a></p>
 <blockquote>
 <p>已下载。hyperpigmentation为spot，inflamed和noninflamed合并为acne.</p>
 </blockquote>
 <p>```python title:“alter.py” import os import json</p>
 <p>def process_dataset(): # 配置 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
-<pre><code># TXT 索引映射: 0-&gt;0, 1-&gt;1, 2-&gt;1
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># TXT 索引映射: 0-&gt;0, 1-&gt;1, 2-&gt;1
 txt_mapping = {
     &#39;0&#39;: &#39;0&#39;, # hyperpigmentation -&gt; spot
     &#39;1&#39;: &#39;1&#39;, # inflamed -&gt; acne
@@ -600,20 +600,20 @@ try:
 except:
     print(&quot;\n警告: 未能更新根目录 classes.txt&quot;)
 
-print(&quot;\n所有任务已执行完毕！&quot;)</code></pre>
+print(&quot;\n所有任务已执行完毕！&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 2 
-names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre>
+names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre></details>
 <p>19.Acne 8类（Веснушка  Морщина  Пигментация  Постакне (рубец)  Прыщ  Расширенная пора  Родинка  Черная точка 雀斑 皱纹 色素沉着 痤疮后疤痕 粉刺 毛孔粗大 痣 黑头） 845张 <a href="https://universe.roboflow.com/acne-mdodj/acne-mz8ar">19</a></p>
 <blockquote>
 <p>已下载。Веснушка雀斑为spot，Пигментация色素沉着为spot，即前二者合并为spot，Прыщ疙瘩即acne，Родинка痣为mole。</p>
 </blockquote>
 <p>```python title:“alter.py” import os import json</p>
 <p>def process_dataset(): # 配置子文件夹 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
-<pre><code># TXT 索引映射 (字符串形式匹配)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># TXT 索引映射 (字符串形式匹配)
 txt_mapping = {
     &#39;0&#39;: &#39;0&#39;, # &#39;----&#39; -&gt; spot
     &#39;2&#39;: &#39;0&#39;, # &#39;------ -----&#39; -&gt; spot
@@ -722,20 +722,20 @@ try:
 except Exception as e:
     print(f&quot;\n无法更新根目录 classes.txt: {e}&quot;)
 
-print(&quot;\n所有操作已完成！请记得手动更新 data.yaml。&quot;)</code></pre>
+print(&quot;\n所有操作已完成！请记得手动更新 data.yaml。&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 3 
-names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre>
+names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre></details>
 <p>21.spots 10类（Acne, Blackheads, Dark-Spots, Dry-Skin, Englarged-Pores, Eyebags, Oily-Skin, Skin-Redness, Whiteheads, Wrinkles）2660张 <a href="https://app.roboflow.com/swilder/skin-problem-detection-relabel-clean3-dtinq/1">21</a></p>
 <blockquote>
 <p>已下载。Dark-Spots为spot，Acne为acne</p>
 </blockquote>
 <p>```python title:“alter.py” import os import json</p>
 <p>def process_dataset(): # 子文件夹列表 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
-<pre><code># TXT 索引映射: 
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># TXT 索引映射: 
 # 原 2 (Dark-Spots) -&gt; 新 0 (spot)
 # 原 0 (Acne) -&gt; 新 1 (acne)
 txt_mapping = {
@@ -843,13 +843,13 @@ try:
 except:
     print(&quot;\n警告: 无法更新根目录 classes.txt&quot;)
 
-print(&quot;\n所有操作已完成！&quot;)</code></pre>
+print(&quot;\n所有操作已完成！&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 2 
-names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre>
+names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre></details>
 <h4 id="未采用数据集">未采用数据集</h4>
 <p>2.Acne-Spots-eyebag-darkcircle 6类 1125张 <a href="https://universe.roboflow.com/buyume-ahuro/acne-spots-eyebag-darkcircle">2</a></p>
 <blockquote>
@@ -920,7 +920,7 @@ names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre>
 <p>采用的数量：8322 3.acne 905张 <a href="https://universe.roboflow.com/acne-qmv2v/acne-ctiit">3</a> 将0改为1.</p>
 <p>```python title:“alter.py” import os</p>
 <p>def change_class_index(): # 目标文件夹 subfolders = [‘train’, ‘valid’, ‘test’]</p>
-<pre><code>count_modified = 0
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>count_modified = 0
 print(&quot;开始修改类别索引：从 0 改为 1...&quot;)
 
 for sub in subfolders:
@@ -968,13 +968,13 @@ for sub in subfolders:
 print(&quot;-&quot; * 30)
 print(f&quot;处理完成！&quot;)
 print(f&quot;共成功修改了 {count_modified} 个标注文件。&quot;)
-print(&quot;请记得将 data.yaml 中的 nc 改为 2，并确保索引 1 对应正确的类名。&quot;)</code></pre>
+print(&quot;请记得将 data.yaml 中的 nc 改为 2，并确保索引 1 对应正确的类名。&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: change_class_index()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 2 
-names: [&#39;placeholder&#39;, &#39;acne&#39;] # 索引 0 留个占位符</code></pre>
+names: [&#39;placeholder&#39;, &#39;acne&#39;] # 索引 0 留个占位符</code></pre></details>
 <p>7.acne 1419张 <a href="https://universe.roboflow.com/yolotest-bu1i2/acne-ho1jq">7</a> 13.acne 800张 <a href="https://universe.roboflow.com/tezim/acne-k7v7j">13</a></p>
 <p>17.acne 1419张 <a href="https://universe.roboflow.com/learning-jth0d/acne-hrslq">17</a></p>
 <h5 id="未采用">未采用</h5>
@@ -1042,7 +1042,7 @@ names: [&#39;placeholder&#39;, &#39;acne&#39;] # 索引 0 留个占位符</code>
 </blockquote>
 <p>```python title:“alter.py” import os import json</p>
 <p>def process_spot_dataset(): # 基础配置 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
-<pre><code># 目标：只保留索引 0 (spot)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># 目标：只保留索引 0 (spot)
 target_idx = &#39;0&#39;
 target_label_name = &#39;spot&#39;
 
@@ -1136,13 +1136,13 @@ try:
 except:
     pass
 
-print(&quot;\n所有操作已完成！&quot;)</code></pre>
+print(&quot;\n所有操作已完成！&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: process_spot_dataset()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 1 
-names: [&#39;spot&#39;]</code></pre>
+names: [&#39;spot&#39;]</code></pre></details>
 <h5 id="未采用-1">未采用</h5>
 <p>1.spots 1439张 <a href="https://app.roboflow.com/swilder/spots-euwan-rpeuc/browse?queryText=&amp;pageSize=50&amp;startingIndex=0&amp;browseQuery=true">1</a></p>
 <blockquote>
@@ -1202,21 +1202,16 @@ names: [&#39;spot&#39;]</code></pre>
           
 <section class="profileCard">
   <img src="../assets/site/moyu-avatar.webp" alt="墨玉头像">
-  <h3>墨玉</h3>
-  <p>把研究生阶段的项目、论文和工具笔记，整理成一份可以慢慢翻的知识目录。</p>
+  <h3>潮汐日志</h3>
+  <p>学习者的潮汐记录，写下每一次靠岸和远航。</p>
   <a href="https://github.com/swilderyude">GitHub / swilderyude</a>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">文件夹目录</h3>
-  <ul class="folderSideList"><li><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测 <span>8</span></a></li>
-<li><a href="../categories.html#folder-yolo相关">YOLO相关 <span>2</span></a></li>
-<li><a href="../categories.html#folder-人工智能">人工智能 <span>4</span></a></li>
-<li><a href="../categories.html#folder-计算机视觉">计算机视觉 <span>2</span></a></li>
-<li><a href="../categories.html#folder-精读论文">精读论文 <span>3</span></a></li>
-<li><a href="../categories.html#folder-科研">科研 <span>1</span></a></li>
-<li><a href="../categories.html#folder-工具">工具 <span>3</span></a></li>
-<li><a href="../categories.html#folder-ai基础">AI基础 <span>1</span></a></li>
-<li><a href="../categories.html#folder-根目录笔记">根目录笔记 <span>3</span></a></li></ul>
+  <h3 class="catListTitle">潮汐分区</h3>
+  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
+<li><a href="../categories.html#造船">造船<span>11</span></a></li>
+<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
+<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

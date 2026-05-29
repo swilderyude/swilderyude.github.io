@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="梳理目标检测基本任务、YOLO 的网格预测、Anchor、NMS、损失函数和多尺度训练等核心概念。">
-  <title>YOLO 理论笔记：从 YOLOv1 到 YOLOv8 - 墨玉</title>
+  <title>YOLO 理论笔记：从 YOLOv1 到 YOLOv8 - 潮汐日志</title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <script defer src="../assets/js/site.js"></script>
 </head>
@@ -15,8 +15,8 @@
       <div id="blogTitle">
         <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><img id="blogLogo" src="../assets/site/moyu-avatar.webp" alt=""></a>
         <div class="brandText">
-          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">墨玉</a></h1>
-          <h2>道阻且长，与君共勉</h2>
+          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">潮汐日志</a></h1>
+          <h2>Tide Logs · 一名学习者的潮汐记录</h2>
         </div>
       </div>
       <nav id="navigator" aria-label="主导航">
@@ -27,7 +27,7 @@
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
         </ul>
-        <div class="blogStats">随笔 27 · 文件夹 9 · 更新 2026-05-28</div>
+        <div class="blogStats">日志 27 · 分区 4 · 今日潮汐</div>
       </nav>
     </header>
     <div id="main">
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#folder-yolo相关">YOLO相关</a><span>/</span><strong>YOLO 理论笔记：从 YOLOv1 到 YOLOv8</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#拾贝">拾贝</a><span>/</span><strong>YOLO 理论笔记：从 YOLOv1 到 YOLOv8</strong></div>
   <h1 class="postTitle single"><span>YOLO 理论笔记：从 YOLOv1 到 YOLOv8</span></h1>
-  <div class="postDesc">posted @ 2026-04-08 墨玉 文件夹: <a href="../categories.html#folder-yolo相关">CS自学 / YOLO相关</a></div>
+  <div class="postDesc">posted @ 2026-04-08 墨玉 分区: <a href="../categories.html#拾贝">拾贝</a></div>
   <p class="postSummary">梳理目标检测基本任务、YOLO 的网格预测、Anchor、NMS、损失函数和多尺度训练等核心概念。</p>
   <div class="postTags"><span>YOLO</span> <span>目标检测</span> <span>计算机视觉</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#yolo-简史">YOLO 简史</a></li>
@@ -187,12 +187,12 @@
 </ol>
 <h1 id="环境配置">环境配置</h1>
 <p>以yolov8为例 <strong>Anaconda</strong></p>
-<pre class="shell"><code>conda env list  # 查看已有环境
+<details class="codeFold"><summary><span>展开代码</span><em>SHELL</em></summary><pre class="shell"><code>conda env list  # 查看已有环境
 conda create -n 环境名 python=版本 # 创建环境
 conda activate 环境名 # 激活环境
-conda deactivate # 退出环境</code></pre>
+conda deactivate # 退出环境</code></pre></details>
 <p><strong>cuda</strong> CUDA是一个让软件能够利用NVIDIA显卡（GPU）进行大规模并行计算的平台和编程模型。 本人Mac m1芯片不能下载，推荐MPS。</p>
-<pre class="shell"><code># 安装PyTorch（支持M1芯片的版本）
+<details class="codeFold"><summary><span>展开代码</span><em>SHELL</em></summary><pre class="shell"><code># 安装PyTorch（支持M1芯片的版本）
 pip3 install torch torchvision torchaudio
 # 安装Ultralytics YOLOv8
 pip install ultralytics
@@ -201,9 +201,9 @@ pip install ultralytics
 # 改用conda安装（conda能更好处理依赖）
 conda install -c conda-forge ultralytics
 # 后面过程有报错
-pip install ultralytics==8.3.0</code></pre>
+pip install ultralytics==8.3.0</code></pre></details>
 <p>在代码中使用MPS</p>
-<pre class="python"><code>from ultralytics import YOLO
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>from ultralytics import YOLO
 
 # 加载模型
 model = YOLO(&#39;yolov8n.pt&#39;)  # 使用nano版本
@@ -212,9 +212,9 @@ model = YOLO(&#39;yolov8n.pt&#39;)  # 使用nano版本
 results = model.train(data=&#39;coco8.yaml&#39;, epochs=100, device=&#39;mps&#39;)
 
 # 或者进行预测时指定 device=&#39;mps&#39;
-results = model(&#39;path/to/image.jpg&#39;, device=&#39;mps&#39;)</code></pre>
+results = model(&#39;path/to/image.jpg&#39;, device=&#39;mps&#39;)</code></pre></details>
 <p>创建测试脚本验证MPS是否正常工作：</p>
-<pre class="python"><code># test_mps.py
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code># test_mps.py
 import torch
 import ultralytics
 
@@ -229,7 +229,7 @@ if torch.backends.mps.is_available():
     x = torch.randn(3, 640, 640).to(device)
     print(&quot;✅ MPS设备测试成功&quot;)
 else:
-    print(&quot;❌ MPS不可用&quot;)</code></pre>
+    print(&quot;❌ MPS不可用&quot;)</code></pre></details>
 <h1 id="训练">训练</h1>
 <div class="image-placeholder">图片未发布：Pasted image 20260402161012.png</div>
 <ol type="1">
@@ -261,21 +261,16 @@ else:
           
 <section class="profileCard">
   <img src="../assets/site/moyu-avatar.webp" alt="墨玉头像">
-  <h3>墨玉</h3>
-  <p>把研究生阶段的项目、论文和工具笔记，整理成一份可以慢慢翻的知识目录。</p>
+  <h3>潮汐日志</h3>
+  <p>学习者的潮汐记录，写下每一次靠岸和远航。</p>
   <a href="https://github.com/swilderyude">GitHub / swilderyude</a>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">文件夹目录</h3>
-  <ul class="folderSideList"><li><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测 <span>8</span></a></li>
-<li><a href="../categories.html#folder-yolo相关">YOLO相关 <span>2</span></a></li>
-<li><a href="../categories.html#folder-人工智能">人工智能 <span>4</span></a></li>
-<li><a href="../categories.html#folder-计算机视觉">计算机视觉 <span>2</span></a></li>
-<li><a href="../categories.html#folder-精读论文">精读论文 <span>3</span></a></li>
-<li><a href="../categories.html#folder-科研">科研 <span>1</span></a></li>
-<li><a href="../categories.html#folder-工具">工具 <span>3</span></a></li>
-<li><a href="../categories.html#folder-ai基础">AI基础 <span>1</span></a></li>
-<li><a href="../categories.html#folder-根目录笔记">根目录笔记 <span>3</span></a></li></ul>
+  <h3 class="catListTitle">潮汐分区</h3>
+  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
+<li><a href="../categories.html#造船">造船<span>11</span></a></li>
+<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
+<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

@@ -5,6 +5,7 @@
     "date": "2026-05-28",
     "category": "项目实践",
     "folder": "CS自学 / 人脸色斑检测",
+    "section": "造船",
     "summary": "围绕人脸色斑检测任务，整理数据匿名化、数据集结构、YOLO 训练、结果融合与 SDK 对接的完整工程记录。",
     "tags": [
       "YOLO",
@@ -19,6 +20,7 @@
     "date": "2026-05-28",
     "category": "科研方法",
     "folder": "CS自学 / 科研",
+    "section": "潜渊",
     "summary": "从选题、读论文、精读代码、实验设置到论文结构，整理一套面向研究生早期阶段的科研工作流。",
     "tags": [
       "科研",
@@ -32,6 +34,7 @@
     "date": "2026-05-28",
     "category": "项目实践",
     "folder": "CS自学 / 人脸色斑检测 / 结果分析",
+    "section": "造船",
     "summary": "汇总模型训练过程中的主要结果、指标变化和阶段性判断。",
     "tags": [
       "训练",
@@ -44,6 +47,7 @@
     "date": "2026-05-28",
     "category": "AI 基础",
     "folder": "CS自学 / 人工智能",
+    "section": "拾贝",
     "summary": "记录 PyTorch 环境配置、自定义 Dataset、Dataloader 和图像数据读取的基础实践。",
     "tags": [
       "PyTorch",
@@ -57,6 +61,7 @@
     "date": "2026-05-28",
     "category": "AI 基础",
     "folder": "CS自学 / 人工智能",
+    "section": "拾贝",
     "summary": "记录深度学习基础、模型训练和实验实践中的关键知识点。",
     "tags": [
       "深度学习",
@@ -69,6 +74,7 @@
     "date": "2026-05-28",
     "category": "工具与环境",
     "folder": "CS自学 / 根目录笔记",
+    "section": "拾贝",
     "summary": "整理 DataLoom 表格、字段类型、过滤排序、Source 自动生成行和导出功能。",
     "tags": [
       "Obsidian",
@@ -82,6 +88,7 @@
     "date": "2026-05-27",
     "category": "项目实践",
     "folder": "CS自学 / 根目录笔记",
+    "section": "造船",
     "summary": "将已有 Python 推理流程封装为 C ABI SDK 的设计笔记，包含头文件、runner、Demo 和交付检查思路。",
     "tags": [
       "SDK",
@@ -96,6 +103,7 @@
     "date": "2026-05-27",
     "category": "AI 基础",
     "folder": "CS自学 / 人工智能 / python",
+    "section": "拾贝",
     "summary": "整理 Python 语法、常用库、文件处理和编程基础，作为后续深度学习实践的底座。",
     "tags": [
       "Python",
@@ -108,6 +116,7 @@
     "date": "2026-05-22",
     "category": "项目实践",
     "folder": "CS自学 / 根目录笔记",
+    "section": "造船",
     "summary": "把斑点分割和痘痣检测拆成两个模型，并通过统一切图、结果回拼和可视化叠加实现协同。",
     "tags": [
       "检测",
@@ -121,6 +130,7 @@
     "date": "2026-05-21",
     "category": "工具与环境",
     "folder": "CS自学 / 工具",
+    "section": "拾贝",
     "summary": "整理研究和开发中常用的 Linux 命令与终端工作流。",
     "tags": [
       "Linux",
@@ -133,6 +143,7 @@
     "date": "2026-05-12",
     "category": "项目实践",
     "folder": "CS自学 / 人脸色斑检测 / 优化",
+    "section": "造船",
     "summary": "围绕小目标检测、分割模型、切图推理、损失函数和多任务管线整理后续优化方向。",
     "tags": [
       "优化",
@@ -146,6 +157,7 @@
     "date": "2026-05-12",
     "category": "工具与环境",
     "folder": "CS自学 / AI基础",
+    "section": "拾贝",
     "summary": "整理 SSH、远程训练、环境管理和服务器使用流程。",
     "tags": [
       "服务器",
@@ -159,6 +171,7 @@
     "date": "2026-04-28",
     "category": "文献精读",
     "folder": "CS自学 / 精读论文 / circulant attention",
+    "section": "潜渊",
     "summary": "围绕 Vision Transformer 中的 Circulant Attention 机制，整理论文结构、核心方法和实现理解。",
     "tags": [
       "Transformer",
@@ -172,6 +185,7 @@
     "date": "2026-04-22",
     "category": "工具与环境",
     "folder": "CS自学 / 人脸色斑检测 / 标注",
+    "section": "造船",
     "summary": "记录自动标注工具的安装、模型配置和常见问题处理。",
     "tags": [
       "X-AnyLabeling",
@@ -184,6 +198,7 @@
     "date": "2026-04-16",
     "category": "项目实践",
     "folder": "CS自学 / YOLO相关",
+    "section": "造船",
     "summary": "记录自助收银/人工柜台场景下的视频处理、数据标注、YOLO 训练、目标追踪和状态机理解过程。",
     "tags": [
       "项目",
@@ -198,6 +213,7 @@
     "date": "2026-04-13",
     "category": "项目实践",
     "folder": "CS自学 / 人脸色斑检测 / 结果分析",
+    "section": "造船",
     "summary": "记录训练、验证、指标观察和实验复盘，为后续调参与模型改进提供依据。",
     "tags": [
       "实验",
@@ -210,6 +226,7 @@
     "date": "2026-04-08",
     "category": "计算机视觉",
     "folder": "CS自学 / YOLO相关",
+    "section": "拾贝",
     "summary": "梳理目标检测基本任务、YOLO 的网格预测、Anchor、NMS、损失函数和多尺度训练等核心概念。",
     "tags": [
       "YOLO",
@@ -223,6 +240,7 @@
     "date": "2026-04-01",
     "category": "文献精读",
     "folder": "CS自学 / 精读论文 / MobileNet",
+    "section": "潜渊",
     "summary": "整理轻量化网络 MobileNet 系列的核心结构、深度可分离卷积和移动端部署思想。",
     "tags": [
       "MobileNet",
@@ -235,6 +253,7 @@
     "date": "2026-03-17",
     "category": "项目实践",
     "folder": "CS自学 / 人脸色斑检测 / 标注",
+    "section": "造船",
     "summary": "记录色斑、痘痣等类别的标注边界、质量控制和一致性要求。",
     "tags": [
       "标注",
@@ -248,6 +267,7 @@
     "date": "2026-03-15",
     "category": "工具与环境",
     "folder": "CS自学 / 工具",
+    "section": "拾贝",
     "summary": "整理 Git 常用命令、分支、提交和协作流程。",
     "tags": [
       "Git",
@@ -260,6 +280,7 @@
     "date": "2026-03-10",
     "category": "AI 基础",
     "folder": "CS自学 / 人工智能",
+    "section": "拾贝",
     "summary": "整理统计学习中的基本概念、模型、损失函数、优化和泛化问题。",
     "tags": [
       "机器学习",
@@ -272,6 +293,7 @@
     "date": "2026-03-09",
     "category": "项目实践",
     "folder": "CS自学 / 人脸色斑检测 / 数据集",
+    "section": "造船",
     "summary": "整理数据集结构、标注格式、训练/验证划分和数据管理中的注意事项。",
     "tags": [
       "数据集",
@@ -285,6 +307,7 @@
     "date": "2026-02-25",
     "category": "计算机视觉",
     "folder": "CS自学 / 计算机视觉",
+    "section": "拾贝",
     "summary": "记录 OpenCV 的图像读取、处理、显示和常见视觉任务实践。",
     "tags": [
       "OpenCV",
@@ -297,6 +320,7 @@
     "date": "2026-01-05",
     "category": "文献精读",
     "folder": "CS自学 / 人脸色斑检测 / 调研",
+    "section": "造船",
     "summary": "对色斑检测与分割领域的两阶段检测、YOLO 小目标、多模态融合、临床诊断逻辑和轻量化部署进行综述。",
     "tags": [
       "综述",
@@ -311,6 +335,7 @@
     "date": "2025-12-03",
     "category": "工具与环境",
     "folder": "CS自学 / 工具 / LaTeX",
+    "section": "拾贝",
     "summary": "整理 LaTeX 环境、公式、排版和论文写作常用技巧。",
     "tags": [
       "LaTeX",
@@ -323,6 +348,7 @@
     "date": "2025-11-12",
     "category": "文献精读",
     "folder": "CS自学 / 精读论文 / 知识蒸馏",
+    "section": "潜渊",
     "summary": "整理教师网络、学生网络、软标签、温度系数和蒸馏损失等知识蒸馏基础概念。",
     "tags": [
       "知识蒸馏",
@@ -335,6 +361,7 @@
     "date": "2025-10-30",
     "category": "计算机视觉",
     "folder": "CS自学 / 计算机视觉",
+    "section": "拾贝",
     "summary": "整理图像处理、分类、检测、分割等计算机视觉基础概念。",
     "tags": [
       "计算机视觉",

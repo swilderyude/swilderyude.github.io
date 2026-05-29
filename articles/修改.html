@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="把斑点分割和痘痣检测拆成两个模型，并通过统一切图、结果回拼和可视化叠加实现协同。">
-  <title>检测与分割双模型协同方案 - 墨玉</title>
+  <title>检测与分割双模型协同方案 - 潮汐日志</title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <script defer src="../assets/js/site.js"></script>
 </head>
@@ -15,8 +15,8 @@
       <div id="blogTitle">
         <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><img id="blogLogo" src="../assets/site/moyu-avatar.webp" alt=""></a>
         <div class="brandText">
-          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">墨玉</a></h1>
-          <h2>道阻且长，与君共勉</h2>
+          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">潮汐日志</a></h1>
+          <h2>Tide Logs · 一名学习者的潮汐记录</h2>
         </div>
       </div>
       <nav id="navigator" aria-label="主导航">
@@ -27,7 +27,7 @@
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
         </ul>
-        <div class="blogStats">随笔 27 · 文件夹 9 · 更新 2026-05-28</div>
+        <div class="blogStats">日志 27 · 分区 4 · 今日潮汐</div>
       </nav>
     </header>
     <div id="main">
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#folder-根目录笔记">根目录笔记</a><span>/</span><strong>检测与分割双模型协同方案</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#造船">造船</a><span>/</span><strong>检测与分割双模型协同方案</strong></div>
   <h1 class="postTitle single"><span>检测与分割双模型协同方案</span></h1>
-  <div class="postDesc">posted @ 2026-05-22 墨玉 文件夹: <a href="../categories.html#folder-根目录笔记">CS自学 / 根目录笔记</a></div>
+  <div class="postDesc">posted @ 2026-05-22 墨玉 分区: <a href="../categories.html#造船">造船</a></div>
   <p class="postSummary">把斑点分割和痘痣检测拆成两个模型，并通过统一切图、结果回拼和可视化叠加实现协同。</p>
   <div class="postTags"><span>检测</span> <span>分割</span> <span>Pipeline</span></div>
   
@@ -81,7 +81,7 @@
 <p>|痣|小目标、边界清晰|检测|</p>
 <p>两个模型能不能同时识别？ 能。 而且工业里非常常见。</p>
 <p>两个模型能不能显示在同一张图？ 完全可以。 这是最常见的实现方式。 例如： 原图：</p>
-<pre class="text"><code>输入图像
+<details class="codeFold"><summary><span>展开代码</span><em>TEXT</em></summary><pre class="text"><code>输入图像
    ↓
 检测模型（痘/痣）
    ↓
@@ -97,7 +97,7 @@
 
 最后：
 bbox + mask
-叠加到同一张图</code></pre>
+叠加到同一张图</code></pre></details>
 <p>最终结果：</p>
 <ul>
 <li><p>痘痘：框</p></li>
@@ -105,7 +105,7 @@ bbox + mask
 <li><p>斑：半透明区域 全部显示在一张图。 这是标准做法。</p></li>
 </ul>
 <p>怎么实现“同图显示”？ 本质就是：</p>
-<pre class="python"><code>原图 image
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>原图 image
     ↓
 检测模型 pred_det
     ↓
@@ -115,14 +115,14 @@ bbox + mask
     ↓
 画mask
 
-最后 merge</code></pre>
+最后 merge</code></pre></details>
 <p>OpenCV 就能实现。</p>
 <p>两个模型怎么跑？ 两个独立模型 Pipeline</p>
-<pre class="text"><code>输入图
+<details class="codeFold"><summary><span>展开代码</span><em>TEXT</em></summary><pre class="text"><code>输入图
    ├── YOLOv8 检测痘/痣
    └── U-Net/YOLOv8-seg 分割斑
 
-最后融合结果</code></pre>
+最后融合结果</code></pre></details>
 <p>优点 非常适合你现在。 因为：</p>
 <ul>
 <li><p>spot 特性和 acne/mole 完全不同</p></li>
@@ -139,7 +139,7 @@ bbox + mask
 </ul>
 <p>尤其医学影像里非常常见。</p>
 <p>那两个模型能共享切图吗？ 完全可以。 这是最佳方案。 推荐工程结构</p>
-<pre class="text"><code>原图
+<details class="codeFold"><summary><span>展开代码</span><em>TEXT</em></summary><pre class="text"><code>原图
    ↓
 统一切图
    ↓
@@ -151,7 +151,7 @@ patch
 
 结果回拼
    ↓
-最终融合显示</code></pre>
+最终融合显示</code></pre></details>
 <p>后续如果提升模块，怎么改？ 检测和分割分开迭代。 因为： 它们是两个完全不同的问题。</p>
 <p>检测侧优化 优化：</p>
 <ul>
@@ -189,9 +189,9 @@ patch
 <li><p>YOLOv8-seg</p></li>
 </ul>
 <p>第三阶段（论文） 做： 多任务联合网络 例如：</p>
-<pre class="text"><code>共享Backbone
+<details class="codeFold"><summary><span>展开代码</span><em>TEXT</em></summary><pre class="text"><code>共享Backbone
    ├── detection head
-   └── segmentation head</code></pre>
+   └── segmentation head</code></pre></details>
 <p>这就很像正式科研了。</p>
 
   </div>
@@ -217,21 +217,16 @@ patch
           
 <section class="profileCard">
   <img src="../assets/site/moyu-avatar.webp" alt="墨玉头像">
-  <h3>墨玉</h3>
-  <p>把研究生阶段的项目、论文和工具笔记，整理成一份可以慢慢翻的知识目录。</p>
+  <h3>潮汐日志</h3>
+  <p>学习者的潮汐记录，写下每一次靠岸和远航。</p>
   <a href="https://github.com/swilderyude">GitHub / swilderyude</a>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">文件夹目录</h3>
-  <ul class="folderSideList"><li><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测 <span>8</span></a></li>
-<li><a href="../categories.html#folder-yolo相关">YOLO相关 <span>2</span></a></li>
-<li><a href="../categories.html#folder-人工智能">人工智能 <span>4</span></a></li>
-<li><a href="../categories.html#folder-计算机视觉">计算机视觉 <span>2</span></a></li>
-<li><a href="../categories.html#folder-精读论文">精读论文 <span>3</span></a></li>
-<li><a href="../categories.html#folder-科研">科研 <span>1</span></a></li>
-<li><a href="../categories.html#folder-工具">工具 <span>3</span></a></li>
-<li><a href="../categories.html#folder-ai基础">AI基础 <span>1</span></a></li>
-<li><a href="../categories.html#folder-根目录笔记">根目录笔记 <span>3</span></a></li></ul>
+  <h3 class="catListTitle">潮汐分区</h3>
+  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
+<li><a href="../categories.html#造船">造船<span>11</span></a></li>
+<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
+<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

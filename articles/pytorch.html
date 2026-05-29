@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="记录 PyTorch 环境配置、自定义 Dataset、Dataloader 和图像数据读取的基础实践。">
-  <title>PyTorch 入门笔记：Dataset 与 Dataloader - 墨玉</title>
+  <title>PyTorch 入门笔记：Dataset 与 Dataloader - 潮汐日志</title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <script defer src="../assets/js/site.js"></script>
 </head>
@@ -15,8 +15,8 @@
       <div id="blogTitle">
         <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><img id="blogLogo" src="../assets/site/moyu-avatar.webp" alt=""></a>
         <div class="brandText">
-          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">墨玉</a></h1>
-          <h2>道阻且长，与君共勉</h2>
+          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">潮汐日志</a></h1>
+          <h2>Tide Logs · 一名学习者的潮汐记录</h2>
         </div>
       </div>
       <nav id="navigator" aria-label="主导航">
@@ -27,7 +27,7 @@
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
         </ul>
-        <div class="blogStats">随笔 27 · 文件夹 9 · 更新 2026-05-28</div>
+        <div class="blogStats">日志 27 · 分区 4 · 今日潮汐</div>
       </nav>
     </header>
     <div id="main">
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#folder-人工智能">人工智能</a><span>/</span><strong>PyTorch 入门笔记：Dataset 与 Dataloader</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#拾贝">拾贝</a><span>/</span><strong>PyTorch 入门笔记：Dataset 与 Dataloader</strong></div>
   <h1 class="postTitle single"><span>PyTorch 入门笔记：Dataset 与 Dataloader</span></h1>
-  <div class="postDesc">posted @ 2026-05-28 墨玉 文件夹: <a href="../categories.html#folder-人工智能">CS自学 / 人工智能</a></div>
+  <div class="postDesc">posted @ 2026-05-28 墨玉 分区: <a href="../categories.html#拾贝">拾贝</a></div>
   <p class="postSummary">记录 PyTorch 环境配置、自定义 Dataset、Dataloader 和图像数据读取的基础实践。</p>
   <div class="postTags"><span>PyTorch</span> <span>Dataset</span> <span>深度学习</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#加载数据">加载数据</a></li>
@@ -45,25 +45,25 @@
   <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
     <p>显卡，驱动和CUDA Toolkit windows，开始菜单打开任务管理器，点击性能，查看GPU型号 网址查看GPU是否支持CUDA https://www.geforce.cn/hardware/technology/cuda/supported-gpus 下载pytorch命令可以继续问问ai</p>
 <p>创建test环境用于实践</p>
-<pre class="bash"><code>conda create --name test python=3.9 -y</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>conda create --name test python=3.9 -y</code></pre></details>
 <p>查看pytorch网址后下载</p>
-<pre class="bash"><code>python -m pip install torch torchvision</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>python -m pip install torch torchvision</code></pre></details>
 <p>可以安装jupyter显示</p>
-<pre class="bash"><code>conda install jupyter</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>conda install jupyter</code></pre></details>
 <p>使用</p>
-<pre class="bash"><code>jupyter notebook</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>jupyter notebook</code></pre></details>
 <p>下载其他包</p>
-<pre class="bash"><code>pip install opencv-python</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>pip install opencv-python</code></pre></details>
 <h1 id="加载数据">加载数据</h1>
 <p>两个类：Dataset数据集、Dataloader数据装载器 Dataset 提供一种方式去获取数据及其label。如何获取每一个数据及其label，说明总共有多少的数据。 Dataloader 为后面的网络提供不同的数据形式。</p>
 <h2 id="dataset类">Dataset类</h2>
 <p>实践</p>
-<pre class="python"><code>from torch.utils.data import Dataset</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>from torch.utils.data import Dataset</code></pre></details>
 <p>说明书</p>
-<pre class="python"><code>help(Dataset)
-Dataset??</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>help(Dataset)
+Dataset??</code></pre></details>
 <p><strong>自定义数据集读取代码</strong></p>
-<pre class="python"><code>from torch.utils.data import Dataset
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>from torch.utils.data import Dataset
 from PIL import Image
 import os
 
@@ -80,7 +80,7 @@ class MyData(Dataset):
         img_item_path = os.path.join(self.root_dir, self.label_dir, img_name)
         img = Image.open(img_item_path)
         label = self.label_dir
-        return img, label</code></pre>
+        return img, label</code></pre></details>
 <p><em>(注：代码没有引入 <code>Dataset</code>，在真实运行环境中，通常需要在开头加上 <code>from torch.utils.data import Dataset</code>)</em> self 将变量声明为生命周期随对象存续且在类内部全局可见的<strong>实例属性</strong>，不加则将其限定为仅在当前方法执行期间有效的<strong>局部变量</strong>。</p>
 <ol type="1">
 <li>导入工具包</li>
@@ -92,16 +92,16 @@ class MyData(Dataset):
 <ol type="1">
 <li>定义一个类</li>
 </ol>
-<pre class="python"><code>class MyData(Dataset):</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>class MyData(Dataset):</code></pre></details>
 <p>类继承。</p>
 <ol start="3" type="1">
 <li>初始化方法</li>
 </ol>
-<pre class="python"><code>    def __init__(self, root_dir, label_dir):
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>    def __init__(self, root_dir, label_dir):
         self.root_dir = root_dir
         self.label_dir = label_dir
         self.path = os.path.join(self.root_dir, self.label_dir)
-        self.img_path = os.listdir(self.path)</code></pre>
+        self.img_path = os.listdir(self.path)</code></pre></details>
 <p>带有双下划线的 <code>__init__</code> 是Python的构造方法，它会自动且最先运行。 前后都带双下划线的方法叫 “magic method” 或 “dunder method”（double underscore），由 Python 解释器在特定时机自动调用。<code>__init__</code>、<code>__str__</code>、<code>__len__</code> 等都属于这一类。</p>
 <ul>
 <li><p><strong><code>self</code></strong>: 代表“自己”。</p></li>
@@ -112,12 +112,12 @@ class MyData(Dataset):
 <ol start="4" type="1">
 <li>获取具体数据的方法</li>
 </ol>
-<pre class="python"><code>    def __getitem__(self, idx):
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>    def __getitem__(self, idx):
         img_name = self.img_path[idx]
         img_item_path = os.path.join(self.root_dir, self.label_dir, img_name)
         img = Image.open(img_item_path)
         label = self.label_dir
-        return img, label</code></pre>
+        return img, label</code></pre></details>
 <p><code>__getitem__</code> 也是一个魔法方法。当机器收到指令“给我第 <code>idx</code> 个数据”时，就会触发这段代码。</p>
 <ul>
 <li><p><strong><code>idx</code></strong>: 意思是 Index（索引、序号）。如果你想要清单里的第0张图，<code>idx</code> 就是 0。</p></li>
@@ -147,21 +147,16 @@ class MyData(Dataset):
           
 <section class="profileCard">
   <img src="../assets/site/moyu-avatar.webp" alt="墨玉头像">
-  <h3>墨玉</h3>
-  <p>把研究生阶段的项目、论文和工具笔记，整理成一份可以慢慢翻的知识目录。</p>
+  <h3>潮汐日志</h3>
+  <p>学习者的潮汐记录，写下每一次靠岸和远航。</p>
   <a href="https://github.com/swilderyude">GitHub / swilderyude</a>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">文件夹目录</h3>
-  <ul class="folderSideList"><li><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测 <span>8</span></a></li>
-<li><a href="../categories.html#folder-yolo相关">YOLO相关 <span>2</span></a></li>
-<li><a href="../categories.html#folder-人工智能">人工智能 <span>4</span></a></li>
-<li><a href="../categories.html#folder-计算机视觉">计算机视觉 <span>2</span></a></li>
-<li><a href="../categories.html#folder-精读论文">精读论文 <span>3</span></a></li>
-<li><a href="../categories.html#folder-科研">科研 <span>1</span></a></li>
-<li><a href="../categories.html#folder-工具">工具 <span>3</span></a></li>
-<li><a href="../categories.html#folder-ai基础">AI基础 <span>1</span></a></li>
-<li><a href="../categories.html#folder-根目录笔记">根目录笔记 <span>3</span></a></li></ul>
+  <h3 class="catListTitle">潮汐分区</h3>
+  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
+<li><a href="../categories.html#造船">造船<span>11</span></a></li>
+<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
+<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

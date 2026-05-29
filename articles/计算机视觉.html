@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="整理图像处理、分类、检测、分割等计算机视觉基础概念。">
-  <title>计算机视觉基础笔记 - 墨玉</title>
+  <title>计算机视觉基础笔记 - 潮汐日志</title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <script defer src="../assets/js/site.js"></script>
 </head>
@@ -15,8 +15,8 @@
       <div id="blogTitle">
         <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><img id="blogLogo" src="../assets/site/moyu-avatar.webp" alt=""></a>
         <div class="brandText">
-          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">墨玉</a></h1>
-          <h2>道阻且长，与君共勉</h2>
+          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">潮汐日志</a></h1>
+          <h2>Tide Logs · 一名学习者的潮汐记录</h2>
         </div>
       </div>
       <nav id="navigator" aria-label="主导航">
@@ -27,7 +27,7 @@
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
         </ul>
-        <div class="blogStats">随笔 27 · 文件夹 9 · 更新 2026-05-28</div>
+        <div class="blogStats">日志 27 · 分区 4 · 今日潮汐</div>
       </nav>
     </header>
     <div id="main">
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#folder-计算机视觉">计算机视觉</a><span>/</span><strong>计算机视觉基础笔记</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#拾贝">拾贝</a><span>/</span><strong>计算机视觉基础笔记</strong></div>
   <h1 class="postTitle single"><span>计算机视觉基础笔记</span></h1>
-  <div class="postDesc">posted @ 2025-10-30 墨玉 文件夹: <a href="../categories.html#folder-计算机视觉">CS自学 / 计算机视觉</a></div>
+  <div class="postDesc">posted @ 2025-10-30 墨玉 分区: <a href="../categories.html#拾贝">拾贝</a></div>
   <p class="postSummary">整理图像处理、分类、检测、分割等计算机视觉基础概念。</p>
   <div class="postTags"><span>计算机视觉</span> <span>图像处理</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#图像分类流程">图像分类流程</a></li>
@@ -65,21 +65,21 @@
     <p>视觉是分层的。 边缘检测。 人脸分类器。opencv，haar SIFT 图片变成向量，再对向量进行分类，或者回归。 数据集：PASCAL Visual Object Challenge 深度残差网络（高于人类） 主要介绍图像分类，物体检测和图像标注。 经典CNN架构 <img src="../assets/media/pasted-image-20251028172338-a8a2a3f49e.webp" alt="Pasted image 20251028172338.png" /> 仍需解决的问题： 人体姿态估计，三维重建，（）语义分割 （不仅要识别出图像中的物品，还要给出物品之间的关联） 图像描述，不仅能读懂图片，还能够理解图片背后的内容。</p>
 <h1 id="图像分类流程">图像分类流程</h1>
 <p>对于图片，计算机识别的是像素矩阵。 RGB三通道指的是图像由红（R）、绿（G）、蓝（B）三个独立颜色通道组成，每个通道记录对应光强度信息，三者叠加形成完整的彩色图像。[0,255].8个bit存储像素值。每一个通道都是一个二维的矩阵（高度 × 宽度）。 图像分类问题就是一个黑箱。</p>
-<pre class="python"><code>def classify_image(image):
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>def classify_image(image):
     # Some magic here?
-    return class_label</code></pre>
+    return class_label</code></pre></details>
 <p>算法不是显性的，只能用数据驱动的方法。 机器学习：数据驱动方法</p>
 <ol type="1">
 <li><p>收集数据集和其标签</p></li>
 <li><p>用机器学习在训练集上训练一个分类器</p></li>
 <li><p>在新的图片（测试集）上进行分类 过拟合：在训练集上完全符合，但在测试集上效果不好</p></li>
 </ol>
-<pre class="python"><code>def train (images, labels):
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>def train (images, labels):
     # Machine learning!
     return model
 def predict(model, test_images) :
     # Use model to predict labels
-    return test_labels</code></pre>
+    return test_labels</code></pre></details>
 <h2 id="nearest-neighbor">Nearest Neighbor</h2>
 <p>惰性算法 像素相减求和计算距离。 <img src="../assets/media/pasted-image-20251028211025-2fa634b097.webp" alt="Pasted image 20251028211025.png" /> 代码实现：</p>
 <p>```python title:“KNN” import numpy as np from tensorflow.keras.datasets import cifar10 from collections import Counter</p>
@@ -91,7 +91,7 @@ def predict(model, test_images) :
 <h1 id="预测函数">2️⃣ 预测函数</h1>
 <h1 id="section-3">——————————</h1>
 <p>def predict(model, test_images, k=3): """ 对测试图片进行KNN分类预测。 """ X_train = model[“images”] y_train = model[“labels”] X_test = test_images.reshape(test_images.shape[0], -1)</p>
-<pre><code>preds = []
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>preds = []
 for i, x in enumerate(X_test):
     # 计算每张测试图像与所有训练图像的欧氏距离
     distances = np.linalg.norm(X_train - x, axis=1)
@@ -106,12 +106,12 @@ for i, x in enumerate(X_test):
     if (i + 1) % 5 ** 0:
         print(f&quot;已预测 {i + 1}/{len(X_test)} 张图片&quot;)
 
-return np.array(preds)</code></pre>
+return np.array(preds)</code></pre></details>
 <h1 id="section-4">——————————</h1>
 <h1 id="主程序">3️⃣ 主程序</h1>
 <h1 id="section-5">——————————</h1>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: # 加载 CIFAR-10 数据集（每张图片32x32x3） (X_train, y_train), (X_test, y_test) = cifar10.load_data()</p>
-<pre><code># 为了演示，我们使用小样本（否则KNN太慢）
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># 为了演示，我们使用小样本（否则KNN太慢）
 X_train = X_train[:1000]
 y_train = y_train[:1000]
 X_test = X_test[:20]
@@ -125,8 +125,8 @@ y_pred = predict(model, X_test, k=3)
 
 # 计算准确率
 acc = np.mean(y_pred == y_test.flatten())
-print(f&quot;\nKNN分类准确率: {acc:.3f}&quot;)</code></pre>
-<pre><code>“训练阶段”几乎不耗时，因此常被称作 **O(1)** 
+print(f&quot;\nKNN分类准确率: {acc:.3f}&quot;)</code></pre></details>
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>“训练阶段”几乎不耗时，因此常被称作 **O(1)** 
 “预测阶段”是核心计算，单样本为 **O(n)**。
 
 边界线是用垂直平分线分出来的。
@@ -256,7 +256,7 @@ for t in range (2000):
     grad_h = grad_y_pred.dot(w2.T)
     grad_w1 = x.T.dot(grad_h *h * (1 - h))
     w1 -= 1e-4 * grad_w1
-    w2 -= 1e-4 * grad_w2</code></pre>
+    w2 -= 1e-4 * grad_w2</code></pre></details>
 <h2 id="激活损失优化函数">激活、损失、优化函数</h2>
 <p>激活函数：将神经网络上一层的输入，经过神经网络层的非线性变换转换后，通过激活函数，得到输出。常见的激活函数包括：sigmoid, tanh, relu等。https://blog.csdn.net/u013250416/article/details/80991831</p>
 <p>损失函数：度量神经网络的输出的预测值，与实际值之间的差距的一种方式。常见的损失函数包括：最小二乘损失函数、交叉熵损失函数、回归中使用的smooth L1损失函数等。</p>
@@ -310,21 +310,16 @@ for t in range (2000):
           
 <section class="profileCard">
   <img src="../assets/site/moyu-avatar.webp" alt="墨玉头像">
-  <h3>墨玉</h3>
-  <p>把研究生阶段的项目、论文和工具笔记，整理成一份可以慢慢翻的知识目录。</p>
+  <h3>潮汐日志</h3>
+  <p>学习者的潮汐记录，写下每一次靠岸和远航。</p>
   <a href="https://github.com/swilderyude">GitHub / swilderyude</a>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">文件夹目录</h3>
-  <ul class="folderSideList"><li><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测 <span>8</span></a></li>
-<li><a href="../categories.html#folder-yolo相关">YOLO相关 <span>2</span></a></li>
-<li><a href="../categories.html#folder-人工智能">人工智能 <span>4</span></a></li>
-<li><a href="../categories.html#folder-计算机视觉">计算机视觉 <span>2</span></a></li>
-<li><a href="../categories.html#folder-精读论文">精读论文 <span>3</span></a></li>
-<li><a href="../categories.html#folder-科研">科研 <span>1</span></a></li>
-<li><a href="../categories.html#folder-工具">工具 <span>3</span></a></li>
-<li><a href="../categories.html#folder-ai基础">AI基础 <span>1</span></a></li>
-<li><a href="../categories.html#folder-根目录笔记">根目录笔记 <span>3</span></a></li></ul>
+  <h3 class="catListTitle">潮汐分区</h3>
+  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
+<li><a href="../categories.html#造船">造船<span>11</span></a></li>
+<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
+<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

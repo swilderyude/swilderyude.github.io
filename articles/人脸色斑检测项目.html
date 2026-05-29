@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="围绕人脸色斑检测任务，整理数据匿名化、数据集结构、YOLO 训练、结果融合与 SDK 对接的完整工程记录。">
-  <title>人脸色斑检测项目：从数据处理到 SDK 封装 - 墨玉</title>
+  <title>人脸色斑检测项目：从数据处理到 SDK 封装 - 潮汐日志</title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <script defer src="../assets/js/site.js"></script>
 </head>
@@ -15,8 +15,8 @@
       <div id="blogTitle">
         <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><img id="blogLogo" src="../assets/site/moyu-avatar.webp" alt=""></a>
         <div class="brandText">
-          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">墨玉</a></h1>
-          <h2>道阻且长，与君共勉</h2>
+          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">潮汐日志</a></h1>
+          <h2>Tide Logs · 一名学习者的潮汐记录</h2>
         </div>
       </div>
       <nav id="navigator" aria-label="主导航">
@@ -27,7 +27,7 @@
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
         </ul>
-        <div class="blogStats">随笔 27 · 文件夹 9 · 更新 2026-05-28</div>
+        <div class="blogStats">日志 27 · 分区 4 · 今日潮汐</div>
       </nav>
     </header>
     <div id="main">
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测</a><span>/</span><strong>人脸色斑检测项目：从数据处理到 SDK 封装</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#造船">造船</a><span>/</span><strong>人脸色斑检测项目：从数据处理到 SDK 封装</strong></div>
   <h1 class="postTitle single"><span>人脸色斑检测项目：从数据处理到 SDK 封装</span></h1>
-  <div class="postDesc">posted @ 2026-05-28 墨玉 文件夹: <a href="../categories.html#folder-人脸色斑检测">CS自学 / 人脸色斑检测</a></div>
+  <div class="postDesc">posted @ 2026-05-28 墨玉 分区: <a href="../categories.html#造船">造船</a></div>
   <p class="postSummary">围绕人脸色斑检测任务，整理数据匿名化、数据集结构、YOLO 训练、结果融合与 SDK 对接的完整工程记录。</p>
   <div class="postTags"><span>YOLO</span> <span>小目标检测</span> <span>医学图像</span> <span>工程化</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#数据预处理">数据预处理</a></li>
@@ -90,16 +90,16 @@
 </ol>
 <p>选择b.<a href="https://blog.csdn.net/weixin_40062244/article/details/128283144">Mediapipe人脸关键点检测</a></p>
 <p>环境部署 Python环境：建议3.6版本以上 Python主要模块:opencv-contrib-python；numpy; pandas; matplotlib Python 主要模块：opencv-contrib-python;numpy;熊猫;Matplotlib MediaPipe模块:mediapipe MediaPipe 模块：mediapipe 安装方法：使用以下pip命令安装</p>
-<pre class="bash"><code>pip install mediapipe</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>pip install mediapipe</code></pre></details>
 <p>测试环境：导入如下库，如果不报错说明导入成功</p>
-<pre class="python"><code>import cv2
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>import cv2
 import mediapipe as mp
 import pandas as pd 
 import numpy as np 
-import matplotlib.pyplot as plt</code></pre>
+import matplotlib.pyplot as plt</code></pre></details>
 <p>若报错，运行冲突。</p>
-<pre class="bash"><code>pip install &quot;numpy&lt;2.0.0&quot;
-pip install &quot;opencv-python**4.9.0.80&quot; &quot;opencv-contrib-python**4.9.0.80&quot; &quot;opencv-python-headless**4.9.0.80&quot; &quot;ml-dtypes~=0.3.1&quot;</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>pip install &quot;numpy&lt;2.0.0&quot;
+pip install &quot;opencv-python**4.9.0.80&quot; &quot;opencv-contrib-python**4.9.0.80&quot; &quot;opencv-python-headless**4.9.0.80&quot; &quot;ml-dtypes~=0.3.1&quot;</code></pre></details>
 <p>运行主代码</p>
 <p>```python title:“anonymize.py” import cv2<br />
 import mediapipe as mp<br />
@@ -112,7 +112,7 @@ import threading</p>
 try:<br />
 mp_face_mesh = mp.solutions.face_mesh<br />
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=10)</p>
-<pre><code>    LEFT_EYE = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246]  
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>    LEFT_EYE = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246]  
     RIGHT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]  
     MOUTH = [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 185, 40, 39, 37, 0, 267, 269, 270, 409]  
     BOTH_EYES = LEFT_EYE + RIGHT_EYE  
@@ -181,7 +181,7 @@ except Exception as e:
 
 finally:  
     # 恢复按钮可点击状态  
-    start_button.config(state=tk.NORMAL)  </code></pre>
+    start_button.config(state=tk.NORMAL)  </code></pre></details>
 <h1 id="section">========================================**</h1>
 <h1 id="界面-gui-设计部分">界面 (GUI) 设计部分</h1>
 <h1 id="section-1"><strong>======================================</strong></h1>
@@ -190,7 +190,7 @@ def <strong>init</strong>(self, root):<br />
 self.root = root<br />
 self.root.title(“人脸隐私一键打码工具”)<br />
 self.root.geometry(“500x400”)</p>
-<pre><code>    self.input_folder = &quot;&quot;  
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>    self.input_folder = &quot;&quot;  
     self.output_folder = &quot;&quot;  
 
     # 标题  
@@ -244,17 +244,17 @@ def start_task(self):
 
     # 开启一个新线程去跑代码  
     threading.Thread(target=process_images,  
-                     args=(self.input_folder, self.output_folder, self.log_text, self.btn_start)).start()  </code></pre>
+                     args=(self.input_folder, self.output_folder, self.log_text, self.btn_start)).start()  </code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”:<br />
 root = tk.Tk()<br />
 app = FaceAnonymizerApp(root)<br />
 root.mainloop()</p>
-<pre><code>打包程序
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>打包程序
 
 ```bash
 pip install pyinstaller
 pyinstaller --windowed --noconfirm --collect-all mediapipe --exclude PyQt5 --exclude PyQt6 --exclude PySide6 --name &quot;FaceMasker&quot; app.py
-# 电脑环境里同时安装了 PyQt5、PyQt6、PySide6</code></pre>
+# 电脑环境里同时安装了 PyQt5、PyQt6、PySide6</code></pre></details>
 <h1 id="数据集">数据集</h1>
 <p><strong>启发</strong>（但是甲方多种光照无法实现） VISIA 图像分析原理 (医美行业标准) VISIA 是由美国 Canfield Scientific 公司开发的皮肤分析系统，是目前全球医美机构公认的检测标准。</p>
 <ul>
@@ -270,7 +270,7 @@ pyinstaller --windowed --noconfirm --collect-all mediapipe --exclude PyQt5 --exc
 </ul></li>
 </ul>
 <p>数据集文件夹结构 mydata：</p>
-<pre class="text"><code>zhao:.
+<details class="codeFold"><summary><span>展开代码</span><em>TEXT</em></summary><pre class="text"><code>zhao:.
 ├──test
 │  ├──images
 │  └──labels
@@ -279,7 +279,7 @@ pyinstaller --windowed --noconfirm --collect-all mediapipe --exclude PyQt5 --exc
 │  └──labels
 └──val
    ├──images
-   └──labels</code></pre>
+   └──labels</code></pre></details>
 <p>train（训练集）、valid（验证集）和 test（测试集）</p>
 <p>接受的文件： 类型：txt文件， 检测框类型：四边形</p>
 <p>原始数据集格式： json文件</p>
@@ -298,7 +298,7 @@ pyinstaller --windowed --noconfirm --collect-all mediapipe --exclude PyQt5 --exc
 <h1 id="定义要处理的根目录">定义要处理的根目录</h1>
 <p>target_dirs = [‘train’, ‘valid’, ‘test’]</p>
 <p>def delete_json_files(): count = 0 for root_dir in target_dirs: # 构建搜索路径，匹配 images 文件夹下的所有 .json 文件 search_pattern = os.path.join(root_dir, ‘images’, ’*.json’)</p>
-<pre><code>    # 获取所有匹配的文件列表
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>    # 获取所有匹配的文件列表
     json_files = glob.glob(search_pattern)
     
     for file_path in json_files:
@@ -309,9 +309,9 @@ pyinstaller --windowed --noconfirm --collect-all mediapipe --exclude PyQt5 --exc
         except Exception as e:
             print(f&quot;删除失败 {file_path}: {e}&quot;)
             
-print(f&quot;\n操作完成！共删除了 {count} 个 JSON 文件。&quot;)</code></pre>
+print(f&quot;\n操作完成！共删除了 {count} 个 JSON 文件。&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: # 确认当前目录下是否存在这些文件夹 exists = [d for d in target_dirs if os.path.exists(d)] if not exists: print(“错误：在当前路径下未找到 train/valid/test 文件夹，请检查运行位置。”) else: delete_json_files()</p>
-<pre><code>merge
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>merge
 
 ```python title:&quot;merge.py&quot;
 import os
@@ -385,16 +385,16 @@ def merge_all_datasets():
     print(&quot;=&quot;*40)
 
 if __name__ ** &quot;__main__&quot;:
-    merge_all_datasets()</code></pre>
+    merge_all_datasets()</code></pre></details>
 <h2 id="universe数据集未使用">Universe数据集（未使用）</h2>
 <p><strong>一个小技巧</strong> 对于已经标注好的yolo文件txt，如何在X-AnyLabeling中显示标注框？ 1.准备好classes.txt文件 2.X-AnyLabeling界面<code>导入</code>-<code>导入yolo水平标注框</code>，导入classes.txt文件，再选择labels文件夹。 3.标注框显示。images文件夹里出现了json文件。 可能会出现的问题： txt文件不是utf-8，但文件确实是utf-8的格式。 是因为mac的隐藏文件也会被识别。要删除。</p>
-<pre class="bash"><code># 删除所有隐藏的 AppleDouble 文件 (以 ._ 开头的文件) 
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code># 删除所有隐藏的 AppleDouble 文件 (以 ._ 开头的文件) 
 dot_clean . 
 # 删除所有的 .DS_Store 文件 
-find . -name &quot;.DS_Store&quot; -depth -exec rm {} \;</code></pre>
+find . -name &quot;.DS_Store&quot; -depth -exec rm {} \;</code></pre></details>
 <p>```python title:“delete.py” import os import shutil</p>
 <p>def deep_clean_hidden_files(start_path=‘.’): deleted_files_count = 0 deleted_dirs_count = 0</p>
-<pre><code>print(f&quot;开始从 {os.path.abspath(start_path)} 递归清理隐藏文件...\n&quot;)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>print(f&quot;开始从 {os.path.abspath(start_path)} 递归清理隐藏文件...\n&quot;)
 
 # os.walk 会遍历目录下所有的文件夹和文件
 # topdown=False 表示先处理子目录中的文件，再处理父目录，这样更安全
@@ -426,9 +426,9 @@ for root, dirs, files in os.walk(start_path, topdown=False):
 print(&quot;-&quot; * 40)
 print(f&quot;清理完成！&quot;)
 print(f&quot;共删除隐藏文件: {deleted_files_count} 个&quot;)
-print(f&quot;共删除隐藏目录: {deleted_dirs_count} 个&quot;)</code></pre>
+print(f&quot;共删除隐藏目录: {deleted_dirs_count} 个&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: # 确认提示（防止误删） confirm = input(“该操作将递归删除当前目录下所有以 ‘.’ 开头的文件和文件夹。确认继续吗？(y/n):”) if confirm.lower() ** ‘y’: deep_clean_hidden_files() else: print(“操作已取消。”)</p>
-<pre><code>
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>
 ### 多类
 
 采用的数量：8824
@@ -552,14 +552,14 @@ def process_full_dataset():
     print(f&quot;当前类别顺序: 0:spot, 1:acne, 2:mole&quot;)
 
 if __name__ ** &quot;__main__&quot;:
-    process_full_dataset()</code></pre>
+    process_full_dataset()</code></pre></details>
 <p>修改data.yaml文件</p>
-<pre class="bash"><code>nc: 3 
-names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>nc: 3 
+names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre></details>
 <p>仅有train文件，将其分为常规三类。</p>
 <p>```python title:“split.py” import os import random import shutil</p>
 <p>def split_train_dataset(train_ratio=0.7, valid_ratio=0.2): # 1. 定义路径 base_train_img = os.path.join(‘train’, ‘images’) base_train_lab = os.path.join(‘train’, ‘labels’)</p>
-<pre><code>if not os.path.exists(base_train_img) or not os.path.exists(base_train_lab):
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>if not os.path.exists(base_train_img) or not os.path.exists(base_train_lab):
     print(&quot;错误：找不到 &#39;train/images&#39; 或 &#39;train/labels&#39; 文件夹！&quot;)
     return
 
@@ -619,9 +619,9 @@ print(&quot;-&quot; * 30)
 print(f&quot;拆分完成！&quot;)
 print(f&quot;Train (保留): {len(train_list)} 张&quot;)
 print(f&quot;Valid (移动): {len(valid_list)} 张&quot;)
-print(f&quot;Test  (移动): {len(test_list)} 张&quot;)</code></pre>
+print(f&quot;Test  (移动): {len(test_list)} 张&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: split_train_dataset()</p>
-<pre><code>
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>
 
 7.Acne 4类 （blackheads  dark spot  fore  papules） 1159张
 [7](https://universe.roboflow.com/new-workspace-ii6dw/acne-gsoza)
@@ -733,17 +733,17 @@ def process_and_clean_dataset():
     print(&quot;\n所有任务已执行完毕！&quot;)
 
 if __name__ ** &quot;__main__&quot;:
-    process_and_clean_dataset()</code></pre>
+    process_and_clean_dataset()</code></pre></details>
 <p>class类为了使acne为1，前面加一个placeholder占位。 data.yaml也进行占位。</p>
-<pre class="bash"><code>nc: 2
-names: [&#39;placeholder&#39;, &#39;acne&#39;]</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>nc: 2
+names: [&#39;placeholder&#39;, &#39;acne&#39;]</code></pre></details>
 <p>14.acne 3类（hyperpigmentation  inflamed  noninflamed） 921张 <a href="https://universe.roboflow.com/acneagent/acne-c5qud">14</a></p>
 <blockquote>
 <p>已下载。hyperpigmentation为spot，inflamed和noninflamed合并为acne.</p>
 </blockquote>
 <p>```python title:“alter.py” import os import json</p>
 <p>def process_dataset(): # 配置 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
-<pre><code># TXT 索引映射: 0-&gt;0, 1-&gt;1, 2-&gt;1
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># TXT 索引映射: 0-&gt;0, 1-&gt;1, 2-&gt;1
 txt_mapping = {
     &#39;0&#39;: &#39;0&#39;, # hyperpigmentation -&gt; spot
     &#39;1&#39;: &#39;1&#39;, # inflamed -&gt; acne
@@ -851,20 +851,20 @@ try:
 except:
     print(&quot;\n警告: 未能更新根目录 classes.txt&quot;)
 
-print(&quot;\n所有任务已执行完毕！&quot;)</code></pre>
+print(&quot;\n所有任务已执行完毕！&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 2 
-names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre>
+names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre></details>
 <p>19.Acne 8类（Веснушка  Морщина  Пигментация  Постакне (рубец)  Прыщ  Расширенная пора  Родинка  Черная точка 雀斑 皱纹 色素沉着 痤疮后疤痕 粉刺 毛孔粗大 痣 黑头） 845张 <a href="https://universe.roboflow.com/acne-mdodj/acne-mz8ar">19</a></p>
 <blockquote>
 <p>已下载。Веснушка雀斑为spot，Пигментация色素沉着为spot，即前二者合并为spot，Прыщ疙瘩即acne，Родинка痣为mole。</p>
 </blockquote>
 <p>```python title:“alter.py” import os import json</p>
 <p>def process_dataset(): # 配置子文件夹 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
-<pre><code># TXT 索引映射 (字符串形式匹配)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># TXT 索引映射 (字符串形式匹配)
 txt_mapping = {
     &#39;0&#39;: &#39;0&#39;, # &#39;----&#39; -&gt; spot
     &#39;2&#39;: &#39;0&#39;, # &#39;------ -----&#39; -&gt; spot
@@ -973,20 +973,20 @@ try:
 except Exception as e:
     print(f&quot;\n无法更新根目录 classes.txt: {e}&quot;)
 
-print(&quot;\n所有操作已完成！请记得手动更新 data.yaml。&quot;)</code></pre>
+print(&quot;\n所有操作已完成！请记得手动更新 data.yaml。&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 3 
-names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre>
+names: [&#39;spot&#39;, &#39;acne&#39;, &#39;mole&#39;]</code></pre></details>
 <p>21.spots 10类（Acne, Blackheads, Dark-Spots, Dry-Skin, Englarged-Pores, Eyebags, Oily-Skin, Skin-Redness, Whiteheads, Wrinkles）2660张 <a href="https://app.roboflow.com/swilder/skin-problem-detection-relabel-clean3-dtinq/1">21</a></p>
 <blockquote>
 <p>已下载。Dark-Spots为spot，Acne为acne</p>
 </blockquote>
 <p>```python title:“alter.py” import os import json</p>
 <p>def process_dataset(): # 子文件夹列表 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
-<pre><code># TXT 索引映射: 
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># TXT 索引映射: 
 # 原 2 (Dark-Spots) -&gt; 新 0 (spot)
 # 原 0 (Acne) -&gt; 新 1 (acne)
 txt_mapping = {
@@ -1094,19 +1094,19 @@ try:
 except:
     print(&quot;\n警告: 无法更新根目录 classes.txt&quot;)
 
-print(&quot;\n所有操作已完成！&quot;)</code></pre>
+print(&quot;\n所有操作已完成！&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: process_dataset()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 2 
-names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre>
+names: [&#39;spot&#39;, &#39;acne&#39;]</code></pre></details>
 <h3 id="单类">单类</h3>
 <h4 id="acne">acne</h4>
 <p>采用的数量：8322 3.acne 905张 <a href="https://universe.roboflow.com/acne-qmv2v/acne-ctiit">3</a> 将0改为1.</p>
 <p>```python title:“alter.py” import os</p>
 <p>def change_class_index(): # 目标文件夹 subfolders = [‘train’, ‘valid’, ‘test’]</p>
-<pre><code>count_modified = 0
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>count_modified = 0
 print(&quot;开始修改类别索引：从 0 改为 1...&quot;)
 
 for sub in subfolders:
@@ -1154,13 +1154,13 @@ for sub in subfolders:
 print(&quot;-&quot; * 30)
 print(f&quot;处理完成！&quot;)
 print(f&quot;共成功修改了 {count_modified} 个标注文件。&quot;)
-print(&quot;请记得将 data.yaml 中的 nc 改为 2，并确保索引 1 对应正确的类名。&quot;)</code></pre>
+print(&quot;请记得将 data.yaml 中的 nc 改为 2，并确保索引 1 对应正确的类名。&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: change_class_index()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 2 
-names: [&#39;placeholder&#39;, &#39;acne&#39;] # 索引 0 留个占位符</code></pre>
+names: [&#39;placeholder&#39;, &#39;acne&#39;] # 索引 0 留个占位符</code></pre></details>
 <p>7.acne 1419张 <a href="https://universe.roboflow.com/yolotest-bu1i2/acne-ho1jq">7</a> 13.acne 800张 <a href="https://universe.roboflow.com/tezim/acne-k7v7j">13</a></p>
 <p>17.acne 1419张 <a href="https://universe.roboflow.com/learning-jth0d/acne-hrslq">17</a></p>
 <h4 id="pigmentation">pigmentation</h4>
@@ -1172,7 +1172,7 @@ names: [&#39;placeholder&#39;, &#39;acne&#39;] # 索引 0 留个占位符</code>
 </blockquote>
 <p>```python title:“alter.py” import os import json</p>
 <p>def process_spot_dataset(): # 基础配置 subfolders = [‘train’, ‘valid’, ‘test’] img_exts = [‘.jpg’, ‘.jpeg’, ‘.png’, ‘.bmp’, ‘.webp’]</p>
-<pre><code># 目标：只保留索引 0 (spot)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># 目标：只保留索引 0 (spot)
 target_idx = &#39;0&#39;
 target_label_name = &#39;spot&#39;
 
@@ -1266,13 +1266,13 @@ try:
 except:
     pass
 
-print(&quot;\n所有操作已完成！&quot;)</code></pre>
+print(&quot;\n所有操作已完成！&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: process_spot_dataset()</p>
-<pre><code>data.yaml
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>data.yaml
 
 ```bash
 nc: 1 
-names: [&#39;spot&#39;]</code></pre>
+names: [&#39;spot&#39;]</code></pre></details>
 <h4 id="pimple">pimple</h4>
 <p>1.pimple on face 35张 <a href="https://app.roboflow.com/swilder/pimple-on-face-sjq4e/1">1</a></p>
 <blockquote>
@@ -1338,7 +1338,7 @@ names: [&#39;spot&#39;]</code></pre>
 <p>LABEL_MAP = { “1spot_斑点”: 0, “2acne_痘痘”: 1, “3mole_⿊痣”: 2 }</p>
 <p>def convert(size, box): img_w, img_h = size xmin, ymin, xmax, ymax = box if img_w ** 0 or img_h ** 0: return None return ((xmin + xmax) / 2.0 / img_w, (ymin + ymax) / 2.0 / img_h, (xmax - xmin) / img_w, (ymax - ymin) / img_h)</p>
 <p>def process(): target_path = os.path.join(os.getcwd(), DATA_SOURCE_DIR) if not os.path.exists(target_path): print(f“❌ 错误：找不到文件夹 ‘{DATA_SOURCE_DIR}’”) return</p>
-<pre><code># 1. 扫描文件，同时过滤掉 macOS 的隐藏文件 (._ 开头)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># 1. 扫描文件，同时过滤掉 macOS 的隐藏文件 (._ 开头)
 all_files = os.listdir(target_path)
 json_files = [f for f in all_files if f.lower().endswith(&#39;.json&#39;) and not f.startswith(&#39;._&#39;)]
 print(f&quot;📂 找到有效 JSON 文件数: {len(json_files)}&quot;)
@@ -1418,9 +1418,9 @@ print(&quot;📊 最终转换报告:&quot;)
 print(f&quot;✅ 成功提取的标注框总数: {total_boxes}&quot;)
 print(f&quot;🏷️  JSON里实际发现的标签名: {list(actual_labels)}&quot;)
 print(f&quot;📁 数据集路径: {os.path.abspath(OUTPUT_DIR)}&quot;)
-print(&quot;=&quot;*40)</code></pre>
+print(&quot;=&quot;*40)</code></pre></details>
 <p>if <strong>name</strong> ** ‘<strong>main</strong>’: process()</p>
-<pre><code>划分数据集为train和val，要求再加上test。
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>划分数据集为train和val，要求再加上test。
 
 ```python title:&quot;avert.py&quot;
 import os
@@ -1528,16 +1528,16 @@ def main():
 
 
 if __name__ ** &quot;__main__&quot;:
-    main()</code></pre>
+    main()</code></pre></details>
 <h3 id="类似数据集">类似数据集</h3>
 <p>采用的 Melasma 数据集来自北京美医医学技术研究院。 Melasma 数据集,覆盖 4617 例色斑患者,每例对应 1 张图像,共有 4617 张图片。 将数据集按 9:1 进行划分,随机选择 90%的数据用于模型的训练,剩余的 10%作为测试集,用于评判深度网络模型的性能。 对于小目标的定义,COCO 数据集将目标像素面积小于 32×32 的物体归类为小目标(Small Object),目标像素面积介于 32×32 至 96×96 的归为中 等目标(Medium Object),目标像素面积超过 96×96 的归为大目标(Large Object)。 该人脸色斑数据集中小目标的占比达到 99.1%(共计 44713 个标注), 中等目标占比达 0.931%(共计 420 个标注)。这种极端的长尾分布特性主要源于两个医学事实:其一,早期病理性色斑多呈现微小点状特征;其二,临床采集时为保证病灶细节,普遍采用<strong>高倍率皮肤镜</strong>拍摄,导致相对成像尺寸缩小。</p>
 <h1 id="模型选择与训练">模型选择与训练</h1>
 <p><strong>环境</strong> pytorch、cuda 使用yolo <a href="https://github.com/ultralytics/ultralytics">yolo代码</a> 进入yolo文件夹下</p>
-<pre class="bash"><code># 先安装依赖
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code># 先安装依赖
 pip install -e .
 
 # 运行训练脚本
-python train.py</code></pre>
+python train.py</code></pre></details>
 <p><strong>模型参数选择</strong> default.yaml <strong>训练前准备</strong> 数据集准备 images:存放图片 train：训练集图片 val：验证集图片 labels：存放标签 train：训练集标签文件，要与训练集图片名称一一对应 val：验证集标签文件，要与验证集图片名称一一对应</p>
 <p>还有另一种存放方式 train images labels vaild images labels test images labels</p>
 <p>解决过拟合主要靠：</p>
@@ -1556,7 +1556,7 @@ python train.py</code></pre>
 <p>if <strong>name</strong> ** ‘<strong>main</strong>’: model = YOLO(“ultralytics/cfg/models/v8/yolov8n.yaml”) model.train( data=‘/data_1/xgd/zhy/ultralytics-8.2.0/datasets/dataset-l/data.yaml’, cache=True, imgsz=640, epochs=300, batch=64, workers=8, optimizer=“SGD”, project=“/data_1/xgd/zhy/ultralytics-8.2.0/l/runs/train”,<br />
 name=“yolov8n-spot”, device=“1”,<br />
 )</p>
-<pre><code>
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>
 ### 关注问题
 
 1.小目标检测的论文。小目标检测与高像素检测
@@ -1715,25 +1715,25 @@ batch_process(
     label_folder=&quot;./Hosdataset/labels&quot;,
     output_root=output_root
 )
-print(&quot;🚀 处理完成！&quot;)</code></pre>
+print(&quot;🚀 处理完成！&quot;)</code></pre></details>
 <h3 id="训练模型">训练模型</h3>
 <ol type="1">
 <li>清理 Ultralytics 配置文件 在终端运行以下命令：</li>
 </ol>
-<pre class="bash"><code>yolo settings reset</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>yolo settings reset</code></pre></details>
 <ol start="2" type="1">
 <li>多卡训练</li>
 </ol>
-<pre class="bash"><code>export PYTHONPATH=$PYTHONPATH:. 
-python train_1.py</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>export PYTHONPATH=$PYTHONPATH:. 
+python train_1.py</code></pre></details>
 <ol start="3" type="1">
 <li>清理内存</li>
 </ol>
-<pre class="bash"><code>ps -ef | grep &#39;envs/pyj_zhy&#39; | grep -v grep | awk &#39;{print $2}&#39; | xargs -r kill -9</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>ps -ef | grep &#39;envs/pyj_zhy&#39; | grep -v grep | awk &#39;{print $2}&#39; | xargs -r kill -9</code></pre></details>
 <h3 id="训练结果">训练结果</h3>
 <h3 id="测试">测试</h3>
 <p>流程</p>
-<pre class="text"><code>加载模型
+<details class="codeFold"><summary><span>展开代码</span><em>TEXT</em></summary><pre class="text"><code>加载模型
     ↓
 读取test大图
     ↓
@@ -1743,7 +1743,7 @@ python train_1.py</code></pre>
     ↓
 全局NMS
     ↓
-保存预测txt</code></pre>
+保存预测txt</code></pre></details>
 <p>步骤 pip install sahi 代码</p>
 <p>```python title:“test_predict.py” from sahi import AutoDetectionModel from sahi.predict import get_sliced_prediction</p>
 <p>import os import cv2</p>
@@ -1754,7 +1754,7 @@ python train_1.py</code></pre>
 <p>detection_model = AutoDetectionModel.from_pretrained( model_type=‘yolov8’, model_path=‘best.pt’, confidence_threshold=0.25, device=‘cuda:0’ )</p>
 <h1 id="遍历-test">=======** 遍历 test **=======</h1>
 <p>for img_name in os.listdir(TEST_IMG_DIR):</p>
-<pre><code>if not img_name.endswith((&#39;.jpg&#39;, &#39;.png&#39;, &#39;.jpeg&#39;)):
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>if not img_name.endswith((&#39;.jpg&#39;, &#39;.png&#39;, &#39;.jpeg&#39;)):
     continue
 
 img_path = os.path.join(TEST_IMG_DIR, img_name)
@@ -1797,13 +1797,13 @@ with open(txt_path, &#39;w&#39;) as f:
 
         line = f&quot;{cls_id} {xc} {yc} {bw} {bh} {score}\n&quot;
 
-        f.write(line)</code></pre>
+        f.write(line)</code></pre></details>
 <p>print(“预测完成”)</p>
-<pre><code>
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>
 ```bash
-result.object_prediction_list</code></pre>
+result.object_prediction_list</code></pre></details>
 <p>评估指标 pip install sahi pycocotools 评估用coco格式</p>
-<pre class="txt"><code>YOLO test labels
+<details class="codeFold"><summary><span>展开代码</span><em>TXT</em></summary><pre class="txt"><code>YOLO test labels
       ↓
 转COCO json
 
@@ -1817,8 +1817,8 @@ COCO evaluator
 mAP50
 mAP50-95
 Precision
-Recall</code></pre>
-<pre class="txt"><code>instances_test.json</code></pre>
+Recall</code></pre></details>
+<details class="codeFold"><summary><span>展开代码</span><em>TXT</em></summary><pre class="txt"><code>instances_test.json</code></pre></details>
 <h2 id="划分数据集">划分数据集</h2>
 <p>simple dataset train:val:test=8:1:1。 总图片数量：713 train: 570 val:   71 test:  72</p>
 <p>simple dataset split 仅切分了train和val，test未修改 Train split:8035 Proportion: 88.09%</p>
@@ -1846,7 +1846,7 @@ Recall</code></pre>
 <p>yolov8 修改 未改</p>
 <p><code>python title:"train.py" results = model.train(data='/home/yious/nwpu_work/zhao/ultralytics-main/datasets/onlydataset-split-big/data.yaml',                            epochs=300,                            imgsz=640,                            workers=16,                           batch=256,                           device=[0, 1, 2, 3],                            project="/home/yious/nwpu_work/zhao/yolov8-small-target-detection-main/only-split-big/run",                           name="yolo8n_only_split_big",                           amp=False                           )</code></p>
 <p>```python title:“train.py” results = model.train( data=‘/home/yious/nwpu_work/zhao/ultralytics-main/datasets/onlydataset-split-big/data.yaml’, epochs=300, imgsz=1280, batch=32, workers=16, device=[0, 1, 2, 3], project=“/home/yious/nwpu_work/zhao/yolov8-small-target-detection-main/only-split-big/run”, name=“yolo8s_only_split_big_img1280”, pretrained=True, patience=50, close_mosaic=30, cos_lr=True, amp=True,</p>
-<pre><code># 数据增强
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code># 数据增强
 mosaic=0.5,
 mixup=0.0,
 copy_paste=0.0,
@@ -1864,9 +1864,9 @@ hsv_h=0.005,
 hsv_s=0.2,
 hsv_v=0.15,
 
-weight_decay=0.0005</code></pre>
+weight_decay=0.0005</code></pre></details>
 <p>)</p>
-<pre><code>1536
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>1536
 1920
 
 &gt; 图片未发布：Pasted image 20260428184539.png
@@ -2092,12 +2092,12 @@ def main():
 
 
 if __name__ ** &quot;__main__&quot;:
-    main()</code></pre>
+    main()</code></pre></details>
 <p>仅对train和val进行处理，test仍为大图。</p>
 <p>```python title:“train.py” from ultralytics import YOLO</p>
 <p>model = YOLO(“yolov8s.pt”)</p>
 <p>results = model.train( data=“/home/yious/nwpu_work/zhao/ultralytics-main/datasets/onlydataset-tile-1280/data.yaml”, epochs=300, imgsz=1280, batch=16, workers=16, device=[0, 1, 2, 3], project=“/home/yious/nwpu_work/zhao/yolov8-small-target-detection-main/only-tile-1280/run”, name=“yolov8s_tile1280”, pretrained=True, patience=50, close_mosaic=30, cos_lr=True, amp=True,</p>
-<pre><code>mosaic=0.5,
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>mosaic=0.5,
 mixup=0.0,
 copy_paste=0.0,
 
@@ -2114,9 +2114,9 @@ hsv_h=0.005,
 hsv_s=0.2,
 hsv_v=0.15,
 
-weight_decay=0.0005</code></pre>
+weight_decay=0.0005</code></pre></details>
 <p>)</p>
-<pre><code>验证
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>验证
 
 ```python title:&quot;val&quot;
 from ultralytics import YOLO
@@ -2130,7 +2130,7 @@ metrics = model.val(
     device=[0, 1, 2, 3]
 )
 
-print(metrics)</code></pre>
+print(metrics)</code></pre></details>
 <p>大分辨率测试</p>
 <p>```python title:“val or test” import cv2 import torch import numpy as np from pathlib import Path from ultralytics import YOLO from torchvision.ops import nms</p>
 <h1 id="section-4">**=======================</h1>
@@ -2143,15 +2143,15 @@ print(metrics)</code></pre>
 <p>conf_thres = 0.25 iou_thres = 0.5</p>
 <p>device = 0</p>
 <p>def get_start_positions(length, tile_size, stride): if length &lt;= tile_size: return [0]</p>
-<pre><code>positions = list(range(0, length - tile_size + 1, stride))
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>positions = list(range(0, length - tile_size + 1, stride))
 last = length - tile_size
 
 if positions[-1] != last:
     positions.append(last)
 
-return positions</code></pre>
+return positions</code></pre></details>
 <p>def class_aware_nms(boxes, scores, classes, iou_thres=0.5): """ 按类别分别做 NMS boxes: Nx4, xyxy scores: N classes: N """ if len(boxes) ** 0: return []</p>
-<pre><code>boxes_t = torch.tensor(boxes, dtype=torch.float32)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>boxes_t = torch.tensor(boxes, dtype=torch.float32)
 scores_t = torch.tensor(scores, dtype=torch.float32)
 classes_t = torch.tensor(classes, dtype=torch.int64)
 
@@ -2162,9 +2162,9 @@ for cls in classes_t.unique():
     keep = nms(boxes_t[idx], scores_t[idx], iou_thres)
     keep_all.extend(idx[keep].tolist())
 
-return keep_all</code></pre>
+return keep_all</code></pre></details>
 <p>def sliding_window_inference(model, img): h, w = img.shape[:2]</p>
-<pre><code>x_starts = get_start_positions(w, tile_size, stride)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>x_starts = get_start_positions(w, tile_size, stride)
 y_starts = get_start_positions(h, tile_size, stride)
 
 all_boxes = []
@@ -2223,9 +2223,9 @@ final_boxes = [all_boxes[i] for i in keep]
 final_scores = [all_scores[i] for i in keep]
 final_classes = [all_classes[i] for i in keep]
 
-return final_boxes, final_scores, final_classes</code></pre>
+return final_boxes, final_scores, final_classes</code></pre></details>
 <p>def draw_results(img, boxes, scores, classes): names = { 0: “ban”, 1: “dou”, 2: “zhi” }</p>
-<pre><code>for box, score, cls in zip(boxes, scores, classes):
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>for box, score, cls in zip(boxes, scores, classes):
     x1, y1, x2, y2 = map(int, box)
     label = f&quot;{names.get(cls, str(cls))} {score:.2f}&quot;
 
@@ -2246,9 +2246,9 @@ return final_boxes, final_scores, final_classes</code></pre>
         2
     )
 
-return img</code></pre>
+return img</code></pre></details>
 <p>def main(): model = YOLO(model_path)</p>
-<pre><code>img = cv2.imread(image_path)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>img = cv2.imread(image_path)
 if img is None:
     raise RuntimeError(f&quot;无法读取图片: {image_path}&quot;)
 
@@ -2262,13 +2262,13 @@ save_path_obj = Path(save_path)
 save_path_obj.parent.mkdir(parents=True, exist_ok=True)
 cv2.imwrite(str(save_path_obj), vis)
 
-print(f&quot;结果保存到: {save_path}&quot;)</code></pre>
+print(f&quot;结果保存到: {save_path}&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: main()</p>
-<pre><code>
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>
 指标评估
 
 ```bash
-model.val(data=&quot;切图数据集data.yaml&quot;, imgsz=1280)</code></pre>
+model.val(data=&quot;切图数据集data.yaml&quot;, imgsz=1280)</code></pre></details>
 <p>```python title:“pr” import cv2 import torch import numpy as np from pathlib import Path from ultralytics import YOLO from torchvision.ops import nms</p>
 <h1 id="section-6">=========================</h1>
 <h1 id="修改这些路径">修改这些路径</h1>
@@ -2283,15 +2283,15 @@ model.val(data=&quot;切图数据集data.yaml&quot;, imgsz=1280)</code></pre>
 <p>device = 0</p>
 <p>img_exts = [“.jpg”, “.jpeg”, “.png”, “.bmp”, “.webp”]</p>
 <p>def get_start_positions(length, tile_size, stride): if length &lt;= tile_size: return [0]</p>
-<pre><code>positions = list(range(0, length - tile_size + 1, stride))
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>positions = list(range(0, length - tile_size + 1, stride))
 last = length - tile_size
 
 if positions[-1] != last:
     positions.append(last)
 
-return positions</code></pre>
+return positions</code></pre></details>
 <p>def class_aware_nms(boxes, scores, classes, iou_thres=0.5): if len(boxes) ** 0: return []</p>
-<pre><code>boxes_t = torch.tensor(boxes, dtype=torch.float32)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>boxes_t = torch.tensor(boxes, dtype=torch.float32)
 scores_t = torch.tensor(scores, dtype=torch.float32)
 classes_t = torch.tensor(classes, dtype=torch.int64)
 
@@ -2302,9 +2302,9 @@ for cls in classes_t.unique():
     keep = nms(boxes_t[idx], scores_t[idx], iou_thres)
     keep_all.extend(idx[keep].tolist())
 
-return keep_all</code></pre>
+return keep_all</code></pre></details>
 <p>def sliding_window_inference(model, img): h, w = img.shape[:2]</p>
-<pre><code>x_starts = get_start_positions(w, tile_size, stride)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>x_starts = get_start_positions(w, tile_size, stride)
 y_starts = get_start_positions(h, tile_size, stride)
 
 all_boxes = []
@@ -2361,9 +2361,9 @@ final_boxes = [all_boxes[i] for i in keep]
 final_scores = [all_scores[i] for i in keep]
 final_classes = [all_classes[i] for i in keep]
 
-return final_boxes, final_scores, final_classes</code></pre>
+return final_boxes, final_scores, final_classes</code></pre></details>
 <p>def read_gt_yolo(label_path, img_w, img_h): gt_boxes = [] gt_classes = []</p>
-<pre><code>if not label_path.exists():
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>if not label_path.exists():
     return gt_boxes, gt_classes
 
 with open(label_path, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
@@ -2388,9 +2388,9 @@ for line in lines:
     gt_boxes.append([x1, y1, x2, y2])
     gt_classes.append(cls)
 
-return gt_boxes, gt_classes</code></pre>
+return gt_boxes, gt_classes</code></pre></details>
 <p>def box_iou(box1, box2): x1 = max(box1[0], box2[0]) y1 = max(box1[1], box2[1]) x2 = min(box1[2], box2[2]) y2 = min(box1[3], box2[3])</p>
-<pre><code>inter = max(0, x2 - x1) * max(0, y2 - y1)
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>inter = max(0, x2 - x1) * max(0, y2 - y1)
 
 area1 = max(0, box1[2] - box1[0]) * max(0, box1[3] - box1[1])
 area2 = max(0, box2[2] - box2[0]) * max(0, box2[3] - box2[1])
@@ -2400,9 +2400,9 @@ union = area1 + area2 - inter
 if union &lt;= 0:
     return 0.0
 
-return inter / union</code></pre>
+return inter / union</code></pre></details>
 <p>def evaluate_one_image(pred_boxes, pred_scores, pred_classes, gt_boxes, gt_classes): """ 对一张图统计每类 TP FP FN """ tp = [0] * num_classes fp = [0] * num_classes fn = [0] * num_classes</p>
-<pre><code>pred_indices_by_cls = {c: [] for c in range(num_classes)}
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>pred_indices_by_cls = {c: [] for c in range(num_classes)}
 gt_indices_by_cls = {c: [] for c in range(num_classes)}
 
 for i, c in enumerate(pred_classes):
@@ -2444,9 +2444,9 @@ for cls in range(num_classes):
 
     fn[cls] += len(gt_idxs) - len(matched_gt)
 
-return tp, fp, fn</code></pre>
+return tp, fp, fn</code></pre></details>
 <p>def main(): model = YOLO(model_path)</p>
-<pre><code>img_paths = []
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>img_paths = []
 for ext in img_exts:
     img_paths.extend(val_img_dir.glob(f&quot;*{ext}&quot;))
     img_paths.extend(val_img_dir.glob(f&quot;*{ext.upper()}&quot;))
@@ -2514,7 +2514,7 @@ micro_p = total_TP / (total_TP + total_FP + 1e-9)
 micro_r = total_TP / (total_TP + total_FN + 1e-9)
 
 print(f&quot;Micro Precision: {micro_p:.4f}&quot;)
-print(f&quot;Micro Recall:    {micro_r:.4f}&quot;)</code></pre>
+print(f&quot;Micro Recall:    {micro_r:.4f}&quot;)</code></pre></details>
 <p>if <strong>name</strong> ** “<strong>main</strong>”: main() ``` train结果 zhy1</p>
 <p>当然，你可以分两类做工作。 一是筛选数据集，找到图中标注比较少，看起来很明显，区别很大的那一类数据组成容易集，用容易集来训3分类的模型，效果不好再训单类模型。 二是强化全量数据集的单类模型的性能，我们把它当做定位提取器，提取出斑痘痣的位置之后再后接分类模型。第二类工作也是需要清晰的类别标注的 单类定位模型，你也需要考虑到高精度，小目标这两个问题</p>
 <p>先强化定位能力，后面再完善分类能力 把类别标注成“可疑点”这样 有两个方向，1是继续完善模型标注，增强类别之间的差异。2是后接一个特征提取的模型，把裁剪出来的斑点图片换算成特征矩阵，然后用机器学习算法打标签（分类） 通过提取区域候选和分类</p>
@@ -2552,21 +2552,16 @@ print(f&quot;Micro Recall:    {micro_r:.4f}&quot;)</code></pre>
           
 <section class="profileCard">
   <img src="../assets/site/moyu-avatar.webp" alt="墨玉头像">
-  <h3>墨玉</h3>
-  <p>把研究生阶段的项目、论文和工具笔记，整理成一份可以慢慢翻的知识目录。</p>
+  <h3>潮汐日志</h3>
+  <p>学习者的潮汐记录，写下每一次靠岸和远航。</p>
   <a href="https://github.com/swilderyude">GitHub / swilderyude</a>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">文件夹目录</h3>
-  <ul class="folderSideList"><li><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测 <span>8</span></a></li>
-<li><a href="../categories.html#folder-yolo相关">YOLO相关 <span>2</span></a></li>
-<li><a href="../categories.html#folder-人工智能">人工智能 <span>4</span></a></li>
-<li><a href="../categories.html#folder-计算机视觉">计算机视觉 <span>2</span></a></li>
-<li><a href="../categories.html#folder-精读论文">精读论文 <span>3</span></a></li>
-<li><a href="../categories.html#folder-科研">科研 <span>1</span></a></li>
-<li><a href="../categories.html#folder-工具">工具 <span>3</span></a></li>
-<li><a href="../categories.html#folder-ai基础">AI基础 <span>1</span></a></li>
-<li><a href="../categories.html#folder-根目录笔记">根目录笔记 <span>3</span></a></li></ul>
+  <h3 class="catListTitle">潮汐分区</h3>
+  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
+<li><a href="../categories.html#造船">造船<span>11</span></a></li>
+<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
+<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

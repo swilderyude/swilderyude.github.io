@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="围绕 Vision Transformer 中的 Circulant Attention 机制，整理论文结构、核心方法和实现理解。">
-  <title>Circulant Attention 精读笔记 - 墨玉</title>
+  <title>Circulant Attention 精读笔记 - 潮汐日志</title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <script defer src="../assets/js/site.js"></script>
 </head>
@@ -15,8 +15,8 @@
       <div id="blogTitle">
         <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><img id="blogLogo" src="../assets/site/moyu-avatar.webp" alt=""></a>
         <div class="brandText">
-          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">墨玉</a></h1>
-          <h2>道阻且长，与君共勉</h2>
+          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">潮汐日志</a></h1>
+          <h2>Tide Logs · 一名学习者的潮汐记录</h2>
         </div>
       </div>
       <nav id="navigator" aria-label="主导航">
@@ -27,7 +27,7 @@
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
         </ul>
-        <div class="blogStats">随笔 27 · 文件夹 9 · 更新 2026-05-28</div>
+        <div class="blogStats">日志 27 · 分区 4 · 今日潮汐</div>
       </nav>
     </header>
     <div id="main">
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#folder-精读论文">精读论文</a><span>/</span><strong>Circulant Attention 精读笔记</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#潜渊">潜渊</a><span>/</span><strong>Circulant Attention 精读笔记</strong></div>
   <h1 class="postTitle single"><span>Circulant Attention 精读笔记</span></h1>
-  <div class="postDesc">posted @ 2026-04-28 墨玉 文件夹: <a href="../categories.html#folder-精读论文">CS自学 / 精读论文 / circulant attention</a></div>
+  <div class="postDesc">posted @ 2026-04-28 墨玉 分区: <a href="../categories.html#潜渊">潜渊</a></div>
   <p class="postSummary">围绕 Vision Transformer 中的 Circulant Attention 机制，整理论文结构、核心方法和实现理解。</p>
   <div class="postTags"><span>Transformer</span> <span>Attention</span> <span>论文精读</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-2"><a href="#图1">图1</a></li>
@@ -379,17 +379,17 @@ $$</span></p>
 <ol type="1">
 <li>前重加权（Pre-weight） <span class="math display"><em>O</em> = <em>C</em><em>i</em><em>r</em><em>A</em><em>t</em><em>t</em><em>n</em>(<em>Q</em>, <em>K</em>, <em>V</em> ⊙ <em>T</em>)</span> 代码感知：</li>
 </ol>
-<pre class="python"><code>T = silu(x @ W_T)        # [N,d]
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>T = silu(x @ W_T)        # [N,d]
 V2 = V * T               # [N,d] 逐元素乘
-O  = CirAttn(Q, K, V2)   # [N,d]</code></pre>
+O  = CirAttn(Q, K, V2)   # [N,d]</code></pre></details>
 <p>含义： 先把 <span class="math inline"><em>V</em></span> 里重要位置放大，再送进注意力混合。 =&gt; 会影响“信息如何被传播和混合”的全过程。</p>
 <ol start="2" type="1">
 <li>后重加权（Post-weight） <span class="math display"><em>O</em> = <em>C</em><em>i</em><em>r</em><em>A</em><em>t</em><em>t</em><em>n</em>(<em>Q</em>, <em>K</em>, <em>V</em>) ⊙ <em>T</em></span></li>
 </ol>
 <p>代码感知：</p>
-<pre class="python"><code>T = silu(x @ W_T)         # [N,d]
+<details class="codeFold"><summary><span>展开代码</span><em>PYTHON</em></summary><pre class="python"><code>T = silu(x @ W_T)         # [N,d]
 O0 = CirAttn(Q, K, V)     # [N,d]
-O  = O0 * T               # [N,d]</code></pre>
+O  = O0 * T               # [N,d]</code></pre></details>
 <p>含义： 先做完注意力，再对输出做门控。 =&gt; 不改变注意力内部混合，只在最后“调音量”。</p>
 <h1 id="实验">5 实验</h1>
 <p>在本节中，我们进行了大量实验来评估我们方法的有效性，包括 ImageNet 分类（Deng et al. 2009）、COCO 目标检测（Lin et al. 2014）以及 ADE20K 语义分割（Zhou et al. 2019）。同时还提供了可视化与分析。</p>
@@ -476,21 +476,16 @@ O  = O0 * T               # [N,d]</code></pre>
           
 <section class="profileCard">
   <img src="../assets/site/moyu-avatar.webp" alt="墨玉头像">
-  <h3>墨玉</h3>
-  <p>把研究生阶段的项目、论文和工具笔记，整理成一份可以慢慢翻的知识目录。</p>
+  <h3>潮汐日志</h3>
+  <p>学习者的潮汐记录，写下每一次靠岸和远航。</p>
   <a href="https://github.com/swilderyude">GitHub / swilderyude</a>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">文件夹目录</h3>
-  <ul class="folderSideList"><li><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测 <span>8</span></a></li>
-<li><a href="../categories.html#folder-yolo相关">YOLO相关 <span>2</span></a></li>
-<li><a href="../categories.html#folder-人工智能">人工智能 <span>4</span></a></li>
-<li><a href="../categories.html#folder-计算机视觉">计算机视觉 <span>2</span></a></li>
-<li><a href="../categories.html#folder-精读论文">精读论文 <span>3</span></a></li>
-<li><a href="../categories.html#folder-科研">科研 <span>1</span></a></li>
-<li><a href="../categories.html#folder-工具">工具 <span>3</span></a></li>
-<li><a href="../categories.html#folder-ai基础">AI基础 <span>1</span></a></li>
-<li><a href="../categories.html#folder-根目录笔记">根目录笔记 <span>3</span></a></li></ul>
+  <h3 class="catListTitle">潮汐分区</h3>
+  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
+<li><a href="../categories.html#造船">造船<span>11</span></a></li>
+<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
+<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

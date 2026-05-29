@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="整理 SSH、远程训练、环境管理和服务器使用流程。">
-  <title>远程服务器使用笔记 - 墨玉</title>
+  <title>远程服务器使用笔记 - 潮汐日志</title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <script defer src="../assets/js/site.js"></script>
 </head>
@@ -15,8 +15,8 @@
       <div id="blogTitle">
         <a id="lnkBlogLogo" href="../index.html" aria-label="返回主页"><img id="blogLogo" src="../assets/site/moyu-avatar.webp" alt=""></a>
         <div class="brandText">
-          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">墨玉</a></h1>
-          <h2>道阻且长，与君共勉</h2>
+          <h1><a id="Header1_HeaderTitle" class="headermaintitle" href="../index.html">潮汐日志</a></h1>
+          <h2>Tide Logs · 一名学习者的潮汐记录</h2>
         </div>
       </div>
       <nav id="navigator" aria-label="主导航">
@@ -27,7 +27,7 @@
 <li><a class="menu" href="../about.html">关于</a></li>
 <li><a class="menu" href="https://github.com/swilderyude">GitHub</a></li>
         </ul>
-        <div class="blogStats">随笔 27 · 文件夹 9 · 更新 2026-05-28</div>
+        <div class="blogStats">日志 27 · 分区 4 · 今日潮汐</div>
       </nav>
     </header>
     <div id="main">
@@ -35,9 +35,9 @@
         <div class="forFlow">
           
 <article class="post">
-  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#folder-ai基础">AI基础</a><span>/</span><strong>远程服务器使用笔记</strong></div>
+  <div class="breadcrumbs"><a href="../index.html">首页</a><span>/</span><a href="../categories.html#拾贝">拾贝</a><span>/</span><strong>远程服务器使用笔记</strong></div>
   <h1 class="postTitle single"><span>远程服务器使用笔记</span></h1>
-  <div class="postDesc">posted @ 2026-05-12 墨玉 文件夹: <a href="../categories.html#folder-ai基础">CS自学 / AI基础</a></div>
+  <div class="postDesc">posted @ 2026-05-12 墨玉 分区: <a href="../categories.html#拾贝">拾贝</a></div>
   <p class="postSummary">整理 SSH、远程训练、环境管理和服务器使用流程。</p>
   <div class="postTags"><span>服务器</span> <span>SSH</span> <span>环境配置</span></div>
   <div class="toc"><div class="toc-container-header">目录</div><ul><li class="toc-level-1"><a href="#上传大文件用百度网盘">上传大文件用百度网盘</a></li>
@@ -56,20 +56,20 @@
 <p>工作目录：/home/yious/nwpu_work</p>
 <p>要求： 服务器上的操作权限比较高，其他无关文件夹和文件千万勿动 到时候登录后直接 conda activate pyj 切换我的虚拟环境使用即可，非必要情况下不要额外安装python包 使用 conda create –name 新环境名 –clone 原环境名 clone一个新环境使用</p>
 <p>个人操作</p>
-<pre class="bash"><code># 1. 复制 pyj 环境，克隆出一个环境（命名为 pyj_zhy）
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code># 1. 复制 pyj 环境，克隆出一个环境（命名为 pyj_zhy）
 conda create -n pyj_zhy --clone pyj
 # 2. 激活新环境
-conda activate pyj_zhy</code></pre>
+conda activate pyj_zhy</code></pre></details>
 <p>查看剩余空间</p>
-<pre class="bash"><code>df -h .</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>df -h .</code></pre></details>
 <p>AUTODL</p>
 <h1 id="上传大文件用百度网盘">上传大文件用百度网盘</h1>
 <p>https://github.com/qjfoidnh/BaiduPCS-Go 对于查看网页 Cmd + Option + I</p>
-<pre><code>BaiduPCS-Go login -bduss=[REDACTED] -stoken=[REDACTED]
+<details class="codeFold"><summary><span>展开代码</span><em>代码</em></summary><pre><code>BaiduPCS-Go login -bduss=[REDACTED] -stoken=[REDACTED]
 bduss
 VB6SEdNVGNrdk1nNVRFMVhSNWxkQlFjZUpCOGlMd0xJRUIyVzVkSm5KZW04UlpxRVFBQUFBJCQAAAAAAAAAAAEAAADlTJXSt9HM2l9QaGlsaXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKZk72mmZO9pQ
 stoken
-b0cbc73cc102be5c48070343ea937eb0523858cd2f623458127c8baa3d8092cb</code></pre>
+b0cbc73cc102be5c48070343ea937eb0523858cd2f623458127c8baa3d8092cb</code></pre></details>
 <h1 id="操作视频">操作视频</h1>
 <p><a href="https://www.bilibili.com/video/BV1t14y1o7vb/?spm_id_from=333.1387.favlist.content.click&amp;vd_source=09869b1ec3841e2995a2d4fa3739cba5">b站</a></p>
 <h1 id="royal-tsx">Royal tsx</h1>
@@ -83,12 +83,12 @@ b0cbc73cc102be5c48070343ea937eb0523858cd2f623458127c8baa3d8092cb</code></pre>
 <p>• 配置ssh和sftp • 设置远程解释器 优点：能做到代码同步，还能远程debug 缺点：设置略微繁琐，无法浏览远程文件路径 <strong>操作步骤</strong>： <code>tools</code>-<code>deployment</code>-<code>configuration</code>,弹出部署界面。 <code>connection</code> 界面<code>+</code>,<code>SFTP</code>,输入名字。eg：server-1 <code>SSH</code>-<code>...</code>,弹出界面。 <code>host</code>:远程服务器地址 账号密码 <code>Root path</code>:Autodetect <code>mapping</code> <code>deployment path</code>:选择远程项目的路径。 右键文件-<code>deployment</code>-<code>compare with ...</code> <code>tools</code>-<code>deployment</code>-<code>automatic upload</code>,自动上传。 实现远程debug。 <code>settings</code>-<code>该项目</code>-<code>python interpreter</code>-<code>add interpreter</code>-<code>on ssh</code>-<code>existing</code>-<code>选择</code> -<code>next</code> <code>Environment</code>:existing <code>Interpreter</code>:在<code>royal tsx</code>查询<code>which python</code>-<code>...</code>-<code>复制地址</code> <code>Sync folders</code>:选择项目根目录</p>
 <h1 id="tmux">Tmux</h1>
 <p>• 防止实验中断 下载</p>
-<pre class="bash"><code>tmux -V # 查看版本
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>tmux -V # 查看版本
 
 #### Ubuntu / Debian 系统（最常用）
 apt update             # 先更新软件列表
-apt install tmux       # 执行安装</code></pre>
-<pre class="bash"><code>### 创建会话
+apt install tmux       # 执行安装</code></pre></details>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>### 创建会话
 tmux new -s seesion_name
 ### 连接会话
 tmux at -t seesion_name
@@ -101,14 +101,14 @@ tmux ls
 1. 进入 tmux 后。 
 2. 按下 Ctrl + B，然后按 %（左右分屏）。
 3. 按下 Ctrl + B，然后按 &quot;（上下分屏）。
-4. 按下 Ctrl + B，然后按 方向键 可以在不同格子里切换。</code></pre>
+4. 按下 Ctrl + B，然后按 方向键 可以在不同格子里切换。</code></pre></details>
 <p>先输入上述对话，再激活环境进行训练。 和他人共用的话，tmux会被误清理。 配合nohop训练</p>
-<pre class="bash"><code>nohup python train.py &gt; train.log 2&gt;&amp;1 &amp;</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>nohup python train.py &gt; train.log 2&gt;&amp;1 &amp;</code></pre></details>
 <p>使用 <code>nohup ... &amp;</code> 将程序放到后台运行后，所有的输出（原本在屏幕上跳动的进度条、日志、报错等）都会被写入你指定的 <code>train.log</code> 文件中。</p>
 <ol type="1">
 <li><strong>实时查看进度</strong> 让屏幕像之前训练时一样实时滚动显示进度，可以使用 <code>tail</code> 命令：</li>
 </ol>
-<pre class="bash"><code>tail -f train.log</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>tail -f train.log</code></pre></details>
 <ul>
 <li><p><code>-f</code>：代表 follow，它会盯住这个文件，只要有新内容（比如下一轮训练开始了），它就会立刻显示在屏幕上。</p></li>
 <li><p>如何退出？ 按下 <code>Ctrl</code> + <code>C</code>。</p></li>
@@ -117,11 +117,11 @@ tmux ls
 <ol start="2" type="1">
 <li><strong>一次性查看全部内容</strong> 只想看看现在跑到第几轮了，或者看看有没有报错，可以使用：</li>
 </ol>
-<pre class="bash"><code># 查看文件最后 50 行
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code># 查看文件最后 50 行
 tail -n 50 train.log
 
 # 或者查看整个文件（适合文件还不是很大的时候）
-cat train.log</code></pre>
+cat train.log</code></pre></details>
 <ol start="3" type="1">
 <li>YOLOv8 <strong>特有的结果查看</strong> YOLOv8 除了把文本记在 <code>train.log</code> 里，它还会自动在你的项目目录下创建一个文件夹（比如 <code>runs/train/yolov8n-spot/</code>）：</li>
 </ol>
@@ -130,7 +130,7 @@ cat train.log</code></pre>
 <li><p><strong><code>args.yaml</code></strong>：记录了你训练时用的所有参数。</p></li>
 <li><p><strong><code>last.pt</code> / <code>best.pt</code></strong>：正在生成的模型权重。 你可以通过 <code>ls</code> 命令查看这些文件是否在不断更新：</p></li>
 </ul>
-<pre class="bash"><code>ls -lh runs/train/yolov8n-spot/</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>ls -lh runs/train/yolov8n-spot/</code></pre></details>
 <ul>
 <li><p>新建：screen -S train  </p></li>
 <li><p>退出（分离）：Ctrl + A 然后按 D</p></li>
@@ -138,9 +138,9 @@ cat train.log</code></pre>
 <li><p>按下 <code>Ctrl + A</code>，然后按 <code>d</code>，这会让 <code>screen</code> 会话进入“分离”状态。分离后，<code>screen</code> 会话会在后台继续运行，你可以稍后重新附加（<code>reattach</code>）到该会话。 <strong>结束一个 <code>screen</code> 会话</strong></p></li>
 <li><p>输入 <code>exit</code> 并按回车键 screen -X -S [会话ID] quit 对于鼠标滚动问题： 打开配置文件</p></li>
 </ul>
-<pre class="bash"><code>nano ~/.screenrc</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>nano ~/.screenrc</code></pre></details>
 <p>在末尾添加文本</p>
-<pre class="bash"><code>termcapinfo xterm* ti@:te@</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>termcapinfo xterm* ti@:te@</code></pre></details>
 <p>Ctrl+O 回车保存，Ctrl+X 退出</p>
 <h1 id="显卡状态">显卡状态</h1>
 <p>仅使用一张显卡 <code>export CUDA_VISIBLE_DEVICES=0</code></p>
@@ -148,7 +148,7 @@ cat train.log</code></pre>
 <p>服务器文件地址：（按自己名字or项目名字创建自己的文件夹，放自己的代码数据集等内容） <code>/data_1/xgd</code> <strong>常用命令（conda、python、screen）</strong></p>
 <p>1. 查看环境： <code>conda env list</code></p>
 <p>2. 运行yolo代码 数据集（需要写yaml文件）： yolo代码：<a href="https://github.com/ultralytics/ultralytics">https://github.com/ultralytics/ultralytics</a> 代码运行：python train.py Train.py需要自己写，或者直接复制我们文件夹里面的，注意修改数据集和模型： screen （因为模型训练需要时间，但是在训练过程中关闭窗口训练会中断，使用screen可以保证关闭窗口后训练照常进行） <strong>服务器bug</strong>： 有时候连接上直接使用conda命令激活环境会报错，报错后输入以下命令：</p>
-<pre class="bash"><code>source /data_1/Anaconda3/etc/profile.d/conda.sh</code></pre>
+<details class="codeFold"><summary><span>展开代码</span><em>BASH</em></summary><pre class="bash"><code>source /data_1/Anaconda3/etc/profile.d/conda.sh</code></pre></details>
 
   </div>
   <section class="recommend">
@@ -171,21 +171,16 @@ cat train.log</code></pre>
           
 <section class="profileCard">
   <img src="../assets/site/moyu-avatar.webp" alt="墨玉头像">
-  <h3>墨玉</h3>
-  <p>把研究生阶段的项目、论文和工具笔记，整理成一份可以慢慢翻的知识目录。</p>
+  <h3>潮汐日志</h3>
+  <p>学习者的潮汐记录，写下每一次靠岸和远航。</p>
   <a href="https://github.com/swilderyude">GitHub / swilderyude</a>
 </section>
 <section class="catList">
-  <h3 class="catListTitle">文件夹目录</h3>
-  <ul class="folderSideList"><li><a href="../categories.html#folder-人脸色斑检测">人脸色斑检测 <span>8</span></a></li>
-<li><a href="../categories.html#folder-yolo相关">YOLO相关 <span>2</span></a></li>
-<li><a href="../categories.html#folder-人工智能">人工智能 <span>4</span></a></li>
-<li><a href="../categories.html#folder-计算机视觉">计算机视觉 <span>2</span></a></li>
-<li><a href="../categories.html#folder-精读论文">精读论文 <span>3</span></a></li>
-<li><a href="../categories.html#folder-科研">科研 <span>1</span></a></li>
-<li><a href="../categories.html#folder-工具">工具 <span>3</span></a></li>
-<li><a href="../categories.html#folder-ai基础">AI基础 <span>1</span></a></li>
-<li><a href="../categories.html#folder-根目录笔记">根目录笔记 <span>3</span></a></li></ul>
+  <h3 class="catListTitle">潮汐分区</h3>
+  <ul class="sectionSideList"><li><a href="../categories.html#拾贝">拾贝<span>12</span></a></li>
+<li><a href="../categories.html#造船">造船<span>11</span></a></li>
+<li><a href="../categories.html#潜渊">潜渊<span>4</span></a></li>
+<li><a href="../categories.html#漂流瓶">漂流瓶<span>0</span></a></li></ul>
 </section>
 <section class="catList">
   <h3 class="catListTitle">主线笔记</h3>

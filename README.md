@@ -1,3 +1,3 @@
-# 墨玉
+# 潮汐日志
 
-GitHub Pages blog generated from research-stage notes.
+Tide Logs · 一名学习者的潮汐记录。

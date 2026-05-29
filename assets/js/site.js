@@ -1,4 +1,31 @@
 (() => {
+  const quotes = [
+    "潮平两岸阔，风正一帆悬。",
+    "海上生明月，天涯共此时。",
+    "长风破浪会有时，直挂云帆济沧海。",
+    "行到水穷处，坐看云起时。",
+    "春水碧于天，画船听雨眠。",
+    "星垂平野阔，月涌大江流。",
+    "沧海月明珠有泪，蓝田日暖玉生烟。",
+    "醉后不知天在水，满船清梦压星河。",
+    "山中何事？松花酿酒，春水煎茶。",
+    "疏影横斜水清浅，暗香浮动月黄昏。",
+    "溪云初起日沉阁，山雨欲来风满楼。",
+    "孤帆远影碧空尽，唯见长江天际流。",
+    "青山一道同云雨，明月何曾是两乡。",
+    "晚来天欲雪，能饮一杯无。",
+    "落霞与孤鹜齐飞，秋水共长天一色。",
+  ];
+
+  const dayStart = new Date();
+  dayStart.setHours(0, 0, 0, 0);
+  const dayIndex = Math.floor(dayStart.getTime() / 86400000) % quotes.length;
+  document.querySelectorAll("[data-daily-quote]").forEach((node) => {
+    node.textContent = quotes[dayIndex];
+  });
+})();
+
+(() => {
   const list = document.querySelector(".archive-list");
   if (!list) return;
 
